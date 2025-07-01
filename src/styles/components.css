@@ -123,6 +123,62 @@
     overflow: hidden;
 }
 
+/* Toolbar icon classes */
+.cdx-toolbar-icon--bold {
+    width: 20px;
+    height: 20px;
+    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2020%2020%27%3E%3Cpath%20d%3D%27M8.46%201q2.325%200%203.9.45c1.07.29%201.86.77%202.39%201.44.54.66.8%201.55.8%202.67%200%20.68-.1%201.29-.31%201.84a3.34%203.34%200%2001-.94%201.37c-.39.35-.98.63-1.55.73.59.12%201.23.4%201.7.7.48.3.85.74%201.13%201.31s.42%201.33.42%202.27c0%201.1-.26%202.04-.79%202.83a4.9%204.9%200%2001-2.2%201.79q-1.455.6-3.45.6H3V1zm.41%207c1.09%200%201.83-.04%202.24-.4.43-.35.64-.86.64-1.53%200-.7-.25-1.38-.74-1.68s-1.27-.4-2.33-.4H7v4h1.87ZM7%2011v5h2.14a3.3%203.3%200%20002.34-.8%202.5%202.5%200%2000.66-1.8c0-.45-.1-.85-.3-1.18a2%202%200%2000-.95-.93%205.1%205.1%200%2000-1.87-.3H7Z%27%2F%3E%3C%2Fsvg%3E");
+    background-size: 20px 20px;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-color: transparent !important;
+    display: inline-block;
+}
+
+.cdx-toolbar-icon--italic {
+    width: 20px;
+    height: 20px;
+    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2020%2020%27%3E%3Cpath%20d%3D%27m5%2019%20.33-1.51%202.17-.66%202.9-13.66-1.9-.63L9%201h7l-.71%201.6-2.29.57-2.83%2013.66%202.14.66L12%2019z%27%2F%3E%3C%2Fsvg%3E");
+    background-size: 20px 20px;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-color: transparent !important;
+    display: inline-block;
+}
+
+.cdx-toolbar-icon--link {
+    width: 20px;
+    height: 20px;
+    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2020%2020%27%3E%3Cpath%20d%3D%27M4.83%2015h2.91a4.9%204.9%200%2001-1.55-2H5a3%203%200%20110-6h3a3%203%200%20012.82%204h2.1a5%205%200%2000.08-.83v-.34A4.83%204.83%200%20008.17%205H4.83A4.83%204.83%200%20000%209.83v.34A4.83%204.83%200%20004.83%2015%27%2F%3E%3Cpath%20d%3D%27M15.17%205h-2.91a4.9%204.9%200%20011.55%202H15a3%203%200%20110%206h-3a3%203%200%2001-2.82-4h-2.1a5%205%200%2000-.08.83v.34A4.83%204.83%200%20011.83%2015h3.34A4.83%204.83%200%20020%2010.17v-.34A4.83%204.83%200%20015.17%205%27%2F%3E%3C%2Fsvg%3E");
+    background-size: 20px 20px;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-color: transparent !important;
+    display: inline-block;
+}
+
+.cdx-toolbar-icon--undo {
+    width: 20px;
+    height: 20px;
+    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2020%2020%27%3E%3Cpath%20d%3D%27M1%208.5%208%2014v-4h1c4%200%207%202%207%206v1h3v-1c0-6-5-9-10-9H8V3z%27%2F%3E%3C%2Fsvg%3E");
+    background-size: 20px 20px;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-color: transparent !important;
+    display: inline-block;
+}
+
+.cdx-toolbar-icon--more {
+    width: 20px;
+    height: 20px;
+    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2020%2020%27%3E%3Ccircle%20cx%3D%2710%27%20cy%3D%2710%27%20r%3D%272%27%2F%3E%3Ccircle%20cx%3D%273%27%20cy%3D%2710%27%20r%3D%272%27%2F%3E%3Ccircle%20cx%3D%2717%27%20cy%3D%2710%27%20r%3D%272%27%2F%3E%3C%2Fsvg%3E");
+    background-size: 20px 20px;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-color: transparent !important;
+    display: inline-block;
+}
+
 /* Custom Codex CSS icons for InfoChips */
 .cdx-demo-css-icon--article {
     width: 12px;
@@ -245,6 +301,132 @@
     color: var(--color-base30, #72777d);
 }
 
+/* Article Editor Styles */
+.article-creator__editing-section {
+    padding: 40px 0 var(--spacing-xs, 8px) 0;
+}
+
+/* Global Toolbar (edge-to-edge) */
+.article-creator__global-toolbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    background-color: #ffffff;
+    border-bottom: 1px solid var(--border-color-subtle, #eaecf0);
+    z-index: 1000;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-sm, 12px) var(--spacing-md, 16px);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.article-editor__toolbar-left {
+    display: flex;
+    gap: var(--spacing-xs, 8px);
+    align-items: center;
+}
+
+.article-editor__toolbar-right {
+    display: flex;
+    align-items: center;
+}
+
+/* Add top padding to article creator when toolbar is visible */
+.article-creator--editing {
+    padding-top: 100px;
+}
+
+/* Increase spacing between toolbar and article title */
+.article-creator--editing .article-editor__title {
+    margin-top: var(--spacing-lg, 24px);
+}
+
+.article-editor__tool {
+    min-width: 44px !important;
+    min-height: 44px !important;
+    padding: var(--spacing-xs, 8px) !important;
+    border-radius: var(--border-radius-base, 2px) !important;
+}
+
+.article-editor__tool .cdx-button__icon {
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: transparent !important;
+}
+
+.article-editor__tool .cdx-button__icon svg {
+    width: 20px;
+    height: 20px;
+    fill: currentColor;
+    color: inherit;
+}
+
+.article-editor__tool .cdx-button__icon svg path {
+    fill: currentColor;
+}
+
+
+.article-editor {
+    position: relative;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.article-editor__title {
+    font-family: "Linux Libertine", "Georgia", "Times", serif;
+    font-size: 2.3em;
+    font-weight: normal;
+    line-height: 1.3;
+    color: var(--color-base10, #202122);
+    margin: 0 0 var(--spacing-md, 16px) 0;
+    padding: 0;
+}
+
+.article-editor__title-text {
+    display: inline;
+}
+
+.article-editor__content {
+    margin-top: 16px;
+    font-family: "Linux Libertine", "Georgia", "Times", serif;
+    font-size: 1.1em;
+    line-height: 1.6;
+    position: relative;
+}
+
+.article-editor__cursor {
+    font-weight: normal;
+    color: var(--color-base10, #202122);
+    animation: blink 1s infinite;
+    position: relative;
+    z-index: 2;
+}
+
+.article-editor__placeholder-text {
+    color: var(--color-base50, #a2a9b1);
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 1;
+    pointer-events: none;
+    opacity: 0.6;
+}
+
+@keyframes blink {
+    0%, 50% {
+        opacity: 1;
+    }
+    51%, 100% {
+        opacity: 0;
+    }
+}
+
 /* Enhanced touch targets for mobile */
 @media (max-width: 768px) {
     .topic-item,
@@ -267,4 +449,66 @@
     .article-creator__chips {
         gap: var(--spacing-xs, 8px);
     }
+    
+    /* Article editor mobile styles */
+    .article-editor__title {
+        font-size: 1.8em;
+        padding: var(--spacing-xs, 8px) 0;
+    }
+    
+    .article-editor__content {
+        font-size: 1em;
+        margin-top: var(--spacing-sm, 12px);
+    }
+    
+    /* Toolbar mobile styles */
+    .article-editor__toolbar {
+        gap: var(--spacing-xs, 8px);
+        padding: var(--spacing-xs, 8px) 0;
+        margin-bottom: var(--spacing-sm, 12px);
+        overflow-x: auto;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+    
+    .article-editor__toolbar::-webkit-scrollbar {
+        display: none;
+    }
+    
+    .article-editor__tool {
+        flex-shrink: 0;
+        min-width: 44px !important;
+        min-height: 44px !important;
+    }
+}
+
+/* Editor chips container below blinking cursor */
+.article-editor__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-md);
+    margin-top: var(--spacing-sm);
+}
+/* Global toolbar spacing below toolbar */
+.article-creator__global-toolbar {
+    margin-bottom: var(--spacing-md, 16px);
+}
+/* Editor chip appearance overrides */
+.article-editor__chips .cdx-info-chip {
+    border-color: #C8CCD1 !important;
+    background-color: #F8F9FA !important;
+}
+/* Icon inside editor chips */
+.article-editor__chips .editor-chip-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 12px;
+    height: 12px;
+    margin-right: 4px !important;
+}
+.article-editor__chips .editor-chip-icon svg {
+    width: 100%;
+    height: 100%;
+    fill: currentColor;
 }

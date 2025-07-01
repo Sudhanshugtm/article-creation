@@ -14,6 +14,35 @@
     
     <!-- New HTML version -->
     <div id="app" class="article-creator">
+        <!-- Global Toolbar (shown only in editing mode) -->
+        <div class="article-creator__global-toolbar" id="globalToolbar" style="display: none;">
+            <div class="article-editor__toolbar-left">
+                <button class="cdx-button cdx-button--action-default cdx-button--weight-quiet cdx-button--size-medium article-editor__tool" id="closeBtn" title="Close">
+                    <span class="cdx-button__icon"></span>
+                </button>
+                <button class="cdx-button cdx-button--action-default cdx-button--weight-quiet cdx-button--size-medium article-editor__tool" id="boldBtn" title="Bold">
+                    <span class="cdx-button__icon"></span>
+                </button>
+                <button class="cdx-button cdx-button--action-default cdx-button--weight-quiet cdx-button--size-medium article-editor__tool" id="italicBtn" title="Italic">
+                    <span class="cdx-button__icon"></span>
+                </button>
+                <button class="cdx-button cdx-button--action-default cdx-button--weight-quiet cdx-button--size-medium article-editor__tool" id="linkBtn" title="Link">
+                    <span class="cdx-button__icon"></span>
+                </button>
+                <button class="cdx-button cdx-button--action-default cdx-button--weight-quiet cdx-button--size-medium article-editor__tool" id="undoBtn" title="Undo">
+                    <span class="cdx-button__icon"></span>
+                </button>
+                <button class="cdx-button cdx-button--action-default cdx-button--weight-quiet cdx-button--size-medium article-editor__tool" id="moreBtn" title="More">
+                    <span class="cdx-button__icon"></span>
+                </button>
+            </div>
+            <div class="article-editor__toolbar-right">
+                <button class="cdx-button cdx-button--action-progressive cdx-button--weight-primary cdx-button--size-medium article-editor__tool" id="nextBtn" title="Next">
+                    <span class="cdx-button__icon"></span>
+                </button>
+            </div>
+        </div>
+        
         <header class="article-creator__header">
             <h1 class="article-creator__title">New article</h1>
         </header>
@@ -79,6 +108,21 @@
                     <button class="cdx-button cdx-button--action-progressive cdx-button--weight-primary" id="startCreatingBtn">
                         <span class="cdx-button__text">Start creating article</span>
                     </button>
+                </div>
+            </section>
+            
+            <!-- Article Editing Section -->
+            <section class="article-creator__editing-section" id="editingSection" style="display: none;">
+                <div class="article-editor">
+                    <h1 class="article-editor__title" id="articleEditorTitle">
+                        <span class="article-editor__title-text" id="articleTitleText"></span>
+                    </h1>
+                    <div class="article-editor__content">
+                        <span class="article-editor__cursor">|</span>
+                        <span class="article-editor__placeholder-text" id="articleBackgroundText"></span>
+                        <!-- Editor chips below cursor -->
+                        <div class="article-editor__chips" id="editorChipsContainer"></div>
+                    </div>
                 </div>
             </section>
         </main>

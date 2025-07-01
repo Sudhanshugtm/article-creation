@@ -5,14 +5,25 @@ import { DebounceHandler } from './DebounceHandler';
 import { WikidataService } from './WikidataService';
 import { CategoryMapper, ArticleCategory } from './CategoryMapper';
 import { TopicSelection } from './types/workflow';
-import { cdxIconAdd, cdxIconArticle } from '@wikimedia/codex-icons';
+import { 
+    cdxIconAdd, 
+    cdxIconArticle, 
+    cdxIconBold,
+    cdxIconItalic,
+    cdxIconLink,
+    cdxIconUndo,
+    cdxIconEllipsis,
+    cdxIconClose,
+    cdxIconNext
+} from '@wikimedia/codex-icons';
 import { CdxInfoChip } from '@wikimedia/codex';
 
 enum WorkflowState {
     INPUT = 'input',
     TOPIC_SELECTION = 'topic-selection',
     CATEGORY_SELECTION = 'category-selection',
-    ARTICLE_CREATION = 'article-creation'
+    ARTICLE_CREATION = 'article-creation',
+    ARTICLE_EDITING = 'article-editing'
 }
 
 class HTMLArticleCreator {
@@ -23,9 +34,11 @@ class HTMLArticleCreator {
 
     // DOM elements
     private titleInput!: HTMLInputElement;
+    private inputSection!: HTMLElement;
     private topicSection!: HTMLElement;
     private categorySection!: HTMLElement;
     private creationSection!: HTMLElement;
+    private editingSection!: HTMLElement;
     private topicList!: HTMLElement;
     private categoryList!: HTMLElement;
     private categoryTitle!: HTMLElement;
@@ -34,6 +47,16 @@ class HTMLArticleCreator {
     private creationChipsContainer!: HTMLElement;
     private newTopicBtn!: HTMLElement;
     private startCreatingBtn!: HTMLElement;
+    private articleTitleText!: HTMLElement;
+    private articleBackgroundText!: HTMLElement;
+    private boldBtn!: HTMLElement;
+    private italicBtn!: HTMLElement;
+    private linkBtn!: HTMLElement;
+    private undoBtn!: HTMLElement;
+    private moreBtn!: HTMLElement;
+    private closeBtn!: HTMLElement;
+    private nextBtn!: HTMLElement;
+    private globalToolbar!: HTMLElement;
 
     constructor() {
         this.debounceHandler = new DebounceHandler(2500);
@@ -45,9 +68,11 @@ class HTMLArticleCreator {
 
     private initializeDOM(): void {
         this.titleInput = document.getElementById('articleTitleInput') as HTMLInputElement;
+        this.inputSection = document.querySelector('.article-creator__input-section') as HTMLElement;
         this.topicSection = document.getElementById('topicSection') as HTMLElement;
         this.categorySection = document.getElementById('categorySection') as HTMLElement;
         this.creationSection = document.getElementById('creationSection') as HTMLElement;
+        this.editingSection = document.getElementById('editingSection') as HTMLElement;
         this.topicList = document.getElementById('topicList') as HTMLElement;
         this.categoryList = document.getElementById('categoryList') as HTMLElement;
         this.categoryTitle = document.getElementById('categoryTitle') as HTMLElement;
@@ -56,6 +81,16 @@ class HTMLArticleCreator {
         this.creationChipsContainer = document.getElementById('creationChipsContainer') as HTMLElement;
         this.newTopicBtn = document.getElementById('newTopicBtn') as HTMLElement;
         this.startCreatingBtn = document.getElementById('startCreatingBtn') as HTMLElement;
+        this.articleTitleText = document.getElementById('articleTitleText') as HTMLElement;
+        this.articleBackgroundText = document.getElementById('articleBackgroundText') as HTMLElement;
+        this.boldBtn = document.getElementById('boldBtn') as HTMLElement;
+        this.italicBtn = document.getElementById('italicBtn') as HTMLElement;
+        this.linkBtn = document.getElementById('linkBtn') as HTMLElement;
+        this.undoBtn = document.getElementById('undoBtn') as HTMLElement;
+        this.moreBtn = document.getElementById('moreBtn') as HTMLElement;
+        this.closeBtn = document.getElementById('closeBtn') as HTMLElement;
+        this.nextBtn = document.getElementById('nextBtn') as HTMLElement;
+        this.globalToolbar = document.getElementById('globalToolbar') as HTMLElement;
 
         if (!this.titleInput) {
             throw new Error('Required DOM elements not found');
@@ -66,6 +101,9 @@ class HTMLArticleCreator {
         if (iconSpan) {
             iconSpan.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" aria-hidden="true">${cdxIconAdd}</svg>`;
         }
+        
+        // Initialize toolbar icons
+        this.initializeToolbarIcons();
     }
 
     private setupEventListeners(): void {
@@ -91,7 +129,12 @@ class HTMLArticleCreator {
 
         // Start creating button
         this.startCreatingBtn.addEventListener('click', () => {
-            this.startArticleCreation();
+            this.showArticleEditor();
+        });
+
+        // Close button to return to article creation
+        this.closeBtn.addEventListener('click', () => {
+            this.exitArticleEditor();
         });
 
         // Focus input on load
@@ -306,6 +349,17 @@ class HTMLArticleCreator {
         this.topicSection.style.display = 'none';
         this.categorySection.style.display = 'none';
         this.creationSection.style.display = 'none';
+        this.editingSection.style.display = 'none';
+        
+        // Show/hide input section and header based on state
+        const header = document.querySelector('.article-creator__header') as HTMLElement;
+        if (this.currentState === WorkflowState.ARTICLE_EDITING) {
+            this.inputSection.style.display = 'none';
+            if (header) header.style.display = 'none';
+        } else {
+            this.inputSection.style.display = 'block';
+            if (header) header.style.display = 'block';
+        }
         
         // Show current section
         switch (this.currentState) {
@@ -317,6 +371,9 @@ class HTMLArticleCreator {
                 break;
             case WorkflowState.ARTICLE_CREATION:
                 this.creationSection.style.display = 'block';
+                break;
+            case WorkflowState.ARTICLE_EDITING:
+                this.editingSection.style.display = 'block';
                 break;
         }
     }
@@ -350,6 +407,9 @@ class HTMLArticleCreator {
                         case WorkflowState.ARTICLE_CREATION:
                             this.showArticleCreation();
                             break;
+                        case WorkflowState.ARTICLE_EDITING:
+                            this.showArticleEditor();
+                            break;
                     }
                 }
             } catch (error) {
@@ -358,9 +418,114 @@ class HTMLArticleCreator {
         }
     }
 
-    private startArticleCreation(): void {
-        // TODO: Implement article creation flow
-        console.log('Starting article creation for:', this.selectedTopic);
+    private showArticleEditor(): void {
+        this.setState(WorkflowState.ARTICLE_EDITING);
+        this.setupArticleEditor();
+        
+        // Show the global toolbar and add editing class
+        this.globalToolbar.style.display = 'flex';
+        document.querySelector('.article-creator')?.classList.add('article-creator--editing');
+    }
+
+    private exitArticleEditor(): void {
+        // Hide the global toolbar and remove editing class
+        this.globalToolbar.style.display = 'none';
+        document.querySelector('.article-creator')?.classList.remove('article-creator--editing');
+        
+        // Return to article creation state
+        this.showArticleCreation();
+    }
+
+    private setupArticleEditor(): void {
+        if (!this.selectedTopic) return;
+        
+        // Set the article title
+        const articleTitle = this.searchTerm;
+        this.articleTitleText.textContent = articleTitle;
+        
+        // Set the background text using existing CategoryMapper method
+        const categoryDescription = this.selectedTopic.category.toLowerCase().replace('/', ' or ');
+        const backgroundText = `${articleTitle} is a ${categoryDescription}.`;
+        this.articleBackgroundText.textContent = backgroundText;
+        // Render three example chips below the blinking cursor
+        const editorChipsContainer = document.getElementById('editorChipsContainer') as HTMLElement;
+        if (editorChipsContainer) {
+            editorChipsContainer.innerHTML = '';
+            const chipDefs = [
+                { icon: cdxIconAdd, label: 'Snippet' },
+                { icon: cdxIconAdd, label: 'Fact' },
+                { icon: cdxIconEllipsis, label: 'More' }
+            ];
+            chipDefs.forEach(def => {
+                const chip = document.createElement('div');
+                chip.className = 'cdx-info-chip cdx-info-chip--notice';
+                chip.innerHTML = `
+                    <span class="editor-chip-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 20 20" aria-hidden="true">${def.icon}</svg>
+                    </span>
+                    <span class="cdx-info-chip__text">${def.label}</span>
+                `;
+                editorChipsContainer.appendChild(chip);
+            });
+        }
+    }
+
+    private initializeToolbarIcons(): void {
+        // Inject inline SVG icons into toolbar button icon spans
+        const iconSize = 20;
+        
+        // Close button (string)
+        const closeIconSpan = this.closeBtn.querySelector('.cdx-button__icon');
+        if (closeIconSpan) {
+            closeIconSpan.innerHTML =
+                `<svg xmlns="http://www.w3.org/2000/svg" width="${iconSize}" height="${iconSize}" viewBox="0 0 20 20" aria-hidden="true">${cdxIconClose}</svg>`;
+        }
+        
+        // Bold button (object with langCodeMap)
+        const boldIconSpan = this.boldBtn.querySelector('.cdx-button__icon');
+        if (boldIconSpan) {
+            const boldPath = (cdxIconBold as any).langCodeMap?.en || (cdxIconBold as any).default;
+            boldIconSpan.innerHTML =
+                `<svg xmlns="http://www.w3.org/2000/svg" width="${iconSize}" height="${iconSize}" viewBox="0 0 20 20" aria-hidden="true">${boldPath}</svg>`;
+        }
+        
+        // Italic button (object with langCodeMap)
+        const italicIconSpan = this.italicBtn.querySelector('.cdx-button__icon');
+        if (italicIconSpan) {
+            const italicPath = (cdxIconItalic as any).langCodeMap?.en || (cdxIconItalic as any).default;
+            italicIconSpan.innerHTML =
+                `<svg xmlns="http://www.w3.org/2000/svg" width="${iconSize}" height="${iconSize}" viewBox="0 0 20 20" aria-hidden="true">${italicPath}</svg>`;
+        }
+        
+        // Link button (string)
+        const linkIconSpan = this.linkBtn.querySelector('.cdx-button__icon');
+        if (linkIconSpan) {
+            linkIconSpan.innerHTML =
+                `<svg xmlns="http://www.w3.org/2000/svg" width="${iconSize}" height="${iconSize}" viewBox="0 0 20 20" aria-hidden="true">${cdxIconLink}</svg>`;
+        }
+        
+        // Undo button (object with ltr property)
+        const undoIconSpan = this.undoBtn.querySelector('.cdx-button__icon');
+        if (undoIconSpan) {
+            const undoPath = (cdxIconUndo as any).ltr;
+            undoIconSpan.innerHTML =
+                `<svg xmlns="http://www.w3.org/2000/svg" width="${iconSize}" height="${iconSize}" viewBox="0 0 20 20" aria-hidden="true">${undoPath}</svg>`;
+        }
+        
+        // More (ellipsis) button (string)
+        const moreIconSpan = this.moreBtn.querySelector('.cdx-button__icon');
+        if (moreIconSpan) {
+            moreIconSpan.innerHTML =
+                `<svg xmlns="http://www.w3.org/2000/svg" width="${iconSize}" height="${iconSize}" viewBox="0 0 20 20" aria-hidden="true">${cdxIconEllipsis}</svg>`;
+        }
+        
+        // Next button (object with ltr property)
+        const nextIconSpan = this.nextBtn.querySelector('.cdx-button__icon');
+        if (nextIconSpan) {
+            const nextPath = (cdxIconNext as any).ltr;
+            nextIconSpan.innerHTML =
+                `<svg xmlns="http://www.w3.org/2000/svg" width="${iconSize}" height="${iconSize}" viewBox="0 0 20 20" aria-hidden="true">${nextPath}</svg>`;
+        }
     }
 }
 
