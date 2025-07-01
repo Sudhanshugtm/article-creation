@@ -132,7 +132,7 @@ export class CodexCanvas {
       variant = 'quiet', 
       size = 'medium', 
       disabled = false,
-      width = this.measureText(text, size, '600') + (size === 'large' ? 30 : size === 'small' ? 20 : 24),
+      width = this.measureText(text, size as any, '600') + (size === 'large' ? 30 : size === 'small' ? 20 : 24),
       height = size === 'large' ? 40 : size === 'small' ? 24 : 32
     } = options;
 

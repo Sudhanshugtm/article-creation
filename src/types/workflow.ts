@@ -20,7 +20,8 @@ export interface ClickableArea {
 }
 
 export interface TopicSelection {
-    topic: string;
+    wikidataId: string | null;
+    label: string;
+    description: string;
     category: ArticleCategory;
-    source: 'wikidata' | 'manual';
 }

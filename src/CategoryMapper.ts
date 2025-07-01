@@ -2,6 +2,16 @@
 // ABOUTME: Maps P31 instance-of values to meaningful Wikipedia article categories
 
 import { WikidataTopic } from './WikidataService';
+import { 
+    cdxIconUserAvatar, 
+    cdxIconGlobe, 
+    cdxIconDie, 
+    cdxIconHome, 
+    cdxIconBook, 
+    cdxIconImage, 
+    cdxIconCalendar, 
+    cdxIconArticle 
+} from '@wikimedia/codex-icons';
 
 export enum ArticleCategory {
     PERSON = 'Person/Biography',
@@ -272,26 +282,28 @@ export class CategoryMapper {
         }
     }
 
-    static getCategoryIcon(category: ArticleCategory): string {
+    static getCategoryIcon(category: ArticleCategory, size: number = 20): string {
+        const iconSize = size === 12 ? '12' : '20';
+        
         switch (category) {
             case ArticleCategory.PERSON:
-                return '👤';
+                return `<svg xmlns="http://www.w3.org/2000/svg" width="${iconSize}" height="${iconSize}" viewBox="0 0 20 20" aria-hidden="true">${cdxIconUserAvatar}</svg>`;
             case ArticleCategory.LOCATION:
-                return '🌍';
+                return `<svg xmlns="http://www.w3.org/2000/svg" width="${iconSize}" height="${iconSize}" viewBox="0 0 20 20" aria-hidden="true">${cdxIconGlobe}</svg>`;
             case ArticleCategory.SPECIES:
-                return '🐅';
+                return `<svg xmlns="http://www.w3.org/2000/svg" width="${iconSize}" height="${iconSize}" viewBox="0 0 20 20" aria-hidden="true">${cdxIconDie}</svg>`;
             case ArticleCategory.ORGANIZATION:
-                return '🏢';
+                return `<svg xmlns="http://www.w3.org/2000/svg" width="${iconSize}" height="${iconSize}" viewBox="0 0 20 20" aria-hidden="true">${cdxIconHome}</svg>`;
             case ArticleCategory.CONCEPT:
-                return '📚';
+                return `<svg xmlns="http://www.w3.org/2000/svg" width="${iconSize}" height="${iconSize}" viewBox="0 0 20 20" aria-hidden="true">${cdxIconBook.ltr}</svg>`;
             case ArticleCategory.CREATIVE_WORK:
-                return '🎭';
+                return `<svg xmlns="http://www.w3.org/2000/svg" width="${iconSize}" height="${iconSize}" viewBox="0 0 20 20" aria-hidden="true">${cdxIconImage}</svg>`;
             case ArticleCategory.EVENT:
-                return '📅';
+                return `<svg xmlns="http://www.w3.org/2000/svg" width="${iconSize}" height="${iconSize}" viewBox="0 0 20 20" aria-hidden="true">${cdxIconCalendar}</svg>`;
             case ArticleCategory.OTHER:
-                return '📄';
+                return `<svg xmlns="http://www.w3.org/2000/svg" width="${iconSize}" height="${iconSize}" viewBox="0 0 20 20" aria-hidden="true">${cdxIconArticle.ltr}</svg>`;
             default:
-                return '📄';
+                return `<svg xmlns="http://www.w3.org/2000/svg" width="${iconSize}" height="${iconSize}" viewBox="0 0 20 20" aria-hidden="true">${cdxIconArticle.ltr}</svg>`;
         }
     }
 }

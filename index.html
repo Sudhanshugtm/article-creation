@@ -4,11 +4,86 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Article Creator</title>
+    <link rel="stylesheet" href="/src/styles/codex.css">
     <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
-    <canvas id="articleCanvas"></canvas>
-    <input type="text" id="hiddenInput" aria-label="Type article title" />
-    <script type="module" src="/src/main.ts"></script>
+    <!-- Canvas version (to be phased out) -->
+    <canvas id="articleCanvas" style="display: none;"></canvas>
+    <input type="text" id="hiddenInput" aria-label="Type article title" style="display: none;" />
+    
+    <!-- New HTML version -->
+    <div id="app" class="article-creator">
+        <header class="article-creator__header">
+            <h1 class="article-creator__title">New article</h1>
+        </header>
+        
+        <main class="article-creator__main">
+            <!-- Input Section -->
+            <section class="article-creator__input-section">
+                <div class="cdx-field">
+                    <div class="cdx-field__control">
+                        <input 
+                            type="text" 
+                            id="articleTitleInput"
+                            class="cdx-text-input__input"
+                            placeholder="Type article title"
+                            aria-label="Article title"
+                            autocomplete="off"
+                            spellcheck="false"
+                        />
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Topic Selection Section -->
+            <section class="article-creator__topic-section" id="topicSection" style="display: none;">
+                <h2 class="article-creator__section-title">Select the exact topic for this page</h2>
+                <p class="article-creator__section-description">This page is about...</p>
+                
+                <div class="article-creator__topic-list" id="topicList">
+                    <!-- Topic results will be populated here -->
+                </div>
+                
+                <div class="article-creator__new-topic">
+                    <button class="cdx-button cdx-button--action-default cdx-button--weight-quiet cdx-button--size-medium" id="newTopicBtn">
+                        <span class="cdx-button__icon"></span>
+                        <span>New topic</span>
+                    </button>
+                </div>
+            </section>
+            
+            <!-- Category Selection Section -->
+            <section class="article-creator__category-section" id="categorySection" style="display: none;">
+                <div class="article-creator__chips" id="chipsContainer">
+                    <!-- Chips will be populated here -->
+                </div>
+                
+                <h2 class="article-creator__section-title" id="categoryTitle">Help us categorize ""</h2>
+                <p class="article-creator__section-description">Select the category that best fits your new article:</p>
+                
+                <div class="article-creator__category-list" id="categoryList">
+                    <!-- Category options will be populated here -->
+                </div>
+            </section>
+            
+            <!-- Article Creation Section -->
+            <section class="article-creator__creation-section" id="creationSection" style="display: none;">
+                <div class="article-creator__chips" id="creationChipsContainer">
+                    <!-- Chips will be populated here -->
+                </div>
+                
+                <h2 class="article-creator__section-title" id="creationTitle">Creating article about ""</h2>
+                
+                <div class="article-creator__actions">
+                    <button class="cdx-button cdx-button--action-progressive cdx-button--weight-primary" id="startCreatingBtn">
+                        <span class="cdx-button__text">Start creating article</span>
+                    </button>
+                </div>
+            </section>
+        </main>
+    </div>
+    
+    <script type="module" src="/src/html-main.ts"></script>
 </body>
 </html>
