@@ -5,9 +5,8 @@ import { DebounceHandler } from './DebounceHandler';
 import { WikidataService } from './WikidataService';
 import { CategoryMapper, ArticleCategory } from './CategoryMapper';
 import { TopicSelection } from './types/workflow';
-import { 
-    cdxIconAdd, 
-    cdxIconArticle, 
+import {
+    cdxIconAdd,
     cdxIconBold,
     cdxIconItalic,
     cdxIconLink,
@@ -16,7 +15,6 @@ import {
     cdxIconClose,
     cdxIconNext
 } from '@wikimedia/codex-icons';
-import { CdxInfoChip } from '@wikimedia/codex';
 
 enum WorkflowState {
     INPUT = 'input',
@@ -48,12 +46,17 @@ class HTMLArticleCreator {
     private newTopicBtn!: HTMLElement;
     private startCreatingBtn!: HTMLElement;
     private articleTitleText!: HTMLElement;
-    private articleBackgroundText!: HTMLElement;
     private boldBtn!: HTMLElement;
     private italicBtn!: HTMLElement;
     private linkBtn!: HTMLElement;
     private undoBtn!: HTMLElement;
     private moreBtn!: HTMLElement;
+    private articleContent!: HTMLElement;
+    // Snippet modal elements
+    private snippetModal!: HTMLElement;
+    private snippetTitleSpan!: HTMLElement;
+    private snippetCardsContainer!: HTMLElement;
+    private snippetCancelBtn!: HTMLElement;
     private closeBtn!: HTMLElement;
     private nextBtn!: HTMLElement;
     private globalToolbar!: HTMLElement;
@@ -82,15 +85,22 @@ class HTMLArticleCreator {
         this.newTopicBtn = document.getElementById('newTopicBtn') as HTMLElement;
         this.startCreatingBtn = document.getElementById('startCreatingBtn') as HTMLElement;
         this.articleTitleText = document.getElementById('articleTitleText') as HTMLElement;
-        this.articleBackgroundText = document.getElementById('articleBackgroundText') as HTMLElement;
         this.boldBtn = document.getElementById('boldBtn') as HTMLElement;
         this.italicBtn = document.getElementById('italicBtn') as HTMLElement;
         this.linkBtn = document.getElementById('linkBtn') as HTMLElement;
         this.undoBtn = document.getElementById('undoBtn') as HTMLElement;
         this.moreBtn = document.getElementById('moreBtn') as HTMLElement;
+        // Editable content area for article body
+        this.articleContent = document.getElementById('articleContent') as HTMLElement;
         this.closeBtn = document.getElementById('closeBtn') as HTMLElement;
         this.nextBtn = document.getElementById('nextBtn') as HTMLElement;
         this.globalToolbar = document.getElementById('globalToolbar') as HTMLElement;
+        // Snippet modal elements
+        this.snippetModal = document.getElementById('snippetModal') as HTMLElement;
+        this.snippetTitleSpan = document.getElementById('snippetTitle') as HTMLElement;
+        this.snippetCardsContainer = document.getElementById('snippetSuggestionCards') as HTMLElement;
+        this.snippetCancelBtn = document.getElementById('snippetCancelBtn') as HTMLElement;
+        this.snippetCancelBtn.addEventListener('click', () => this.closeSnippetModal());
 
         if (!this.titleInput) {
             throw new Error('Required DOM elements not found');
@@ -131,6 +141,7 @@ class HTMLArticleCreator {
         this.startCreatingBtn.addEventListener('click', () => {
             this.showArticleEditor();
         });
+
 
         // Close button to return to article creation
         this.closeBtn.addEventListener('click', () => {
@@ -425,6 +436,8 @@ class HTMLArticleCreator {
         // Show the global toolbar and add editing class
         this.globalToolbar.style.display = 'flex';
         document.querySelector('.article-creator')?.classList.add('article-creator--editing');
+        // Focus the editable article body to enable typing
+        this.articleContent.focus();
     }
 
     private exitArticleEditor(): void {
@@ -446,29 +459,96 @@ class HTMLArticleCreator {
         // Set the background text using existing CategoryMapper method
         const categoryDescription = this.selectedTopic.category.toLowerCase().replace('/', ' or ');
         const backgroundText = `${articleTitle} is a ${categoryDescription}.`;
-        this.articleBackgroundText.textContent = backgroundText;
-        // Render three example chips below the blinking cursor
+        // Set placeholder text via data attribute
+        this.articleContent.dataset.placeholder = backgroundText;
+        // Render editor action chips below the content area
         const editorChipsContainer = document.getElementById('editorChipsContainer') as HTMLElement;
         if (editorChipsContainer) {
             editorChipsContainer.innerHTML = '';
             const chipDefs = [
-                { icon: cdxIconAdd, label: 'Snippet' },
-                { icon: cdxIconAdd, label: 'Fact' },
-                { icon: cdxIconEllipsis, label: 'More' }
+                { type: 'snippet', icon: cdxIconAdd, label: 'Snippet' },
+                { type: 'fact', icon: cdxIconAdd, label: 'Fact' },
+                { type: 'more', icon: cdxIconEllipsis, label: 'More' }
             ];
             chipDefs.forEach(def => {
                 const chip = document.createElement('div');
                 chip.className = 'cdx-info-chip cdx-info-chip--notice';
+                chip.setAttribute('data-chip-type', def.type);
                 chip.innerHTML = `
                     <span class="editor-chip-icon">
                         <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 20 20" aria-hidden="true">${def.icon}</svg>
                     </span>
                     <span class="cdx-info-chip__text">${def.label}</span>
                 `;
+                chip.addEventListener('click', () => this.handleEditorChipClick(def.type));
                 editorChipsContainer.appendChild(chip);
             });
         }
     }
+    
+    private handleEditorChipClick(type: string): void {
+        switch (type) {
+            case 'snippet':
+                this.openSnippetModal();
+                break;
+            case 'fact':
+                // TODO: implement fact insertion
+                break;
+            case 'more':
+                // TODO: implement more options
+                break;
+        }
+    }
+
+    
+    private openSnippetModal(): void {
+        if (!this.selectedTopic) return;
+        // Set modal title
+        this.snippetTitleSpan.textContent = this.searchTerm;
+        // Load Wikipedia summary suggestions and render as clickable cards
+        fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(this.searchTerm)}`)
+            .then(res => res.ok ? res.json() : Promise.reject(res))
+            .then((data: any) => {
+                const extract: string = data.extract || '';
+                const sentences = extract.split(/\.\s+/).filter(s => s).slice(0, 3);
+                this.snippetCardsContainer.innerHTML = '';
+                sentences.forEach(text => {
+                    const card = document.createElement('div');
+                    card.className = 'snippet-modal__card';
+                    card.innerHTML = `<p>${text}</p>`;
+                    card.addEventListener('click', () => {
+                        this.insertSelectedSnippet(text);
+                        this.closeSnippetModal();
+                    });
+                    this.snippetCardsContainer.appendChild(card);
+                });
+            })
+            .catch(() => {
+                this.snippetCardsContainer.innerHTML = '<p>No suggestions available</p>';
+            });
+        // Show modal
+        this.snippetModal.style.display = 'flex';
+    }
+
+    private insertSelectedSnippet(text: string): void {
+        // Insert selected snippet into the editor
+        this.articleContent.innerText = text;
+        // Place caret at end
+        const range = document.createRange();
+        const sel = window.getSelection();
+        range.selectNodeContents(this.articleContent);
+        range.collapse(false);
+        if (sel) {
+            sel.removeAllRanges();
+            sel.addRange(range);
+        }
+        this.articleContent.focus();
+    }
+
+    private closeSnippetModal(): void {
+        this.snippetModal.style.display = 'none';
+    }
+
 
     private initializeToolbarIcons(): void {
         // Inject inline SVG icons into toolbar button icon spans

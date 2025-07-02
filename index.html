@@ -117,12 +117,9 @@
                     <h1 class="article-editor__title" id="articleEditorTitle">
                         <span class="article-editor__title-text" id="articleTitleText"></span>
                     </h1>
-                    <div class="article-editor__content">
-                        <span class="article-editor__cursor">|</span>
-                        <span class="article-editor__placeholder-text" id="articleBackgroundText"></span>
-                        <!-- Editor chips below cursor -->
-                        <div class="article-editor__chips" id="editorChipsContainer"></div>
-                    </div>
+                    <div id="articleContent" class="article-editor__content" contenteditable="true" tabindex="0" data-placeholder=""></div>
+                    <!-- Editor chips below the editable content area -->
+                    <div class="article-editor__chips" id="editorChipsContainer"></div>
                 </div>
             </section>
         </main>
@@ -130,4 +127,14 @@
     
     <script type="module" src="/src/html-main.ts"></script>
 </body>
+    <!-- Snippet Modal Overlay -->
+    <div id="snippetModal" class="snippet-modal" style="display: none;">
+        <div class="snippet-modal__content">
+            <h2 class="snippet-modal__title">Intro Snippet for &quot;<span id="snippetTitle"></span>&quot;</h2>
+            <div id="snippetSuggestionCards" class="snippet-modal__cards"></div>
+            <div class="snippet-modal__actions">
+                <button id="snippetCancelBtn" class="cdx-button cdx-button--action-default">Close</button>
+            </div>
+        </div>
+    </div>
 </html>
