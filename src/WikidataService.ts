@@ -119,4 +119,111 @@ export class WikidataService {
 
         return topics;
     }
+
+    static async getEntityProperties(entityId: string, propertyIds: string[]): Promise<Record<string, any>> {
+        const params = new URLSearchParams({
+            action: 'wbgetentities',
+            ids: entityId,
+            format: 'json',
+            languages: 'en',
+            props: 'claims',
+            origin: '*'
+        });
+
+        try {
+            const response = await fetch(`${this.BASE_URL}?${params}`);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            const entity = data.entities?.[entityId];
+            
+            if (!entity || !entity.claims) {
+                return {};
+            }
+
+            const properties: Record<string, any> = {};
+            
+            for (const propId of propertyIds) {
+                const claims = entity.claims[propId];
+                if (claims && claims.length > 0) {
+                    const claim = claims[0];
+                    const value = this.extractClaimValue(claim);
+                    if (value) {
+                        properties[propId] = value;
+                    }
+                }
+            }
+
+            return properties;
+        } catch (error) {
+            console.error(`Error fetching properties for ${entityId}:`, error);
+            return {};
+        }
+    }
+
+    private static extractClaimValue(claim: any): string | null {
+        const datavalue = claim.mainsnak?.datavalue;
+        if (!datavalue) return null;
+
+        switch (datavalue.type) {
+            case 'string':
+                return datavalue.value;
+            case 'wikibase-entityid':
+                return datavalue.value.id;
+            case 'time':
+                return this.formatDate(datavalue.value.time);
+            case 'quantity':
+                return datavalue.value.amount;
+            default:
+                return datavalue.value?.toString() || null;
+        }
+    }
+
+    static async resolveEntityNames(entityIds: string[]): Promise<Record<string, string>> {
+        if (entityIds.length === 0) return {};
+
+        const params = new URLSearchParams({
+            action: 'wbgetentities',
+            ids: entityIds.join('|'),
+            format: 'json',
+            languages: 'en',
+            props: 'labels',
+            origin: '*'
+        });
+
+        try {
+            const response = await fetch(`${this.BASE_URL}?${params}`);
+            if (!response.ok) return {};
+
+            const data = await response.json();
+            const resolved: Record<string, string> = {};
+
+            for (const entityId of entityIds) {
+                const entity = data.entities?.[entityId];
+                if (entity?.labels?.en?.value) {
+                    resolved[entityId] = entity.labels.en.value;
+                }
+            }
+
+            return resolved;
+        } catch {
+            return {};
+        }
+    }
+
+    private static formatDate(timeString: string): string {
+        try {
+            const match = timeString.match(/^([+-]?\d{4,})-(\d{2})-(\d{2})/);
+            if (match) {
+                const [, year, month, day] = match;
+                return `${year}-${month}-${day}`;
+            }
+            return timeString;
+        } catch {
+            return timeString;
+        }
+    }
 }

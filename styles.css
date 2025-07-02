@@ -1,3 +1,6 @@
+/* Import styles */
+@import url('/src/styles/snippet-modal.css');
+
 * {
     margin: 0;
     padding: 0;

@@ -127,6 +127,148 @@
     
     <script type="module" src="/src/html-main.ts"></script>
 </body>
+    
+    <!-- Reference Dialog -->
+    <div class="reference-dialog" id="referenceDialog">
+        <div class="reference-dialog__content">
+            <h2 class="reference-dialog__title">
+                📎 Add Reference
+            </h2>
+            <form class="reference-dialog__form" id="referenceForm">
+                <div class="reference-dialog__field">
+                    <label class="reference-dialog__label" for="referenceUrl">
+                        Article URL or Title
+                    </label>
+                    <input 
+                        type="text" 
+                        id="referenceUrl" 
+                        class="reference-dialog__input"
+                        placeholder="https://example.com/article or Article Title"
+                        required
+                    />
+                    <div class="reference-dialog__error" id="referenceError" style="display: none;"></div>
+                </div>
+                
+                <div class="reference-dialog__field" id="referenceAccessField" style="display: none;">
+                    <label class="reference-dialog__label" for="referenceAccess">
+                        Access Date
+                    </label>
+                    <input 
+                        type="date" 
+                        id="referenceAccess" 
+                        class="reference-dialog__input"
+                    />
+                </div>
+                
+                <div class="reference-dialog__preview" id="referencePreview" style="display: none;">
+                    <div class="reference-dialog__preview-title">Preview:</div>
+                    <div id="referencePreviewContent"></div>
+                </div>
+                
+                <div class="reference-dialog__loading" id="referenceLoading" style="display: none;">
+                    <div class="reference-dialog__spinner"></div>
+                    Validating reference...
+                </div>
+            </form>
+            
+            <div class="reference-dialog__actions">
+                <button type="button" class="reference-dialog__button" id="referenceCancelBtn">
+                    Cancel
+                </button>
+                <button type="button" class="reference-dialog__button reference-dialog__button--primary" id="referenceInsertBtn" disabled>
+                    Insert Reference
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Add from Link Dialog -->
+    <div class="add-link-dialog" id="addLinkDialog">
+        <div class="add-link-dialog__content">
+            <h2 class="add-link-dialog__title">
+                🔗 Add fact from reference
+            </h2>
+            
+            <!-- Step 1: URL Input -->
+            <div class="add-link-dialog__step" id="addLinkStep1">
+                <div class="add-link-dialog__field">
+                    <label class="add-link-dialog__label" for="addLinkUrl">
+                        Link to incorporate new contents:
+                    </label>
+                    <div class="add-link-dialog__url-input">
+                        <input 
+                            type="text" 
+                            id="addLinkUrl" 
+                            class="add-link-dialog__input"
+                            placeholder="https://..."
+                            required
+                        />
+                        <button type="button" class="add-link-dialog__url-btn" id="addLinkSubmitUrl" disabled>
+                            ➜
+                        </button>
+                    </div>
+                    <div class="add-link-dialog__error" id="addLinkError" style="display: none;"></div>
+                </div>
+                
+                <div class="add-link-dialog__loading" id="addLinkLoading" style="display: none;">
+                    <div class="add-link-dialog__spinner"></div>
+                    Extracting content from link...
+                </div>
+            </div>
+            
+            <!-- Step 2: Content Extraction -->
+            <div class="add-link-dialog__step" id="addLinkStep2" style="display: none;">
+                <div class="add-link-dialog__extracted-content">
+                    <div class="add-link-dialog__source-info">
+                        <strong id="addLinkSourceTitle"></strong><br>
+                        <em id="addLinkSourceDomain"></em>
+                    </div>
+                    
+                    <div class="add-link-dialog__question-section">
+                        <label class="add-link-dialog__label" for="addLinkQuestion">
+                            Describe the contents you want to add from the linked information
+                        </label>
+                        <input 
+                            type="text" 
+                            id="addLinkQuestion" 
+                            class="add-link-dialog__input"
+                            placeholder="What can people learn from this?"
+                        />
+                    </div>
+                    
+                    <div class="add-link-dialog__suggestions">
+                        <div class="add-link-dialog__suggestions-title">Possible learnings:</div>
+                        <div class="add-link-dialog__suggestion-items" id="addLinkSuggestions">
+                            <!-- Suggestions will be populated here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Step 3: Generated Content -->
+            <div class="add-link-dialog__step" id="addLinkStep3" style="display: none;">
+                <div class="add-link-dialog__generated-content">
+                    <div class="add-link-dialog__preview-title">Generated paragraph:</div>
+                    <div class="add-link-dialog__preview-content" id="addLinkPreview">
+                        <!-- Generated content will appear here -->
+                    </div>
+                </div>
+            </div>
+            
+            <div class="add-link-dialog__actions">
+                <button type="button" class="add-link-dialog__button" id="addLinkCancelBtn">
+                    Cancel
+                </button>
+                <button type="button" class="add-link-dialog__button add-link-dialog__button--primary" id="addLinkNextBtn" style="display: none;">
+                    Generate Content
+                </button>
+                <button type="button" class="add-link-dialog__button add-link-dialog__button--primary" id="addLinkInsertBtn" style="display: none;">
+                    Insert Paragraph
+                </button>
+            </div>
+        </div>
+    </div>
+    
     <!-- Snippet Modal Overlay -->
     <div id="snippetModal" class="snippet-modal" style="display: none;">
         <div class="snippet-modal__content">
