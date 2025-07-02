@@ -9,6 +9,7 @@ interface SectionTemplate {
   description: string;
   icon: string;
   contentTemplate: string;
+  templateVariations?: string[];
   wikidataProperties?: string[];
   priority: number;
   wikipediaEvidence?: string[];
@@ -22,6 +23,7 @@ interface CategorySections {
 
 export class IntelligentSectionEngine {
   private categorySections: Map<ArticleCategory, CategorySections> = new Map();
+  private templateUsageCount: Map<string, number> = new Map();
   
   constructor(private wikidataService: WikidataService) {
     this.initializeSectionTemplates();
@@ -38,6 +40,12 @@ export class IntelligentSectionEngine {
             description: 'Childhood, family background, and educational journey',
             icon: '🎓',
             contentTemplate: '{{NAME}} was born {{BIRTH_DETAILS}}. {{EARLY_EDUCATION}} {{FAMILY_BACKGROUND}} {{EDUCATIONAL_INSTITUTIONS}}',
+            templateVariations: [
+              '{{NAME}} entered the world {{BIRTH_DETAILS}}. {{FAMILY_BACKGROUND}} {{EDUCATIONAL_JOURNEY}} shaped their future pursuits.',
+              'Born {{BIRTH_DETAILS}}, {{NAME}} showed early promise in academic endeavors. {{FAMILY_INFLUENCE}} {{EDUCATIONAL_FOUNDATION}} provided the groundwork for later achievements.',
+              'The early years of {{NAME}} began {{BIRTH_DETAILS}}. {{CHILDHOOD_INFLUENCES}} {{ACADEMIC_DEVELOPMENT}} would prove instrumental in their career.',
+              '{{NAME}}\'s formative years commenced {{BIRTH_DETAILS}}. {{EARLY_ENVIRONMENT}} {{EDUCATIONAL_PATH}} established the foundation for their scholarly pursuits.'
+            ],
             wikidataProperties: ['P569', 'P19', 'P22', 'P25', 'P69', 'P512'],
             priority: 1,
             wikipediaEvidence: ['Standard section in scientist biographies like Einstein, Newton']
@@ -47,6 +55,11 @@ export class IntelligentSectionEngine {
             description: 'Professional career, research positions, and major work',
             icon: '🔬',
             contentTemplate: '{{NAME}} began {{CAREER_START}} at {{INSTITUTIONS}}. {{RESEARCH_FOCUS}} {{MAJOR_POSITIONS}} {{COLLABORATIONS}}',
+            templateVariations: [
+              '{{NAME}}\'s professional journey commenced {{CAREER_START}} with {{INSTITUTIONS}}. {{RESEARCH_SPECIALIZATION}} {{CAREER_PROGRESSION}} {{SCIENTIFIC_COLLABORATIONS}}',
+              'The scientific career of {{NAME}} took shape {{CAREER_START}} at {{INSTITUTIONS}}. {{RESEARCH_DIRECTION}} {{PROFESSIONAL_DEVELOPMENT}} {{ACADEMIC_PARTNERSHIPS}}',
+              '{{NAME}} embarked on their research path {{CAREER_START}} through {{INSTITUTIONS}}. {{INVESTIGATIVE_FOCUS}} {{CAREER_ADVANCEMENT}} {{COLLABORATIVE_EFFORTS}}'
+            ],
             wikidataProperties: ['P108', 'P101', 'P184', 'P185', 'P800'],
             priority: 2,
             wikipediaEvidence: ['Essential section in scientific biographies']
@@ -365,8 +378,11 @@ export class IntelligentSectionEngine {
     // Map properties to template placeholders
     const placeholders = this.mapSectionPlaceholders(entityData, topic, category, section);
     
+    // Select template variation to avoid repetition
+    const selectedTemplate = this.selectTemplateVariation(section);
+    
     // Fill template
-    return this.fillSectionTemplate(section.contentTemplate, placeholders);
+    return this.fillSectionTemplate(selectedTemplate, placeholders);
   }
 
   private detectSubcategory(topic: WikidataTopic, category: ArticleCategory): string | undefined {
@@ -416,9 +432,20 @@ export class IntelligentSectionEngine {
   ): Record<string, string> {
     const placeholders: Record<string, string> = {};
     
-    // Common placeholders
-    placeholders.NAME = topic.title;
-    placeholders.COMMON_NAME = properties.P1843 || topic.title;
+    // Safety check for topic parameter
+    if (!topic) {
+      console.warn('mapSectionPlaceholders: topic is undefined, using fallback');
+      topic = {
+        id: '',
+        title: 'Entity Name',
+        description: 'A person, place, or thing',
+        category: category
+      } as WikidataTopic;
+    }
+    
+    // Common placeholders with smart entity name detection
+    placeholders.NAME = this.getSmartEntityName(topic);
+    placeholders.COMMON_NAME = properties.P1843 || this.getSmartEntityName(topic);
     
     // Category-specific placeholder mapping
     switch (category) {
@@ -447,10 +474,30 @@ export class IntelligentSectionEngine {
     placeholders.EARLY_EDUCATION = properties.P69 ? `${placeholders.NAME} studied at ${properties.P69}.` : `${placeholders.NAME} pursued education in relevant fields.`;
     placeholders.FAMILY_BACKGROUND = properties.P22 || properties.P25 ? 'Coming from an educated family, ' : '';
     placeholders.EDUCATIONAL_INSTITUTIONS = properties.P69 || '+ educational institutions';
+    
+    // Additional placeholders for template variations
+    placeholders.EDUCATIONAL_JOURNEY = properties.P69 ? `Their academic journey through ${properties.P69}` : 'Their educational path';
+    placeholders.FAMILY_INFLUENCE = properties.P22 || properties.P25 ? 'Family connections' : 'Personal motivation';
+    placeholders.EDUCATIONAL_FOUNDATION = properties.P512 ? `earning ${properties.P512}` : 'building academic credentials';
+    placeholders.CHILDHOOD_INFLUENCES = 'Early exposure to intellectual pursuits';
+    placeholders.ACADEMIC_DEVELOPMENT = properties.P69 ? `Studies at ${properties.P69}` : 'Academic preparation';
+    placeholders.EARLY_ENVIRONMENT = 'The intellectual climate of their youth';
+    placeholders.EDUCATIONAL_PATH = properties.P69 ? `formal education at ${properties.P69}` : 'scholarly preparation';
     placeholders.CAREER_START = properties.P108 ? `their career at ${properties.P108}` : 'their professional career';
     placeholders.INSTITUTIONS = properties.P108 || '+ institutions';
     placeholders.RESEARCH_FOCUS = `${placeholders.NAME} focused on + research areas.`;
     placeholders.MAJOR_POSITIONS = properties.P39 ? `holding positions including ${properties.P39}` : 'advancing through various positions';
+    
+    // Additional career-related placeholders for variations
+    placeholders.RESEARCH_SPECIALIZATION = `Their work concentrated on + specialized field`;
+    placeholders.CAREER_PROGRESSION = `They advanced through + career stages`;
+    placeholders.SCIENTIFIC_COLLABORATIONS = `working alongside + collaborators`;
+    placeholders.RESEARCH_DIRECTION = `Their investigations centered on + research focus`;
+    placeholders.PROFESSIONAL_DEVELOPMENT = `progressing through + professional roles`;
+    placeholders.ACADEMIC_PARTNERSHIPS = `collaborating with + research partners`;
+    placeholders.INVESTIGATIVE_FOCUS = `concentrating on + investigation areas`;
+    placeholders.CAREER_ADVANCEMENT = `rising through + academic positions`;
+    placeholders.COLLABORATIVE_EFFORTS = `partnering with + fellow researchers`;
     placeholders.MAJOR_DISCOVERY = properties.P800 || 'their groundbreaking work';
     placeholders.DISCOVERY_DETAILS = `This ${section.title.includes('discover') ? 'discovery' : 'work'} demonstrated + key findings.`;
     placeholders.SCIENTIFIC_IMPACT = 'The implications of this work were significant for the field.';
@@ -493,23 +540,62 @@ export class IntelligentSectionEngine {
     placeholders.TAXONOMIC_CLASSIFICATION = properties.P171 || '+ taxonomic family';
   }
 
+  private selectTemplateVariation(section: SectionTemplate): string {
+    // If no variations available, use the main template
+    if (!section.templateVariations || section.templateVariations.length === 0) {
+      return section.contentTemplate;
+    }
+    
+    // Get usage counts for all templates including main one
+    const allTemplates = [section.contentTemplate, ...section.templateVariations];
+    const templateKey = section.title.toLowerCase().replace(/\s+/g, '_');
+    
+    // Find the least used template
+    let leastUsedTemplate = allTemplates[0];
+    let minUsage = this.templateUsageCount.get(`${templateKey}_0`) || 0;
+    
+    allTemplates.forEach((template, index) => {
+      const usageKey = `${templateKey}_${index}`;
+      const usage = this.templateUsageCount.get(usageKey) || 0;
+      if (usage < minUsage) {
+        minUsage = usage;
+        leastUsedTemplate = template;
+      }
+    });
+    
+    // Update usage count for selected template
+    const selectedIndex = allTemplates.indexOf(leastUsedTemplate);
+    const usageKey = `${templateKey}_${selectedIndex}`;
+    this.templateUsageCount.set(usageKey, (this.templateUsageCount.get(usageKey) || 0) + 1);
+    
+    return leastUsedTemplate;
+  }
+
   private fillSectionTemplate(template: string, placeholders: Record<string, string>): string {
     let filled = template;
     
     Object.entries(placeholders).forEach(([key, value]) => {
-      filled = filled.replace(new RegExp(`{{${key}}}`, 'g'), value || '');
+      if (value && value.trim() && value !== 'undefined') {
+        filled = filled.replace(new RegExp(`{{${key}}}`, 'g'), value);
+      }
     });
     
-    // Clean up unfilled placeholders and convert to interactive chips
-    filled = filled.replace(/{{[^}]+}}/g, (match) => {
-      const placeholder = match.replace(/[{}]/g, '').toLowerCase().replace(/_/g, ' ');
-      return `<span class="detail-chip" data-detail="${placeholder}">+ ${placeholder}</span>`;
+    // Convert unfilled placeholders to interactive chips
+    filled = filled.replace(/{{([^}]+)}}/g, (match, placeholder) => {
+      const chipText = placeholder.toLowerCase().replace(/_/g, ' ');
+      return `<span class="detail-chip" data-detail="${placeholder.toLowerCase()}">${chipText}</span>`;
     });
     
     // Convert existing + [info] patterns to chips  
     filled = filled.replace(/\+\s*\[([^\]]+)\]/g, (match, content) => {
       const detailType = content.toLowerCase().replace(/\s+/g, '_');
       return `<span class="detail-chip" data-detail="${detailType}">+ ${content}</span>`;
+    });
+    
+    // Convert standalone + patterns to chips
+    filled = filled.replace(/\+\s+([a-zA-Z\s]+?)(?=\s*[.!?]|$)/g, (match, content) => {
+      const detailType = content.trim().toLowerCase().replace(/\s+/g, '_');
+      return `<span class="detail-chip" data-detail="${detailType}">+ ${content.trim()}</span>`;
     });
     
     // Clean up extra spaces
@@ -535,6 +621,26 @@ export class IntelligentSectionEngine {
         priority: 2
       }
     ];
+  }
+
+  // Smart entity name detection
+  private getSmartEntityName(topic: WikidataTopic): string {
+    // Safety check: ensure topic and topic.title exist
+    if (!topic || !topic.title || typeof topic.title !== 'string') {
+      return '<span class="detail-chip" data-detail="entity_name">entity name</span>';
+    }
+    
+    // If the topic title looks like a placeholder (contains brackets, plus signs, etc), make it a chip
+    if (topic.title.includes('[') || topic.title.includes('+') || topic.title.match(/^(new topic|untitled|article)/i)) {
+      return '<span class="detail-chip" data-detail="entity_name">entity name</span>';
+    }
+    
+    // Check if it's a user-created placeholder title
+    if (topic.title.toLowerCase().includes('example') || topic.title.toLowerCase().includes('placeholder')) {
+      return '<span class="detail-chip" data-detail="entity_name">entity name</span>';
+    }
+    
+    return topic.title;
   }
 
   // Utility methods

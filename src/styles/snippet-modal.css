@@ -191,6 +191,7 @@
 
 .detail-chip--editing {
   background: #fff;
+  color: #202122;
   border-color: #3366cc;
   box-shadow: 0 0 0 2px #3366cc33;
   padding: 2px 4px;
@@ -253,6 +254,86 @@
 .detail-chip__menu-option:hover {
   background: #eef3ff;
   color: #3366cc;
+}
+
+/* Dropdown-specific styles for intelligent chips */
+.detail-chip--dropdown {
+  position: relative;
+  display: inline-block;
+  min-width: 200px;
+  max-width: 350px;
+  padding: 0;
+  background: #fff;
+  border: 2px solid #3366cc;
+  border-radius: 8px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  z-index: 1002;
+  vertical-align: top;
+}
+
+.detail-chip__dropdown {
+  width: 100%;
+  background: #fff;
+  border-radius: 6px;
+  overflow: visible;
+  display: block;
+}
+
+.detail-chip__input--dropdown {
+  width: 100%;
+  padding: 8px 12px;
+  border: none;
+  outline: none;
+  background: #fff;
+  color: #202122;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-bottom: 1px solid #eaecf0;
+}
+
+.detail-chip__input--dropdown::placeholder {
+  color: #72777d;
+  font-weight: 400;
+}
+
+.detail-chip__suggestions {
+  max-height: 200px;
+  overflow-y: auto;
+  background: #fff;
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  position: relative;
+  z-index: 1003;
+  border-top: 1px solid #eaecf0;
+  width: 100%;
+}
+
+.detail-chip__suggestion {
+  padding: 10px 12px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  color: #202122;
+  border-bottom: 1px solid #f0f0f0;
+  transition: background-color 0.15s ease;
+  display: block !important;
+  visibility: visible !important;
+  white-space: nowrap;
+}
+
+.detail-chip__suggestion:last-child {
+  border-bottom: none;
+}
+
+.detail-chip__suggestion:hover {
+  background: #eef3ff;
+  color: #3366cc;
+}
+
+.detail-chip__suggestion--custom {
+  font-style: italic;
+  color: #72777d;
+  background: #f8f9fa;
 }
 
 /* Editor More Section - Card-based layout matching user's image */

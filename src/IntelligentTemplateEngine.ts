@@ -395,8 +395,9 @@ export class IntelligentTemplateEngine {
   private mapPersonPlaceholders(properties: Record<string, any>, topic: WikidataTopic, subcategory?: string): Record<string, string> {
     const placeholders: Record<string, string> = {};
     
-    // Common person placeholders
-    placeholders.FULL_NAME = topic.title;
+    // Smart NAME detection - check if we have a real entity or placeholder
+    placeholders.FULL_NAME = this.getSmartEntityName(topic);
+    placeholders.NAME = placeholders.FULL_NAME;
     placeholders.LIFE_SPAN = this.formatLifeSpan(properties.P569, properties.P570);
     placeholders.BIRTH_DETAILS = this.formatBirthDetails(properties.P569, properties.P19);
     placeholders.DEATH_DETAILS = this.formatDeathDetails(properties.P570, properties.P20);
@@ -426,7 +427,7 @@ export class IntelligentTemplateEngine {
   private mapLocationPlaceholders(properties: Record<string, any>, topic: WikidataTopic, subcategory?: string): Record<string, string> {
     const placeholders: Record<string, string> = {};
     
-    placeholders.NAME = topic.title;
+    placeholders.NAME = this.getSmartEntityName(topic);
     placeholders.REGION = properties.P131 || properties.P17 || this.inferRegionFromTitle(topic.title);
     placeholders.ARTICLE = this.getArticle('city');
     
@@ -454,7 +455,7 @@ export class IntelligentTemplateEngine {
   private mapSpeciesPlaceholders(properties: Record<string, any>, topic: WikidataTopic, subcategory?: string): Record<string, string> {
     const placeholders: Record<string, string> = {};
     
-    placeholders.COMMON_NAME = properties.P1843 || topic.title;
+    placeholders.COMMON_NAME = properties.P1843 || this.getSmartEntityName(topic);
     placeholders.SCIENTIFIC_NAME = properties.P225 || '';
     placeholders.ARTICLE = this.getArticle(placeholders.COMMON_NAME);
     
@@ -468,12 +469,27 @@ export class IntelligentTemplateEngine {
     return placeholders;
   }
 
+  // Smart entity name detection
+  private getSmartEntityName(topic: WikidataTopic): string {
+    // If the topic title looks like a placeholder (contains brackets, plus signs, etc), make it a chip
+    if (topic.title.includes('[') || topic.title.includes('+') || topic.title.match(/^(new topic|untitled|article)/i)) {
+      return '<span class="detail-chip" data-detail="entity_name">entity name</span>';
+    }
+    
+    // Check if it's a user-created placeholder title
+    if (topic.title.toLowerCase().includes('example') || topic.title.toLowerCase().includes('placeholder')) {
+      return '<span class="detail-chip" data-detail="entity_name">entity name</span>';
+    }
+    
+    return topic.title;
+  }
+
   // Utility methods for intelligent placeholder mapping
   private formatLifeSpan(birthDate: string, deathDate: string): string {
-    if (!birthDate && !deathDate) return 'dates unknown';
+    if (!birthDate && !deathDate) return '<span class="detail-chip" data-detail="birth_year">birth year</span>';
     if (birthDate && deathDate) return `${birthDate}–${deathDate}`;
     if (birthDate) return `born ${birthDate}`;
-    return 'dates unknown';
+    return '<span class="detail-chip" data-detail="birth_year">birth year</span>';
   }
 
   private formatBirthDetails(birthDate: string, birthPlace: string): string {
@@ -520,11 +536,18 @@ export class IntelligentTemplateEngine {
     let filled = template;
     
     Object.entries(data).forEach(([key, value]) => {
-      filled = filled.replace(new RegExp(`{{${key}}}`, 'g'), value || '');
+      if (value && value.trim() && value !== 'undefined') {
+        filled = filled.replace(new RegExp(`{{${key}}}`, 'g'), value);
+      }
     });
     
-    // Clean up unfilled placeholders and extra spaces
-    filled = filled.replace(/{{[^}]+}}/g, '');
+    // Convert unfilled placeholders to interactive chips instead of removing them
+    filled = filled.replace(/{{([^}]+)}}/g, (match, placeholder) => {
+      const chipText = placeholder.toLowerCase().replace(/_/g, ' ');
+      return `<span class="detail-chip" data-detail="${placeholder.toLowerCase()}">${chipText}</span>`;
+    });
+    
+    // Clean up extra spaces and punctuation
     filled = filled.replace(/\s+/g, ' ').trim();
     filled = filled.replace(/\s+([.,;!?])/g, '$1');
     

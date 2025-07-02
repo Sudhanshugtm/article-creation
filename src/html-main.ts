@@ -355,6 +355,10 @@ class HTMLArticleCreator {
 
     private showArticleCreation(): void {
         this.setState(WorkflowState.ARTICLE_CREATION);
+        
+        // Clear existing article content when switching categories
+        this.articleContent.innerHTML = '';
+        
         if (this.selectedTopic) {
             this.creationTitle.textContent = `Creating ${this.selectedTopic.category} article about "${this.searchTerm}"`;
             this.renderChips(this.creationChipsContainer, this.selectedTopic);
@@ -519,10 +523,20 @@ class HTMLArticleCreator {
         
         // Return to article creation state
         this.showArticleCreation();
+        
+        // Focus the title input to provide clear visual indicator of where user is
+        // Small delay to ensure DOM has updated after state change
+        setTimeout(() => {
+            this.titleInput.focus();
+            this.titleInput.select(); // Also select the text for easy editing
+        }, 100);
     }
 
     private setupArticleEditor(): void {
         if (!this.selectedTopic) return;
+        
+        // Clear any existing article content when setting up editor
+        this.articleContent.innerHTML = '';
         
         // Set the article title
         const articleTitle = this.searchTerm;
@@ -689,7 +703,7 @@ class HTMLArticleCreator {
                 };
             case ArticleCategory.PERSON:
                 return {
-                    lifespan: `${chip('birth_year', 'birth year')}–${chip('death_year', 'death year')}`,
+                    lifespan: `${chip('birth_year', 'birth year')}`,
                     nationality: chip('nationality', 'nationality'),
                     occupation: chip('occupation', 'occupation'),
                     achievement: chip('main_achievement', 'main achievement'),
@@ -1231,16 +1245,39 @@ class HTMLArticleCreator {
         // Minimal fallback suggestions if Wikidata fails
         const fallbacks: Record<string, Record<string, string[]>> = {
             [ArticleCategory.LOCATION]: {
-                'population': ['1 million', '500,000', 'Custom...'],
-                'administrative_role': ['city', 'capital', 'municipality', 'Custom...']
+                'location_type': ['city', 'town', 'village', 'region', 'country', 'Custom...'],
+                'population': ['over 1 million', 'about 500,000', 'about 100,000', 'about 50,000', 'Custom...'],
+                'administrative_role': ['capital city', 'major city', 'municipality', 'administrative center', 'Custom...'],
+                'parent_location': ['United States', 'United Kingdom', 'India', 'Canada', 'Australia', 'Custom...']
             },
             [ArticleCategory.PERSON]: {
-                'nationality': ['American', 'British', 'Indian', 'Custom...'],
-                'occupation': ['writer', 'scientist', 'artist', 'Custom...']
+                'nationality': ['American', 'British', 'Indian', 'Canadian', 'Australian', 'German', 'French', 'Custom...'],
+                'occupation': ['writer', 'scientist', 'artist', 'politician', 'musician', 'actor', 'engineer', 'Custom...'],
+                'birth_year': ['1950', '1960', '1970', '1980', '1990', '2000', 'Custom...'],
+                'main_achievement': ['notable works', 'scientific discoveries', 'artistic contributions', 'political reforms', 'Custom...'],
+                'birth_date': ['January 1, 1970', 'March 15, 1965', 'June 10, 1980', 'Custom...'],
+                'birth_place': ['New York', 'London', 'Paris', 'Mumbai', 'Toronto', 'Sydney', 'Custom...'],
+                'family_background': ['middle-class family', 'academic family', 'working-class origins', 'aristocratic lineage', 'Custom...'],
+                'early_education': ['local schools', 'private tutoring', 'prestigious academy', 'public education', 'Custom...'],
+                'career_start_institution': ['Harvard University', 'Oxford University', 'MIT', 'Stanford University', 'Custom...'],
+                'career_start_year': ['1990', '1995', '2000', '2005', '2010', 'Custom...'],
+                'primary_research': ['theoretical physics', 'molecular biology', 'computer science', 'political theory', 'Custom...'],
+                'major_contributions': ['groundbreaking research', 'innovative policies', 'artistic innovations', 'technological advances', 'Custom...'],
+                'political_start_year': ['1990', '1995', '2000', '2005', '2010', 'Custom...'],
+                'first_office': ['city councilor', 'state representative', 'mayor', 'senator', 'Custom...'],
+                'major_offices': ['Governor', 'Senator', 'Prime Minister', 'President', 'Cabinet Minister', 'Custom...'],
+                'political_achievements': ['landmark legislation', 'policy reforms', 'international agreements', 'social programs', 'Custom...'],
+                'spouse_name': ['Jane Smith', 'John Doe', 'Custom...'],
+                'marriage_year': ['1990', '1995', '2000', '2005', 'Custom...'],
+                'children_details': ['two children', 'three sons', 'one daughter', 'no children', 'Custom...'],
+                'personal_interests': ['reading', 'music', 'sports', 'travel', 'gardening', 'Custom...']
             },
             [ArticleCategory.SPECIES]: {
-                'habitat': ['forests', 'grasslands', 'wetlands', 'Custom...'],
-                'conservation_status': ['Least Concern', 'Vulnerable', 'Custom...']
+                'species_type': ['bird', 'mammal', 'reptile', 'fish', 'amphibian', 'insect', 'plant', 'fungus', 'Custom...'],
+                'habitat': ['forests', 'grasslands', 'wetlands', 'deserts', 'mountains', 'rivers', 'oceans', 'Custom...'],
+                'conservation_status': ['Least Concern', 'Near Threatened', 'Vulnerable', 'Endangered', 'Critically Endangered', 'Custom...'],
+                'native_region': ['North America', 'South America', 'Europe', 'Asia', 'Africa', 'Australia', 'Custom...'],
+                'habitat_details': ['tropical forests', 'temperate forests', 'freshwater lakes', 'coastal areas', 'mountain regions', 'Custom...']
             }
         };
         
@@ -1272,12 +1309,16 @@ class HTMLArticleCreator {
         suggestions.forEach(suggestion => {
             const suggestionItem = document.createElement('div');
             suggestionItem.className = 'detail-chip__suggestion';
+            if (suggestion === 'Custom...') {
+                suggestionItem.className += ' detail-chip__suggestion--custom';
+            }
             suggestionItem.textContent = suggestion;
             
             suggestionItem.addEventListener('click', () => {
                 if (suggestion === 'Custom...') {
                     input.focus();
                     input.value = '';
+                    input.placeholder = `Enter custom ${detailType}...`;
                 } else {
                     this.applySuggestion(chipElement, suggestion, originalText);
                 }
@@ -1561,15 +1602,29 @@ class HTMLArticleCreator {
         
         if (!this.selectedTopic) {
             console.log('No selected topic for section generation');
-            return;
+            // Create a fallback topic to ensure chips are still generated
+            this.selectedTopic = {
+                id: '',
+                title: 'Entity Name',
+                description: 'A person, place, or thing',
+                category: 'Person'
+            } as any;
         }
         
         try {
             const category = this.selectedTopic.category as ArticleCategory;
+            console.log('Generating section content for:', section.title, 'category:', category);
+            
             const sectionContent = await this.sectionEngine.generateSectionContent(section, this.selectedTopic, category);
+            console.log('Generated section content:', sectionContent);
+            
+            // Ensure we have content with chips, not empty/undefined
+            const finalContent = sectionContent && sectionContent.trim() ? 
+                sectionContent : 
+                this.createFallbackSectionWithChips(section.title);
             
             // Add section to article with proper HTML formatting
-            this.insertSectionWithFormatting(section.title, sectionContent);
+            this.insertSectionWithFormatting(section.title, finalContent);
             
             // Close the more section
             this.closeEditorMoreSection();
@@ -1579,11 +1634,53 @@ class HTMLArticleCreator {
             
         } catch (error) {
             console.error('Error generating section content:', error);
-            // Fallback to basic section
-            const basicContent = `[Add information about ${section.title.toLowerCase()}]`;
-            this.insertSectionWithFormatting(section.title, basicContent);
+            console.error('Error details:', error);
+            
+            // Fallback with interactive chips instead of static text
+            const chipContent = this.createFallbackSectionWithChips(section.title);
+            this.insertSectionWithFormatting(section.title, chipContent);
             this.closeEditorMoreSection();
             this.articleContent.focus();
+        }
+    }
+
+    private createFallbackSectionWithChips(sectionTitle: string): string {
+        // Create intelligent fallback content with chips based on section type
+        const lowerTitle = sectionTitle.toLowerCase();
+        console.log('Creating fallback section for:', sectionTitle, 'lowercased:', lowerTitle);
+        
+        // Early Life & Education
+        if (lowerTitle.includes('early life') || lowerTitle.includes('education') || lowerTitle.includes('childhood') || lowerTitle.includes('youth')) {
+            return `<span class="detail-chip" data-detail="entity_name">Entity name</span> was born <span class="detail-chip" data-detail="birth_date">birth date</span> in <span class="detail-chip" data-detail="birth_place">birth place</span>. <span class="detail-chip" data-detail="family_background">Family background</span> and <span class="detail-chip" data-detail="early_education">early education</span> shaped their development.`;
+        } 
+        // Career & Research  
+        else if (lowerTitle.includes('career') || lowerTitle.includes('research') || lowerTitle.includes('work') || lowerTitle.includes('profession')) {
+            return `<span class="detail-chip" data-detail="entity_name">Entity name</span> began their career at <span class="detail-chip" data-detail="career_start_institution">institution</span> in <span class="detail-chip" data-detail="career_start_year">year</span>. Their work focused on <span class="detail-chip" data-detail="primary_research">research area</span> and <span class="detail-chip" data-detail="major_contributions">key contributions</span>.`;
+        }
+        // Political Career
+        else if (lowerTitle.includes('political') || lowerTitle.includes('government') || lowerTitle.includes('office') || lowerTitle.includes('leadership')) {
+            return `<span class="detail-chip" data-detail="entity_name">Entity name</span> entered politics in <span class="detail-chip" data-detail="political_start_year">year</span> as <span class="detail-chip" data-detail="first_office">first position</span>. They later served as <span class="detail-chip" data-detail="major_offices">major positions</span> and achieved <span class="detail-chip" data-detail="political_achievements">key accomplishments</span>.`;
+        }
+        // Personal Life
+        else if (lowerTitle.includes('personal') || lowerTitle.includes('family') || lowerTitle.includes('private')) {
+            return `<span class="detail-chip" data-detail="entity_name">Entity name</span> married <span class="detail-chip" data-detail="spouse_name">spouse</span> in <span class="detail-chip" data-detail="marriage_year">year</span>. They have <span class="detail-chip" data-detail="children_details">children information</span> and <span class="detail-chip" data-detail="personal_interests">personal interests</span>.`;
+        }
+        // Legacy & Death
+        else if (lowerTitle.includes('legacy') || lowerTitle.includes('death') || lowerTitle.includes('later life') || lowerTitle.includes('impact')) {
+            return `<span class="detail-chip" data-detail="entity_name">Entity name</span> passed away <span class="detail-chip" data-detail="death_date">date</span> in <span class="detail-chip" data-detail="death_place">place</span>. Their legacy includes <span class="detail-chip" data-detail="lasting_impact">lasting contributions</span> and <span class="detail-chip" data-detail="commemorations">commemorations</span>.`;
+        }
+        // Awards & Recognition
+        else if (lowerTitle.includes('awards') || lowerTitle.includes('recognition') || lowerTitle.includes('honors') || lowerTitle.includes('achievements')) {
+            return `<span class="detail-chip" data-detail="entity_name">Entity name</span> received <span class="detail-chip" data-detail="major_awards">major awards</span> including <span class="detail-chip" data-detail="prestigious_honors">prestigious honors</span>. Their work was recognized by <span class="detail-chip" data-detail="recognition_institutions">institutions</span> and <span class="detail-chip" data-detail="peer_recognition">peers</span>.`;
+        }
+        // Publications & Works
+        else if (lowerTitle.includes('publications') || lowerTitle.includes('works') || lowerTitle.includes('writings') || lowerTitle.includes('books')) {
+            return `<span class="detail-chip" data-detail="entity_name">Entity name</span> published <span class="detail-chip" data-detail="major_publications">major works</span> including <span class="detail-chip" data-detail="notable_books">notable books</span>. Their <span class="detail-chip" data-detail="publication_themes">key themes</span> influenced <span class="detail-chip" data-detail="field_impact">field impact</span>.`;
+        }
+        // Generic fallback - but make it better
+        else {
+            console.log('Using generic fallback for section:', sectionTitle);
+            return `<span class="detail-chip" data-detail="entity_name">Entity name</span> <span class="detail-chip" data-detail="section_context">section context</span>. <span class="detail-chip" data-detail="key_information">Key information</span> about <span class="detail-chip" data-detail="specific_details">specific details</span> and <span class="detail-chip" data-detail="relevant_facts">relevant facts</span>.`;
         }
     }
     
