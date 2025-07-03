@@ -23,7 +23,7 @@ An intelligent article creation tool that helps users generate Wikipedia-style a
 
 ```bash
 # Clone the repository
-git clone [repository-url]
+git clone https://github.com/SudhanshuGtm/article-creation.git
 cd article-creation
 
 # Install dependencies
