@@ -8,6 +8,8 @@ import { TopicSelection } from './types/workflow';
 import { LeadTemplateEngine } from './LeadTemplateEngine';
 import { IntelligentTemplateEngine } from './IntelligentTemplateEngine';
 import { IntelligentSectionEngine } from './IntelligentSectionEngine';
+import { IntelligentContentGenerator } from './IntelligentContentGenerator';
+import { WikipediaLinkService, LinkSuggestion } from './WikipediaLinkService';
 // import { SnippetModal } from './SnippetModal';
 import {
     cdxIconAdd,
@@ -67,6 +69,7 @@ class HTMLArticleCreator {
     private leadEngine!: LeadTemplateEngine;
     private intelligentEngine!: IntelligentTemplateEngine;
     private sectionEngine!: IntelligentSectionEngine;
+    private contentGenerator!: IntelligentContentGenerator;
     // Reference dialog elements
     private referenceDialog!: HTMLElement;
     private referenceForm!: HTMLFormElement;
@@ -98,12 +101,16 @@ class HTMLArticleCreator {
     private addLinkNextBtn!: HTMLButtonElement;
     private addLinkInsertBtn!: HTMLButtonElement;
     private currentExtractedContent: any = null;
+    // Link detection properties
+    private currentLinkSuggestions: LinkSuggestion[] = [];
+    private isLinkDetectionActive: boolean = false;
 
     constructor() {
         this.debounceHandler = new DebounceHandler(2500);
         this.leadEngine = new LeadTemplateEngine(new WikidataService());
         this.intelligentEngine = new IntelligentTemplateEngine(new WikidataService());
         this.sectionEngine = new IntelligentSectionEngine(new WikidataService());
+        this.contentGenerator = new IntelligentContentGenerator();
         
         this.initializeDOM();
         this.setupEventListeners();
@@ -218,6 +225,11 @@ class HTMLArticleCreator {
         // Close button to return to article creation
         this.closeBtn.addEventListener('click', () => {
             this.exitArticleEditor();
+        });
+
+        // Link button for manual Wikipedia link detection
+        this.linkBtn.addEventListener('click', () => {
+            this.detectLinksManually();
         });
 
         // Focus input on load
@@ -512,6 +524,10 @@ class HTMLArticleCreator {
         // Show the global toolbar and add editing class
         this.globalToolbar.style.display = 'flex';
         document.querySelector('.article-creator')?.classList.add('article-creator--editing');
+        
+        // Set up link detection for this editing session
+        // Link detection will be manual via link button
+        
         // Focus the editable article body to enable typing
         this.articleContent.focus();
     }
@@ -542,11 +558,27 @@ class HTMLArticleCreator {
         const articleTitle = this.searchTerm;
         this.articleTitleText.textContent = articleTitle;
         
-        // Set the background text using existing CategoryMapper method
-        const categoryDescription = this.selectedTopic.category.toLowerCase().replace('/', ' or ');
-        const backgroundText = `${articleTitle} is a ${categoryDescription}.`;
-        // Set placeholder text via data attribute
-        this.articleContent.dataset.placeholder = backgroundText;
+        // Generate a brief, focused lead section (not detailed)
+        const leadVariations = this.getManualLeads(this.selectedTopic.label, this.selectedTopic.category as ArticleCategory);
+        const briefLead = leadVariations.formal; // Use formal instead of detailed for conciseness
+        
+        // Create a lead paragraph element
+        const leadParagraph = document.createElement('p');
+        leadParagraph.className = 'article-lead';
+        leadParagraph.innerHTML = briefLead;
+        
+        // Insert the lead into the article content
+        this.articleContent.appendChild(leadParagraph);
+        
+        // Add click handlers to detail chips in the lead
+        const detailChips = leadParagraph.querySelectorAll('.detail-chip');
+        detailChips.forEach(chip => {
+            const detail = chip.getAttribute('data-detail');
+            chip.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.handleDetailChipClick(detail || '', chip as HTMLElement);
+            });
+        });
         // Render editor action chips below the content area
         const editorChipsContainer = document.getElementById('editorChipsContainer') as HTMLElement;
         if (editorChipsContainer) {
@@ -1277,7 +1309,80 @@ class HTMLArticleCreator {
                 'habitat': ['forests', 'grasslands', 'wetlands', 'deserts', 'mountains', 'rivers', 'oceans', 'Custom...'],
                 'conservation_status': ['Least Concern', 'Near Threatened', 'Vulnerable', 'Endangered', 'Critically Endangered', 'Custom...'],
                 'native_region': ['North America', 'South America', 'Europe', 'Asia', 'Africa', 'Australia', 'Custom...'],
-                'habitat_details': ['tropical forests', 'temperate forests', 'freshwater lakes', 'coastal areas', 'mountain regions', 'Custom...']
+                'habitat_details': ['tropical forests', 'temperate forests', 'freshwater lakes', 'coastal areas', 'mountain regions', 'Custom...'],
+                // Physical characteristics
+                'size_category': ['small', 'medium-sized', 'large', 'very large', 'tiny', 'compact', 'Custom...'],
+                'length_measurement': ['30-50 cm', '1-2 meters', '2-3 meters', '50-100 cm', '10-30 cm', 'Custom...'],
+                'weight_range': ['1-5 kg', '10-25 kg', '25-50 kg', '50-100 kg', '100-200 kg', 'Custom...'],
+                'sexual_dimorphism': ['pronounced sexual dimorphism', 'minimal sexual dimorphism', 'no sexual dimorphism', 'males larger than females', 'females larger than males', 'Custom...'],
+                'size_difference': ['10-15% larger', '20-30% larger', '50% larger', 'twice the size', 'similar sizes', 'Custom...'],
+                'primary_distinguishing_feature': ['prominent crest', 'distinctive coloration', 'long tail', 'large ears', 'powerful build', 'unique markings', 'Custom...'],
+                'feature_function_1': ['defensive purposes', 'territorial display', 'mating ritual', 'heat regulation', 'camouflage', 'Custom...'],
+                'feature_function_2': ['communication', 'navigation', 'protection', 'hunting', 'social bonding', 'Custom...'],
+                'body_covering': ['thick fur', 'smooth scales', 'feathers', 'tough skin', 'protective shell', 'Custom...'],
+                'protection_type': ['weather protection', 'predator defense', 'UV protection', 'thermal insulation', 'Custom...'],
+                'adaptive_function': ['thermoregulation', 'water conservation', 'energy efficiency', 'sensory enhancement', 'Custom...'],
+                'skull_features': ['elongated skull', 'reinforced cranium', 'specialized jaw structure', 'enlarged brain case', 'Custom...'],
+                'sensory_organs': ['acute hearing', 'enhanced vision', 'sensitive smell', 'specialized touch receptors', 'Custom...'],
+                'eye_description': ['large round eyes', 'forward-facing eyes', 'small beady eyes', 'compound eyes', 'Custom...'],
+                'vision_type': ['excellent night vision', 'color vision', 'motion detection', 'depth perception', 'Custom...'],
+                'lighting_conditions': ['bright daylight', 'low light conditions', 'complete darkness', 'underwater', 'Custom...'],
+                'limb_structure': ['muscular limbs', 'elongated limbs', 'short sturdy limbs', 'flexible appendages', 'Custom...'],
+                'extremity_features': ['sharp claws', 'webbed feet', 'opposable thumbs', 'suction cups', 'hooves', 'Custom...'],
+                'locomotion_ability': ['rapid running', 'precise climbing', 'efficient swimming', 'sustained flight', 'Custom...'],
+                'terrain_types': ['rocky surfaces', 'sandy terrain', 'muddy ground', 'tree branches', 'water surfaces', 'Custom...'],
+                // Taxonomy and classification
+                'taxonomic_classification': ['vertebrate species', 'invertebrate species', 'flowering plant', 'coniferous tree', 'Custom...'],
+                'family_classification': ['Felidae family', 'Canidae family', 'Ursidae family', 'Corvidae family', 'Custom...'],
+                'order_classification': ['Carnivora', 'Primates', 'Rodentia', 'Passeriformes', 'Lepidoptera', 'Custom...'],
+                'discovery_year': ['1758', '1859', '1901', '1950', '1975', '2000', 'Custom...'],
+                'describing_scientist': ['Carl Linnaeus', 'Charles Darwin', 'Alfred Wallace', 'John Smith', 'Custom...'],
+                'type_locality': ['Madagascar', 'Amazon rainforest', 'Galápagos Islands', 'Australian Outback', 'Custom...'],
+                'distinguishing_feature_1': ['unique coloration pattern', 'distinctive size', 'specialized appendages', 'unusual behavior', 'Custom...'],
+                'distinguishing_feature_2': ['vocal characteristics', 'mating displays', 'feeding habits', 'seasonal changes', 'Custom...'],
+                'distinguishing_feature_3': ['habitat preferences', 'social structure', 'reproductive cycle', 'migration patterns', 'Custom...'],
+                'phenotypic_variation': ['significant color variation', 'size polymorphism', 'seasonal dimorphism', 'geographic variation', 'Custom...'],
+                'subspecies_number': ['three recognized subspecies', 'five distinct populations', 'no subspecies', 'numerous local variants', 'Custom...'],
+                // Ecology and behavior
+                'ecological_role': ['apex predator', 'keystone species', 'pollinator', 'seed disperser', 'decomposer', 'Custom...'],
+                'predator_role': ['top predator', 'secondary predator', 'opportunistic hunter', 'ambush predator', 'Custom...'],
+                'prey_role': ['primary prey', 'occasional prey', 'rarely preyed upon', 'protected by defenses', 'Custom...'],
+                'seasonal_behaviors': ['winter hibernation', 'spring migration', 'summer breeding', 'autumn feeding', 'Custom...'],
+                'life_stages': ['juvenile development', 'adult maturity', 'elderly decline', 'metamorphosis stages', 'Custom...'],
+                'feeding_classification': ['strict carnivore', 'herbivore', 'omnivore', 'insectivore', 'filter feeder', 'Custom...'],
+                'primary_food_sources': ['small mammals', 'insects', 'fruits and seeds', 'aquatic plants', 'nectar', 'Custom...'],
+                'secondary_diet': ['seasonal fruits', 'emergency protein sources', 'mineral supplements', 'occasional scavenging', 'Custom...'],
+                'resource_scarcity': ['winter months', 'drought periods', 'territorial competition', 'climate changes', 'Custom...'],
+                'social_organization': ['matriarchal groups', 'alpha-dominated packs', 'loose aggregations', 'solitary individuals', 'Custom...'],
+                'group_size': ['small family units', 'large flocks', 'mated pairs', 'temporary gatherings', 'Custom...'],
+                'group_composition': ['mixed-age groups', 'age-segregated clusters', 'breeding pairs only', 'female-dominated groups', 'Custom...'],
+                'communication_methods': ['complex vocalizations', 'visual displays', 'chemical signals', 'tactile interactions', 'Custom...'],
+                'communication_complexity': ['15+ distinct calls', '30+ vocalizations', 'simple sound repertoire', 'elaborate signal system', 'Custom...'],
+                'call_functions': ['alarm calls', 'mating songs', 'territorial warnings', 'parent-offspring communication', 'Custom...'],
+                'breeding_pattern': ['annual breeding cycle', 'biannual reproduction', 'opportunistic breeding', 'continuous reproduction', 'Custom...'],
+                'breeding_season': ['spring months', 'late summer', 'dry season', 'year-round', 'Custom...'],
+                'courtship_behavior': ['complex dances', 'vocal performances', 'gift presentations', 'territorial displays', 'Custom...'],
+                'courtship_duration': ['several days', 'multiple weeks', 'brief encounters', 'extended seasons', 'Custom...'],
+                'parental_strategy': ['biparental care', 'female-only care', 'male-only care', 'communal raising', 'Custom...'],
+                'care_activities': ['nest building', 'food provisioning', 'protection duties', 'teaching behaviors', 'Custom...'],
+                'care_duration': ['2-3 months', '6 months', 'one year', 'until independence', 'Custom...'],
+                // Habitat details
+                'primary_habitat': ['dense forests', 'open grasslands', 'wetland areas', 'rocky mountains', 'coastal regions', 'Custom...'],
+                'geographic_distribution': ['widespread across continents', 'limited to specific regions', 'island populations', 'fragmented habitats', 'Custom...'],
+                'habitat_types': ['diverse ecosystems', 'specialized niches', 'edge environments', 'transitional zones', 'Custom...'],
+                'secondary_habitats': ['agricultural areas', 'urban parks', 'secondary forests', 'disturbed habitats', 'Custom...'],
+                'vegetation_type': ['old-growth forests', 'deciduous woodlands', 'coniferous stands', 'mixed vegetation', 'Custom...'],
+                'canopy_coverage': ['dense canopy (80-90%)', 'moderate coverage (50-70%)', 'open canopy (30-50%)', 'sparse coverage', 'Custom...'],
+                'shelter_benefits': ['predator avoidance', 'weather protection', 'nesting sites', 'roosting locations', 'Custom...'],
+                'resource_availability': ['year-round food sources', 'seasonal abundance', 'water access', 'nesting materials', 'Custom...'],
+                'terrain_features': ['river valleys', 'steep slopes', 'plateau areas', 'cave systems', 'Custom...'],
+                'landscape_elements': ['natural clearings', 'fallen logs', 'boulder fields', 'stream corridors', 'Custom...'],
+                'seasonal_range_1': ['northern breeding areas', 'mountain highlands', 'tropical regions', 'coastal zones', 'Custom...'],
+                'seasonal_range_2': ['southern wintering grounds', 'lowland areas', 'temperate zones', 'inland regions', 'Custom...'],
+                'migration_distance': ['short local movements', 'medium-distance travel', 'transcontinental journeys', 'no migration', 'Custom...'],
+                'climate_adaptations': ['temperature tolerance', 'drought resistance', 'flood adaptations', 'seasonal adjustments', 'Custom...'],
+                'alternative_habitats': ['human-modified landscapes', 'protected reserves', 'restoration areas', 'corridor habitats', 'Custom...'],
+                'elevation_changes': ['higher altitudes', 'lower elevations', 'sea level areas', 'mountain peaks', 'Custom...']
             }
         };
         
@@ -1554,7 +1659,17 @@ class HTMLArticleCreator {
         
         try {
             const category = this.selectedTopic.category as ArticleCategory;
-            const sectionSuggestions = await this.sectionEngine.getSuggestedSections(this.selectedTopic, category);
+            
+            // Convert TopicSelection to WikidataTopic format
+            const wikidataTopic = {
+                id: this.selectedTopic.wikidataId || '',
+                title: this.selectedTopic.label,
+                description: this.selectedTopic.description,
+                category: this.selectedTopic.category,
+                instanceOf: [] as string[]
+            };
+            
+            const sectionSuggestions = await this.sectionEngine.getSuggestedSections(wikidataTopic, category);
             
             // Limit to top 4 suggestions to avoid overwhelming the UI
             const topSuggestions = sectionSuggestions.slice(0, 4);
@@ -1612,16 +1727,32 @@ class HTMLArticleCreator {
         }
         
         try {
-            const category = this.selectedTopic.category as ArticleCategory;
+            const category = this.selectedTopic?.category as ArticleCategory;
             console.log('Generating section content for:', section.title, 'category:', category);
             
-            const sectionContent = await this.sectionEngine.generateSectionContent(section, this.selectedTopic, category);
+            if (!this.selectedTopic) {
+                throw new Error('No selected topic available');
+            }
+            
+            console.log('DEBUG: selectedTopic structure:', this.selectedTopic);
+            
+            // Convert TopicSelection to WikidataTopic format
+            const wikidataTopic = {
+                id: this.selectedTopic.wikidataId || '',
+                title: this.selectedTopic.label,
+                description: this.selectedTopic.description,
+                category: this.selectedTopic.category,
+                instanceOf: [] as string[]
+            };
+            console.log('DEBUG: Topic title:', wikidataTopic.title);
+            
+            const sectionContent = await this.sectionEngine.generateSectionContent(section, wikidataTopic, category);
             console.log('Generated section content:', sectionContent);
             
             // Ensure we have content with chips, not empty/undefined
             const finalContent = sectionContent && sectionContent.trim() ? 
                 sectionContent : 
-                this.createFallbackSectionWithChips(section.title);
+                await this.createFallbackSectionWithChips(section.title);
             
             // Add section to article with proper HTML formatting
             this.insertSectionWithFormatting(section.title, finalContent);
@@ -1637,50 +1768,107 @@ class HTMLArticleCreator {
             console.error('Error details:', error);
             
             // Fallback with interactive chips instead of static text
-            const chipContent = this.createFallbackSectionWithChips(section.title);
+            const chipContent = await this.createFallbackSectionWithChips(section.title);
             this.insertSectionWithFormatting(section.title, chipContent);
             this.closeEditorMoreSection();
             this.articleContent.focus();
         }
     }
 
-    private createFallbackSectionWithChips(sectionTitle: string): string {
+    private async createFallbackSectionWithChips(sectionTitle: string): Promise<string> {
         // Create intelligent fallback content with chips based on section type
         const lowerTitle = sectionTitle.toLowerCase();
-        console.log('Creating fallback section for:', sectionTitle, 'lowercased:', lowerTitle);
+        console.log('Creating intelligent fallback section for:', sectionTitle, 'lowercased:', lowerTitle);
         
-        // Early Life & Education
-        if (lowerTitle.includes('early life') || lowerTitle.includes('education') || lowerTitle.includes('childhood') || lowerTitle.includes('youth')) {
-            return `<span class="detail-chip" data-detail="entity_name">Entity name</span> was born <span class="detail-chip" data-detail="birth_date">birth date</span> in <span class="detail-chip" data-detail="birth_place">birth place</span>. <span class="detail-chip" data-detail="family_background">Family background</span> and <span class="detail-chip" data-detail="early_education">early education</span> shaped their development.`;
-        } 
-        // Career & Research  
-        else if (lowerTitle.includes('career') || lowerTitle.includes('research') || lowerTitle.includes('work') || lowerTitle.includes('profession')) {
-            return `<span class="detail-chip" data-detail="entity_name">Entity name</span> began their career at <span class="detail-chip" data-detail="career_start_institution">institution</span> in <span class="detail-chip" data-detail="career_start_year">year</span>. Their work focused on <span class="detail-chip" data-detail="primary_research">research area</span> and <span class="detail-chip" data-detail="major_contributions">key contributions</span>.`;
+        // Get the entity name and category from the current topic
+        const entityName = this.selectedTopic?.label || 'entity';
+        const category = this.selectedTopic?.category as ArticleCategory || ArticleCategory.PERSON;
+        
+        // Create a mock topic for content generation
+        const mockTopic = {
+            id: '',
+            title: entityName,
+            label: entityName,
+            description: this.getCategoryContextualDescription(category, entityName),
+            category: this.selectedTopic?.category || 'person',
+            instanceOf: [] as string[]
+        };
+
+        try {
+            // Generate intelligent content suggestions
+            const suggestions = await this.contentGenerator.generateContentSuggestions(
+                mockTopic,
+                category,
+                lowerTitle
+            );
+
+            // Get contextual entity name instead of generic "Entity name"
+            const entityChip = this.getIntelligentEntityChip(entityName, category);
+            
+            // Early Life & Education
+            if (lowerTitle.includes('early life') || lowerTitle.includes('education') || lowerTitle.includes('childhood') || lowerTitle.includes('youth')) {
+                return `${entityChip} was born <span class="detail-chip" data-detail="birth_date">birth date</span> in <span class="detail-chip" data-detail="birth_place">birth place</span>. <span class="detail-chip" data-detail="family_background">Family background</span> and <span class="detail-chip" data-detail="early_education">early education</span> shaped their development.`;
+            } 
+            // Career & Research  
+            else if (lowerTitle.includes('career') || lowerTitle.includes('research') || lowerTitle.includes('work') || lowerTitle.includes('profession')) {
+                return `${entityChip} began their career at <span class="detail-chip" data-detail="career_start_institution">institution</span> in <span class="detail-chip" data-detail="career_start_year">year</span>. Their work focused on <span class="detail-chip" data-detail="primary_research">research area</span> and <span class="detail-chip" data-detail="major_contributions">key contributions</span>.`;
+            }
+            // Political Career
+            else if (lowerTitle.includes('political') || lowerTitle.includes('government') || lowerTitle.includes('office') || lowerTitle.includes('leadership')) {
+                return `${entityChip} entered politics in <span class="detail-chip" data-detail="political_start_year">year</span> as <span class="detail-chip" data-detail="first_office">first position</span>. They later served as <span class="detail-chip" data-detail="major_offices">major positions</span> and achieved <span class="detail-chip" data-detail="political_achievements">key accomplishments</span>.`;
+            }
+            // Personal Life
+            else if (lowerTitle.includes('personal') || lowerTitle.includes('family') || lowerTitle.includes('private')) {
+                return `${entityChip} married <span class="detail-chip" data-detail="spouse_name">spouse</span> in <span class="detail-chip" data-detail="marriage_year">year</span>. They have <span class="detail-chip" data-detail="children_details">children information</span> and <span class="detail-chip" data-detail="personal_interests">personal interests</span>.`;
+            }
+            // Legacy & Death
+            else if (lowerTitle.includes('legacy') || lowerTitle.includes('death') || lowerTitle.includes('later life') || lowerTitle.includes('impact')) {
+                return `${entityChip} passed away <span class="detail-chip" data-detail="death_date">date</span> in <span class="detail-chip" data-detail="death_place">place</span>. Their legacy includes <span class="detail-chip" data-detail="lasting_impact">lasting contributions</span> and <span class="detail-chip" data-detail="commemorations">commemorations</span>.`;
+            }
+            // Awards & Recognition
+            else if (lowerTitle.includes('awards') || lowerTitle.includes('recognition') || lowerTitle.includes('honors') || lowerTitle.includes('achievements')) {
+                return `${entityChip} received <span class="detail-chip" data-detail="major_awards">major awards</span> including <span class="detail-chip" data-detail="prestigious_honors">prestigious honors</span>. Their work was recognized by <span class="detail-chip" data-detail="recognition_institutions">institutions</span> and <span class="detail-chip" data-detail="peer_recognition">peers</span>.`;
+            }
+            // Publications & Works
+            else if (lowerTitle.includes('publications') || lowerTitle.includes('works') || lowerTitle.includes('writings') || lowerTitle.includes('books')) {
+                return `${entityChip} published <span class="detail-chip" data-detail="major_publications">major works</span> including <span class="detail-chip" data-detail="notable_books">notable books</span>. Their <span class="detail-chip" data-detail="publication_themes">key themes</span> influenced <span class="detail-chip" data-detail="field_impact">field impact</span>.`;
+            }
+            // Generic fallback - but make it contextual
+            else {
+                console.log('Using intelligent generic fallback for section:', sectionTitle);
+                return `${entityChip} <span class="detail-chip" data-detail="section_context">section context</span>. <span class="detail-chip" data-detail="key_information">Key information</span> about <span class="detail-chip" data-detail="specific_details">specific details</span> and <span class="detail-chip" data-detail="relevant_facts">relevant facts</span>.`;
+            }
+        } catch (error) {
+            console.error('Error generating intelligent section content:', error);
+            // Fallback to simple entity name
+            const simpleEntityChip = `<span class="detail-chip" data-detail="entity_name">${entityName}</span>`;
+            return `${simpleEntityChip} <span class="detail-chip" data-detail="section_context">section context</span>. <span class="detail-chip" data-detail="key_information">Key information</span> about <span class="detail-chip" data-detail="specific_details">specific details</span> and <span class="detail-chip" data-detail="relevant_facts">relevant facts</span>.`;
         }
-        // Political Career
-        else if (lowerTitle.includes('political') || lowerTitle.includes('government') || lowerTitle.includes('office') || lowerTitle.includes('leadership')) {
-            return `<span class="detail-chip" data-detail="entity_name">Entity name</span> entered politics in <span class="detail-chip" data-detail="political_start_year">year</span> as <span class="detail-chip" data-detail="first_office">first position</span>. They later served as <span class="detail-chip" data-detail="major_offices">major positions</span> and achieved <span class="detail-chip" data-detail="political_achievements">key accomplishments</span>.`;
-        }
-        // Personal Life
-        else if (lowerTitle.includes('personal') || lowerTitle.includes('family') || lowerTitle.includes('private')) {
-            return `<span class="detail-chip" data-detail="entity_name">Entity name</span> married <span class="detail-chip" data-detail="spouse_name">spouse</span> in <span class="detail-chip" data-detail="marriage_year">year</span>. They have <span class="detail-chip" data-detail="children_details">children information</span> and <span class="detail-chip" data-detail="personal_interests">personal interests</span>.`;
-        }
-        // Legacy & Death
-        else if (lowerTitle.includes('legacy') || lowerTitle.includes('death') || lowerTitle.includes('later life') || lowerTitle.includes('impact')) {
-            return `<span class="detail-chip" data-detail="entity_name">Entity name</span> passed away <span class="detail-chip" data-detail="death_date">date</span> in <span class="detail-chip" data-detail="death_place">place</span>. Their legacy includes <span class="detail-chip" data-detail="lasting_impact">lasting contributions</span> and <span class="detail-chip" data-detail="commemorations">commemorations</span>.`;
-        }
-        // Awards & Recognition
-        else if (lowerTitle.includes('awards') || lowerTitle.includes('recognition') || lowerTitle.includes('honors') || lowerTitle.includes('achievements')) {
-            return `<span class="detail-chip" data-detail="entity_name">Entity name</span> received <span class="detail-chip" data-detail="major_awards">major awards</span> including <span class="detail-chip" data-detail="prestigious_honors">prestigious honors</span>. Their work was recognized by <span class="detail-chip" data-detail="recognition_institutions">institutions</span> and <span class="detail-chip" data-detail="peer_recognition">peers</span>.`;
-        }
-        // Publications & Works
-        else if (lowerTitle.includes('publications') || lowerTitle.includes('works') || lowerTitle.includes('writings') || lowerTitle.includes('books')) {
-            return `<span class="detail-chip" data-detail="entity_name">Entity name</span> published <span class="detail-chip" data-detail="major_publications">major works</span> including <span class="detail-chip" data-detail="notable_books">notable books</span>. Their <span class="detail-chip" data-detail="publication_themes">key themes</span> influenced <span class="detail-chip" data-detail="field_impact">field impact</span>.`;
-        }
-        // Generic fallback - but make it better
-        else {
-            console.log('Using generic fallback for section:', sectionTitle);
-            return `<span class="detail-chip" data-detail="entity_name">Entity name</span> <span class="detail-chip" data-detail="section_context">section context</span>. <span class="detail-chip" data-detail="key_information">Key information</span> about <span class="detail-chip" data-detail="specific_details">specific details</span> and <span class="detail-chip" data-detail="relevant_facts">relevant facts</span>.`;
+    }
+
+    private getIntelligentEntityChip(entityName: string, category: ArticleCategory): string {
+        // Generate contextual entity chip instead of generic "Entity name"
+        const chipText = this.generateContextualEntityName(entityName, category);
+        return `<span class="detail-chip" data-detail="entity_name">${chipText}</span>`;
+    }
+
+    private generateContextualEntityName(entityName: string, category: ArticleCategory): string {
+        // For fictional/unknown entities, create contextual descriptions
+        switch (category) {
+            case ArticleCategory.SPECIES:
+                if (entityName.toLowerCase().includes('saurus')) {
+                    return `The ${entityName}`;
+                } else if (entityName.toLowerCase().includes('bird') || entityName.toLowerCase().includes('fly')) {
+                    return `The ${entityName}`;
+                } else {
+                    return `**${entityName}**`;
+                }
+            case ArticleCategory.PERSON:
+                return `**${entityName}**`;
+            case ArticleCategory.LOCATION:
+                return `**${entityName}**`;
+            default:
+                return `**${entityName}**`;
         }
     }
     
@@ -1694,14 +1882,19 @@ class HTMLArticleCreator {
         heading.className = 'article-section__heading';
         heading.textContent = sectionTitle;
         
-        // Create section content paragraph
-        const contentParagraph = document.createElement('p');
-        contentParagraph.className = 'article-section__content';
-        contentParagraph.innerHTML = sectionContent;
-        
-        // Assemble section
+        // Assemble section - add heading first
         sectionElement.appendChild(heading);
-        sectionElement.appendChild(contentParagraph);
+        
+        // Process content to handle multiple paragraphs
+        const paragraphs = sectionContent.split('\n\n').filter(p => p.trim().length > 0);
+        
+        // Create multiple paragraph elements for better formatting
+        paragraphs.forEach(paragraphText => {
+            const contentParagraph = document.createElement('p');
+            contentParagraph.className = 'article-section__content';
+            contentParagraph.innerHTML = paragraphText.trim();
+            sectionElement.appendChild(contentParagraph);
+        });
         
         // Insert into article
         this.articleContent.appendChild(sectionElement);
@@ -2261,6 +2454,290 @@ class HTMLArticleCreator {
         this.addLinkError.textContent = message;
         this.addLinkError.style.display = 'block';
     }
+    
+    // Wikipedia Link Detection Methods
+    // Manual Wikipedia Link Detection triggered by link button
+    private detectLinksManually(): void {
+        if (this.isLinkDetectionActive) return;
+        
+        // Clear any existing suggestions first
+        this.clearLinkSuggestions();
+        
+        // Check if there's content to analyze
+        const textContent = this.getTextContentForLinkDetection();
+        if (!textContent || textContent.length < 20) {
+            this.showLinkDetectionMessage('No content available for link detection. Please add some text first.');
+            return;
+        }
+        
+        // Show detection is happening
+        this.showLinkDetectionMessage('Scanning for potential Wikipedia links...');
+        this.detectAndShowLinkSuggestions();
+    }
+    
+    private showLinkDetectionMessage(message: string): void {
+        // Create a temporary message element
+        const messageElement = document.createElement('div');
+        messageElement.className = 'link-detection-message';
+        messageElement.textContent = message;
+        messageElement.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #3366cc;
+            color: white;
+            padding: 12px 16px;
+            border-radius: 4px;
+            font-size: 0.875rem;
+            z-index: 1006;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        `;
+        
+        document.body.appendChild(messageElement);
+        
+        // Remove message after 3 seconds
+        setTimeout(() => {
+            if (messageElement.parentNode) {
+                messageElement.parentNode.removeChild(messageElement);
+            }
+        }, 3000);
+    }
+    
+    
+    private async detectAndShowLinkSuggestions(): Promise<void> {
+        if (this.isLinkDetectionActive) return;
+        
+        // Get current text content excluding existing links and chips
+        const textContent = this.getTextContentForLinkDetection();
+        
+        if (!textContent || textContent.length < 20) return;
+        
+        // Don't detect links if we already have potential links showing
+        if (this.articleContent.querySelectorAll('.potential-link').length > 0) {
+            return;
+        }
+        
+        this.isLinkDetectionActive = true;
+        
+        try {
+            console.log('Detecting links in text:', textContent.substring(0, 100) + '...');
+            const suggestions = await WikipediaLinkService.detectLinksInText(textContent);
+            console.log('Found suggestions:', suggestions.length);
+            this.currentLinkSuggestions = suggestions;
+            
+            if (suggestions.length > 0) {
+                this.renderLinkSuggestions(suggestions);
+                this.showLinkDetectionMessage(`Found ${suggestions.length} potential Wikipedia link${suggestions.length > 1 ? 's' : ''}. Click to review.`);
+            } else {
+                this.showLinkDetectionMessage('No potential Wikipedia links found in the current text.');
+            }
+            
+        } catch (error) {
+            console.error('Error detecting links:', error);
+        } finally {
+            this.isLinkDetectionActive = false;
+        }
+    }
+    
+    private getTextContentForLinkDetection(): string {
+        // Get clean text content for analysis, excluding existing links and chips
+        const clone = this.articleContent.cloneNode(true) as HTMLElement;
+        
+        // Remove existing links and chips from the clone
+        clone.querySelectorAll('.wikipedia-link, .detail-chip, .potential-link').forEach(el => {
+            el.replaceWith(el.textContent || '');
+        });
+        
+        return clone.textContent || '';
+    }
+    
+    private renderLinkSuggestions(suggestions: LinkSuggestion[]): void {
+        // Clear previous suggestions
+        this.clearLinkSuggestions();
+        
+        // Use a safer approach to add link suggestions
+        this.addLinkSuggestionsToDOM(suggestions);
+        
+        // Add event listeners to the new potential links
+        this.setupPotentialLinkListeners();
+    }
+    
+    private addLinkSuggestionsToDOM(suggestions: LinkSuggestion[]): void {
+        // Get all text nodes in the content
+        const walker = document.createTreeWalker(
+            this.articleContent,
+            NodeFilter.SHOW_TEXT,
+            null
+        );
+        
+        const textNodes: Node[] = [];
+        let node;
+        while (node = walker.nextNode()) {
+            textNodes.push(node);
+        }
+        
+        // Build a complete text map
+        let fullText = '';
+        const nodeMap: Array<{node: Node, start: number, end: number}> = [];
+        
+        for (const textNode of textNodes) {
+            const nodeText = textNode.textContent || '';
+            const start = fullText.length;
+            const end = start + nodeText.length;
+            nodeMap.push({node: textNode, start, end});
+            fullText += nodeText;
+        }
+        
+        // Sort suggestions by position (reverse order to maintain indices)
+        const sortedSuggestions = [...suggestions].sort((a, b) => b.startIndex - a.startIndex);
+        
+        // Apply each suggestion
+        for (const suggestion of sortedSuggestions) {
+            this.applySuggestionToDOM(suggestion, nodeMap, fullText);
+        }
+    }
+    
+    private applySuggestionToDOM(suggestion: LinkSuggestion, nodeMap: Array<{node: Node, start: number, end: number}>, fullText: string): void {
+        // Find which text node(s) contain this suggestion
+        const suggestedText = fullText.substring(suggestion.startIndex, suggestion.endIndex);
+        
+        // Find the node that contains the start of this suggestion
+        const targetNode = nodeMap.find(mapping => 
+            mapping.start <= suggestion.startIndex && mapping.end > suggestion.startIndex
+        );
+        
+        if (!targetNode) return;
+        
+        const nodeText = targetNode.node.textContent || '';
+        const relativeStart = suggestion.startIndex - targetNode.start;
+        const relativeEnd = suggestion.endIndex - targetNode.start;
+        
+        // Make sure the text matches what we expect
+        const actualText = nodeText.substring(relativeStart, relativeEnd);
+        if (actualText.toLowerCase() !== suggestedText.toLowerCase()) {
+            return; // Skip if text doesn't match
+        }
+        
+        // Create the suggestion element
+        const suggestionElement = document.createElement('span');
+        suggestionElement.className = 'potential-link';
+        suggestionElement.setAttribute('data-wikipedia-title', suggestion.wikipediaTitle);
+        suggestionElement.setAttribute('data-confidence', suggestion.confidence.toString());
+        suggestionElement.setAttribute('data-url', suggestion.url);
+        suggestionElement.setAttribute('data-original-text', suggestion.text);
+        suggestionElement.setAttribute('title', `Suggested link: ${suggestion.wikipediaTitle}`);
+        
+        // Add content
+        suggestionElement.innerHTML = `
+            ${suggestion.text}
+            <span class="link-suggestion-tooltip">${this.escapeHtml(suggestion.description || suggestion.wikipediaTitle)}</span>
+            <div class="link-suggestion-actions">
+                <button class="link-action-btn link-action-btn--primary" data-action="accept">Link</button>
+                <button class="link-action-btn" data-action="reject">Ignore</button>
+            </div>
+        `;
+        
+        // Split the text node and insert the suggestion
+        const beforeText = nodeText.substring(0, relativeStart);
+        const afterText = nodeText.substring(relativeEnd);
+        
+        const parentNode = targetNode.node.parentNode;
+        if (!parentNode) return;
+        
+        // Create new text nodes
+        const beforeNode = document.createTextNode(beforeText);
+        const afterNode = document.createTextNode(afterText);
+        
+        // Replace the original node with the new structure
+        if (beforeText) {
+            parentNode.insertBefore(beforeNode, targetNode.node);
+        }
+        parentNode.insertBefore(suggestionElement, targetNode.node);
+        if (afterText) {
+            parentNode.insertBefore(afterNode, targetNode.node);
+        }
+        parentNode.removeChild(targetNode.node);
+    }
+    
+    private escapeHtml(text: string): string {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+    
+    private escapeRegex(string: string): string {
+        return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
+    
+    private setupPotentialLinkListeners(): void {
+        const potentialLinks = this.articleContent.querySelectorAll('.potential-link');
+        
+        potentialLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                
+                // Remove active class from other links
+                potentialLinks.forEach(otherLink => {
+                    otherLink.classList.remove('potential-link--active');
+                });
+                
+                // Toggle active state
+                link.classList.toggle('potential-link--active');
+            });
+            
+            // Handle action buttons
+            const actionBtns = link.querySelectorAll('.link-action-btn');
+            actionBtns.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const action = (btn as HTMLElement).dataset.action;
+                    
+                    if (action === 'accept') {
+                        this.acceptLinkSuggestion(link as HTMLElement);
+                    } else if (action === 'reject') {
+                        this.rejectLinkSuggestion(link as HTMLElement);
+                    }
+                });
+            });
+        });
+    }
+    
+    private acceptLinkSuggestion(linkElement: HTMLElement): void {
+        const wikipediaTitle = linkElement.dataset.wikipediaTitle || '';
+        const url = linkElement.dataset.url || '';
+        const originalText = linkElement.dataset.originalText || '';
+        
+        // Create actual Wikipedia link
+        const actualLink = document.createElement('a');
+        actualLink.href = url;
+        actualLink.target = '_blank';
+        actualLink.className = 'wikipedia-link';
+        actualLink.textContent = originalText;
+        actualLink.title = wikipediaTitle;
+        
+        // Replace the suggestion with the actual link
+        linkElement.parentNode?.replaceChild(actualLink, linkElement);
+    }
+    
+    private rejectLinkSuggestion(linkElement: HTMLElement): void {
+        const originalText = linkElement.dataset.originalText || '';
+        
+        // Replace with plain text
+        const textNode = document.createTextNode(originalText);
+        linkElement.parentNode?.replaceChild(textNode, linkElement);
+    }
+    
+    private clearLinkSuggestions(): void {
+        // Remove any existing potential links
+        const existingSuggestions = this.articleContent.querySelectorAll('.potential-link');
+        existingSuggestions.forEach(suggestion => {
+            const text = suggestion.textContent?.replace(/LinkIgnore/, '').trim() || '';
+            suggestion.outerHTML = text;
+        });
+        
+        this.currentLinkSuggestions = [];
+    }
+    
 }
 
 // Initialize the application

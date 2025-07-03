@@ -981,3 +981,159 @@
   color: #fff;
   border-color: #3366cc;
 }
+
+/* Wikipedia Link Suggestions */
+.potential-link {
+  position: relative;
+  background: linear-gradient(transparent 60%, rgba(51, 102, 204, 0.15) 60%);
+  border-bottom: 1px dotted #3366cc;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline;
+  padding: 1px 2px;
+  border-radius: 2px;
+}
+
+.potential-link:hover {
+  background: rgba(51, 102, 204, 0.1);
+  border-bottom: 1px solid #3366cc;
+}
+
+.potential-link--selected {
+  background: rgba(51, 102, 204, 0.2);
+  border-bottom: 1px solid #3366cc;
+}
+
+.link-suggestion-tooltip {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #2c2c2c;
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  z-index: 1004;
+  margin-bottom: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease, visibility 0.2s ease;
+  max-width: 250px;
+  word-wrap: break-word;
+  white-space: normal;
+}
+
+.link-suggestion-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 4px solid transparent;
+  border-top-color: #2c2c2c;
+}
+
+.potential-link:hover .link-suggestion-tooltip {
+  opacity: 1;
+  visibility: visible;
+}
+
+.link-suggestion-actions {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #fff;
+  border: 1px solid #c8ccd1;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  padding: 4px;
+  z-index: 1005;
+  margin-top: 4px;
+  white-space: nowrap;
+}
+
+.potential-link--active .link-suggestion-actions {
+  display: block;
+}
+
+.link-action-btn {
+  background: none;
+  border: none;
+  padding: 6px 8px;
+  cursor: pointer;
+  border-radius: 2px;
+  font-size: 0.75rem;
+  color: #54595d;
+  transition: background-color 0.15s ease;
+  margin: 0 2px;
+}
+
+.link-action-btn:hover {
+  background: #eaecf0;
+}
+
+.link-action-btn--primary {
+  background: #3366cc;
+  color: #fff;
+}
+
+.link-action-btn--primary:hover {
+  background: #2a4b8d;
+}
+
+/* Wikipedia-style blue links */
+.wikipedia-link {
+  color: #0645ad;
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-bottom-color 0.15s ease;
+}
+
+.wikipedia-link:hover {
+  border-bottom-color: #0645ad;
+}
+
+.wikipedia-link:visited {
+  color: #0b0080;
+}
+
+/* Link scanning indicator */
+.link-scanning-indicator {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: rgba(51, 102, 204, 0.9);
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  z-index: 1006;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  animation: fadeInOut 2s ease-in-out;
+}
+
+.link-scanning-indicator .spinner {
+  width: 12px;
+  height: 12px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top: 2px solid #fff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes fadeInOut {
+  0%, 100% { opacity: 0; transform: translateY(-10px); }
+  20%, 80% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

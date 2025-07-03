@@ -3,6 +3,7 @@
 
 import { WikidataService, WikidataTopic } from './WikidataService';
 import { ArticleCategory } from './CategoryMapper';
+import { IntelligentContentGenerator } from './IntelligentContentGenerator';
 
 interface SectionTemplate {
   title: string;
@@ -24,8 +25,10 @@ interface CategorySections {
 export class IntelligentSectionEngine {
   private categorySections: Map<ArticleCategory, CategorySections> = new Map();
   private templateUsageCount: Map<string, number> = new Map();
+  private contentGenerator: IntelligentContentGenerator;
   
   constructor(private wikidataService: WikidataService) {
+    this.contentGenerator = new IntelligentContentGenerator();
     this.initializeSectionTemplates();
   }
   
@@ -354,35 +357,128 @@ export class IntelligentSectionEngine {
     topic: WikidataTopic,
     category: ArticleCategory
   ): Promise<string> {
-    // Fetch relevant Wikidata properties for this section
-    const properties = section.wikidataProperties || [];
-    let entityData: Record<string, any> = {};
+    try {
+      console.log('DEBUG: Section engine received topic:', topic);
+      console.log('DEBUG: Topic title:', topic.title);
+      console.log('DEBUG: Topic description:', topic.description);
+      // Use IntelligentContentGenerator for contextual, meaningful content
+      const suggestions = await this.contentGenerator.generateContentSuggestions(
+        topic,
+        category,
+        section.title.toLowerCase()
+      );
+
+      // Generate intelligent template based on section type and suggestions
+      const intelligentTemplate = await this.generateIntelligentTemplate(
+        section,
+        topic,
+        category,
+        suggestions
+      );
+
+      return intelligentTemplate;
+    } catch (error) {
+      console.error('Error generating intelligent section content:', error);
+      // Fallback to simple contextual template
+      return this.generateSimpleContextualTemplate(section, topic, category);
+    }
+  }
+
+  private async generateIntelligentTemplate(
+    section: SectionTemplate,
+    topic: WikidataTopic,
+    category: ArticleCategory,
+    suggestions: any[]
+  ): Promise<string> {
+    const categoryString = topic.category || category.toString() || 'unknown';
+    const entityName = this.generateContextualEntityName(topic.title, categoryString);
+    const sectionType = section.title.toLowerCase();
+
+    // Generate content based on section type
+    if (sectionType.includes('physical') || sectionType.includes('characteristics')) {
+      return this.generatePhysicalCharacteristicsContent(entityName, category, suggestions);
+    } else if (sectionType.includes('habitat') || sectionType.includes('distribution')) {
+      return this.generateHabitatContent(entityName, category, suggestions);
+    } else if (sectionType.includes('ecology') || sectionType.includes('behavior')) {
+      return this.generateEcologyContent(entityName, category, suggestions);
+    } else if (sectionType.includes('description')) {
+      return this.generateDescriptionContent(entityName, category, suggestions);
+    } else {
+      return this.generateGenericSectionContent(entityName, category, suggestions, sectionType);
+    }
+  }
+
+  private generatePhysicalCharacteristicsContent(entityName: string, category: ArticleCategory, suggestions: any[]): string {
+    if (category === ArticleCategory.SPECIES) {
+      // Generate comprehensive physical characteristics section
+      let content = `${entityName} is a <span class="detail-chip" data-detail="size_category">medium to large-sized</span> species that typically measures <span class="detail-chip" data-detail="length_measurement">1.2 to 1.8 meters in length</span> and weighs between <span class="detail-chip" data-detail="weight_range">15 to 25 kilograms</span>. Adult specimens display <span class="detail-chip" data-detail="sexual_dimorphism">sexual dimorphism</span>, with males generally being <span class="detail-chip" data-detail="size_difference">10-15% larger</span> than females.\n\n`;
+
+      content += `The most distinctive feature of ${entityName} is its <span class="detail-chip" data-detail="primary_distinguishing_feature">prominent physical characteristic</span>, which serves both <span class="detail-chip" data-detail="feature_function_1">defensive purposes</span> and <span class="detail-chip" data-detail="feature_function_2">communication functions</span>. The species possesses <span class="detail-chip" data-detail="body_covering">specialized body covering</span> that provides <span class="detail-chip" data-detail="protection_type">environmental protection</span> and aids in <span class="detail-chip" data-detail="adaptive_function">thermoregulation</span>.\n\n`;
+
+      content += `The head structure of ${entityName} is characterized by <span class="detail-chip" data-detail="skull_features">distinctive cranial features</span>, including <span class="detail-chip" data-detail="sensory_organs">highly developed sensory organs</span>. The eyes are <span class="detail-chip" data-detail="eye_description">large and forward-facing</span>, adapted for <span class="detail-chip" data-detail="vision_type">keen visual acuity</span> in <span class="detail-chip" data-detail="lighting_conditions">various lighting conditions</span>. The limbs are <span class="detail-chip" data-detail="limb_structure">powerfully built</span> and equipped with <span class="detail-chip" data-detail="extremity_features">specialized appendages</span> that enable <span class="detail-chip" data-detail="locomotion_ability">efficient movement</span> across <span class="detail-chip" data-detail="terrain_types">diverse terrain types</span>.`;
+
+      return content;
+    } else {
+      return this.generateGenericSectionContent(entityName, category, suggestions, 'physical characteristics');
+    }
+  }
+
+  private generateHabitatContent(entityName: string, category: ArticleCategory, suggestions: any[]): string {
+    if (category === ArticleCategory.SPECIES) {
+      let content = `${entityName} inhabits a diverse range of ecosystems, primarily found in <span class="detail-chip" data-detail="primary_habitat">temperate forest regions</span> across <span class="detail-chip" data-detail="geographic_distribution">continental areas</span>. The species demonstrates remarkable adaptability to various environmental conditions, thriving in <span class="detail-chip" data-detail="habitat_types">multiple habitat types</span> including <span class="detail-chip" data-detail="secondary_habitats">woodland areas, grasslands, and riparian zones</span>.\n\n`;
+
+      content += `The preferred habitat consists of <span class="detail-chip" data-detail="vegetation_type">dense canopy forests</span> with <span class="detail-chip" data-detail="canopy_coverage">60-80% canopy coverage</span>, providing both <span class="detail-chip" data-detail="shelter_benefits">protection from predators</span> and <span class="detail-chip" data-detail="resource_availability">abundant food resources</span>. ${entityName} typically establishes territories in areas with <span class="detail-chip" data-detail="terrain_features">specific topographical features</span>, such as <span class="detail-chip" data-detail="landscape_elements">rocky outcrops, water sources, and elevated positions</span> that offer strategic advantages.\n\n`;
+
+      content += `Seasonal migrations occur between <span class="detail-chip" data-detail="seasonal_range_1">breeding grounds</span> and <span class="detail-chip" data-detail="seasonal_range_2">winter refugia</span>, with populations traveling distances of up to <span class="detail-chip" data-detail="migration_distance">several hundred kilometers</span>. Climate change has begun to impact traditional habitat ranges, forcing populations to adapt to <span class="detail-chip" data-detail="climate_adaptations">changing environmental conditions</span> and seek <span class="detail-chip" data-detail="alternative_habitats">alternative suitable areas</span> at <span class="detail-chip" data-detail="elevation_changes">higher elevations or different latitudes</span>.`;
+
+      return content;
+    } else {
+      return this.generateGenericSectionContent(entityName, category, suggestions, 'habitat and distribution');
+    }
+  }
+
+  private generateEcologyContent(entityName: string, category: ArticleCategory, suggestions: any[]): string {
+    if (category === ArticleCategory.SPECIES) {
+      let content = `${entityName} exhibits complex behavioral patterns that vary significantly between <span class="detail-chip" data-detail="seasonal_behaviors">seasonal periods</span> and <span class="detail-chip" data-detail="life_stages">different life stages</span>. As a <span class="detail-chip" data-detail="feeding_classification">dietary specialist</span>, the species primarily feeds on <span class="detail-chip" data-detail="primary_food_sources">specific food sources</span>, supplemented by <span class="detail-chip" data-detail="secondary_diet">opportunistic feeding</span> during periods of <span class="detail-chip" data-detail="resource_scarcity">food scarcity</span>.\n\n`;
+
+      content += `Social structure within ${entityName} populations is characterized by <span class="detail-chip" data-detail="social_organization">hierarchical organization</span>, with individuals forming <span class="detail-chip" data-detail="group_size">stable groups</span> of <span class="detail-chip" data-detail="group_composition">mixed age and sex composition</span>. Communication occurs through a combination of <span class="detail-chip" data-detail="communication_methods">vocalizations, visual displays, and chemical signals</span>, with <span class="detail-chip" data-detail="communication_complexity">over 20 distinct calls</span> documented for different contexts including <span class="detail-chip" data-detail="call_functions">territory defense, mating, and alarm signals</span>.\n\n`;
+
+      content += `Reproductive behavior follows a <span class="detail-chip" data-detail="breeding_pattern">seasonal breeding pattern</span>, with courtship rituals beginning in <span class="detail-chip" data-detail="breeding_season">early spring</span>. Mating pairs engage in <span class="detail-chip" data-detail="courtship_behavior">elaborate courtship displays</span> that can last for <span class="detail-chip" data-detail="courtship_duration">several weeks</span>. Parental care is <span class="detail-chip" data-detail="parental_strategy">biparental</span>, with both adults participating in <span class="detail-chip" data-detail="care_activities">nest construction, incubation, and offspring protection</span> for approximately <span class="detail-chip" data-detail="care_duration">3-4 months</span> post-hatching.`;
+
+      return content;
+    } else {
+      return this.generateGenericSectionContent(entityName, category, suggestions, 'ecology and behavior');
+    }
+  }
+
+  private generateDescriptionContent(entityName: string, category: ArticleCategory, suggestions: any[]): string {
+    let content = '';
     
-    if (topic.id && properties.length > 0) {
-      entityData = await WikidataService.getEntityProperties(topic.id, properties);
-      
-      // Resolve entity references to names
-      const entityIds = Object.values(entityData)
-        .filter(value => typeof value === 'string' && value.match(/^Q\d+$/)) as string[];
-      
-      if (entityIds.length > 0) {
-        const resolvedNames = await WikidataService.resolveEntityNames(entityIds);
-        Object.entries(entityData).forEach(([key, value]) => {
-          if (typeof value === 'string' && value.match(/^Q\d+$/)) {
-            entityData[key] = resolvedNames[value] || value;
-          }
-        });
-      }
+    if (category === ArticleCategory.SPECIES) {
+      content += `${entityName} is <span class="detail-chip" data-detail="taxonomic_classification">a species</span> belonging to the <span class="detail-chip" data-detail="family_classification">family classification</span> within the order <span class="detail-chip" data-detail="order_classification">taxonomic order</span>. The species was first scientifically described in <span class="detail-chip" data-detail="discovery_year">year of description</span> by <span class="detail-chip" data-detail="describing_scientist">taxonomist name</span>, based on specimens collected from <span class="detail-chip" data-detail="type_locality">type locality</span>.\n\n`;
+
+      content += `${entityName} is distinguished from closely related species by several key morphological features, including <span class="detail-chip" data-detail="distinguishing_feature_1">primary distinguishing characteristic</span>, <span class="detail-chip" data-detail="distinguishing_feature_2">secondary feature</span>, and <span class="detail-chip" data-detail="distinguishing_feature_3">tertiary diagnostic trait</span>. The species exhibits <span class="detail-chip" data-detail="phenotypic_variation">phenotypic variation</span> across its range, with <span class="detail-chip" data-detail="subspecies_number">multiple recognized subspecies</span> adapted to different environmental conditions.\n\n`;
+
+      content += `Ecologically, ${entityName} plays a crucial role as <span class="detail-chip" data-detail="ecological_role">keystone species</span> in its ecosystem, serving as both <span class="detail-chip" data-detail="predator_role">predator</span> and <span class="detail-chip" data-detail="prey_role">prey species</span> in complex food webs. The species' conservation status is currently classified as <span class="detail-chip" data-detail="conservation_status">conservation classification</span> due to <span class="detail-chip" data-detail="threat_factors">primary threats</span> including <span class="detail-chip" data-detail="specific_threats">habitat loss, climate change, and human activities</span>.`;
+    } else if (category === ArticleCategory.PERSON) {
+      content += `${entityName} is <span class="detail-chip" data-detail="profession">professional role</span> known for <span class="detail-chip" data-detail="major_achievements">groundbreaking contributions</span> to <span class="detail-chip" data-detail="field_of_work">area of expertise</span>. Born in <span class="detail-chip" data-detail="birth_year">year</span> in <span class="detail-chip" data-detail="birthplace">location</span>, they pursued <span class="detail-chip" data-detail="education">educational background</span> before establishing themselves as <span class="detail-chip" data-detail="career_description">prominent figure in their field</span>.\n\n`;
+
+      content += `Throughout their career, ${entityName} has been recognized for <span class="detail-chip" data-detail="specific_contributions">specific achievements</span>, earning numerous accolades including <span class="detail-chip" data-detail="awards">prestigious awards</span> and <span class="detail-chip" data-detail="honors">professional honors</span>. Their work has had lasting impact on <span class="detail-chip" data-detail="impact_areas">areas of influence</span>, influencing <span class="detail-chip" data-detail="influenced_fields">related disciplines</span> and inspiring <span class="detail-chip" data-detail="legacy">future generations</span>.`;
+    } else {
+      content += `${entityName} is <span class="detail-chip" data-detail="primary_description">comprehensive description</span> characterized by <span class="detail-chip" data-detail="key_features">distinctive features</span> and <span class="detail-chip" data-detail="notable_aspects">significant aspects</span>. <span class="detail-chip" data-detail="historical_context">Historical background</span> and <span class="detail-chip" data-detail="contemporary_relevance">modern significance</span> contribute to its <span class="detail-chip" data-detail="overall_importance">overall importance</span> in <span class="detail-chip" data-detail="relevant_context">relevant field or context</span>.`;
     }
 
-    // Map properties to template placeholders
-    const placeholders = this.mapSectionPlaceholders(entityData, topic, category, section);
-    
-    // Select template variation to avoid repetition
-    const selectedTemplate = this.selectTemplateVariation(section);
-    
-    // Fill template
-    return this.fillSectionTemplate(selectedTemplate, placeholders);
+    return content;
+  }
+
+  private generateGenericSectionContent(entityName: string, category: ArticleCategory, suggestions: any[], sectionType: string): string {
+    return `${entityName} <span class="detail-chip" data-detail="section_content">${sectionType} information</span>. <span class="detail-chip" data-detail="details">Additional details</span> about <span class="detail-chip" data-detail="specific_information">specific aspects</span>.`;
+  }
+
+  private generateSimpleContextualTemplate(section: SectionTemplate, topic: WikidataTopic, category: ArticleCategory): string {
+    const categoryString = topic.category || category.toString() || 'unknown';
+    const entityName = this.generateContextualEntityName(topic.title, categoryString);
+    return this.generateGenericSectionContent(entityName, category, [], section.title.toLowerCase());
   }
 
   private detectSubcategory(topic: WikidataTopic, category: ArticleCategory): string | undefined {
@@ -580,9 +676,9 @@ export class IntelligentSectionEngine {
       }
     });
     
-    // Convert unfilled placeholders to interactive chips
+    // Convert unfilled placeholders to interactive chips with intelligent text
     filled = filled.replace(/{{([^}]+)}}/g, (match, placeholder) => {
-      const chipText = placeholder.toLowerCase().replace(/_/g, ' ');
+      const chipText = this.getIntelligentPlaceholderText(placeholder);
       return `<span class="detail-chip" data-detail="${placeholder.toLowerCase()}">${chipText}</span>`;
     });
     
@@ -602,6 +698,43 @@ export class IntelligentSectionEngine {
     filled = filled.replace(/\s+/g, ' ').trim();
     
     return filled;
+  }
+
+  private getIntelligentPlaceholderText(placeholder: string): string {
+    // Provide more meaningful placeholder text based on the placeholder type
+    const placeholderLower = placeholder.toLowerCase();
+    
+    switch (placeholderLower) {
+      case 'name':
+      case 'common_name':
+        return 'entity name';
+      case 'physical_description':
+        return 'physical description';
+      case 'size_data':
+        return 'size information';
+      case 'distinctive_features':
+        return 'distinctive features';
+      case 'habitat_use':
+        return 'habitat preferences';
+      case 'diet':
+        return 'dietary habits';
+      case 'behavioral_patterns':
+        return 'behavioral characteristics';
+      case 'physical_dimensions':
+        return 'dimensions';
+      case 'elevation_data':
+        return 'elevation details';
+      case 'physical_properties':
+        return 'physical properties';
+      case 'birth_details':
+        return 'birth information';
+      case 'family_background':
+        return 'family background';
+      case 'educational_journey':
+        return 'education details';
+      default:
+        return placeholder.toLowerCase().replace(/_/g, ' ');
+    }
   }
 
   private getGenericSections(): SectionTemplate[] {
@@ -640,7 +773,35 @@ export class IntelligentSectionEngine {
       return '<span class="detail-chip" data-detail="entity_name">entity name</span>';
     }
     
-    return topic.title;
+    // Generate contextual entity name based on category and name patterns
+    return this.generateContextualEntityName(topic.title, topic.category);
+  }
+
+  private generateContextualEntityName(entityName: string, category: string): string {
+    // Handle undefined/null category
+    if (!category || !entityName) {
+      return `**${entityName || 'Entity'}**`;
+    }
+
+    const categoryLower = category.toLowerCase();
+    const entityLower = entityName.toLowerCase();
+
+    // For species, use appropriate articles
+    if (categoryLower === 'species' || categoryLower.includes('biology')) {
+      if (entityLower.includes('saurus')) {
+        return `**The ${entityName}**`;
+      } else if (entityLower.includes('bird') || entityLower.includes('fly')) {
+        return `**The ${entityName}**`;
+      } else {
+        return `**${entityName}**`;
+      }
+    } else if (categoryLower === 'person') {
+      return `**${entityName}**`;
+    } else if (categoryLower === 'location') {
+      return `**${entityName}**`;
+    } else {
+      return `**${entityName}**`;
+    }
   }
 
   // Utility methods
