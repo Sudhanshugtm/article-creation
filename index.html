@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Article Creator</title>
+  <script type="module" crossorigin src="/article-creation/assets/index-2rCbxtQI.js"></script>
+  <link rel="stylesheet" crossorigin href="/article-creation/assets/index-Y9o3PYX4.css">
+</head>
+<body>
+    <!-- Canvas version (to be phased out) -->
+    <canvas id="articleCanvas" style="display: none;"></canvas>
+    <input type="text" id="hiddenInput" aria-label="Type article title" style="display: none;" />
+    
+    <!-- New HTML version -->
+    <div id="app" class="article-creator">
+        <!-- Global Toolbar (shown only in editing mode) -->
+        <div class="article-creator__global-toolbar" id="globalToolbar" style="display: none;">
+            <div class="article-editor__toolbar-left">
+                <button class="cdx-button cdx-button--action-default cdx-button--weight-quiet cdx-button--size-medium article-editor__tool" id="closeBtn" title="Close">
+                    <span class="cdx-button__icon"></span>
+                </button>
+                <button class="cdx-button cdx-button--action-default cdx-button--weight-quiet cdx-button--size-medium article-editor__tool" id="boldBtn" title="Bold">
+                    <span class="cdx-button__icon"></span>
+                </button>
+                <button class="cdx-button cdx-button--action-default cdx-button--weight-quiet cdx-button--size-medium article-editor__tool" id="italicBtn" title="Italic">
+                    <span class="cdx-button__icon"></span>
+                </button>
+                <button class="cdx-button cdx-button--action-default cdx-button--weight-quiet cdx-button--size-medium article-editor__tool" id="linkBtn" title="Link">
+                    <span class="cdx-button__icon"></span>
+                </button>
+                <button class="cdx-button cdx-button--action-default cdx-button--weight-quiet cdx-button--size-medium article-editor__tool" id="undoBtn" title="Undo">
+                    <span class="cdx-button__icon"></span>
+                </button>
+                <button class="cdx-button cdx-button--action-default cdx-button--weight-quiet cdx-button--size-medium article-editor__tool" id="moreBtn" title="More">
+                    <span class="cdx-button__icon"></span>
+                </button>
+            </div>
+            <div class="article-editor__toolbar-right">
+                <button class="cdx-button cdx-button--action-progressive cdx-button--weight-primary cdx-button--size-medium article-editor__tool" id="nextBtn" title="Next">
+                    <span class="cdx-button__icon"></span>
+                </button>
+            </div>
+        </div>
+        
+        <header class="article-creator__header">
+            <h1 class="article-creator__title">New article</h1>
+        </header>
+        
+        <main class="article-creator__main">
+            <!-- Input Section -->
+            <section class="article-creator__input-section">
+                <div class="cdx-field">
+                    <div class="cdx-field__control">
+                        <input 
+                            type="text" 
+                            id="articleTitleInput"
+                            class="cdx-text-input__input"
+                            placeholder="Type article title"
+                            aria-label="Article title"
+                            autocomplete="off"
+                            spellcheck="false"
+                        />
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Topic Selection Section -->
+            <section class="article-creator__topic-section" id="topicSection" style="display: none;">
+                <h2 class="article-creator__section-title">Select the exact topic for this page</h2>
+                <p class="article-creator__section-description">This page is about...</p>
+                
+                <div class="article-creator__topic-list" id="topicList">
+                    <!-- Topic results will be populated here -->
+                </div>
+                
+                <div class="article-creator__new-topic">
+                    <button class="cdx-button cdx-button--action-default cdx-button--weight-quiet cdx-button--size-medium" id="newTopicBtn">
+                        <span class="cdx-button__icon"></span>
+                        <span>New topic</span>
+                    </button>
+                </div>
+            </section>
+            
+            <!-- Category Selection Section -->
+            <section class="article-creator__category-section" id="categorySection" style="display: none;">
+                <div class="article-creator__chips" id="chipsContainer">
+                    <!-- Chips will be populated here -->
+                </div>
+                
+                <h2 class="article-creator__section-title" id="categoryTitle">Help us categorize ""</h2>
+                <p class="article-creator__section-description">Select the category that best fits your new article:</p>
+                
+                <div class="article-creator__category-list" id="categoryList">
+                    <!-- Category options will be populated here -->
+                </div>
+            </section>
+            
+            <!-- Article Creation Section -->
+            <section class="article-creator__creation-section" id="creationSection" style="display: none;">
+                <div class="article-creator__chips" id="creationChipsContainer">
+                    <!-- Chips will be populated here -->
+                </div>
+                
+                <h2 class="article-creator__section-title" id="creationTitle">Creating article about ""</h2>
+                
+                <div class="article-creator__actions">
+                    <button class="cdx-button cdx-button--action-progressive cdx-button--weight-primary" id="startCreatingBtn">
+                        <span class="cdx-button__text">Start creating article</span>
+                    </button>
+                </div>
+            </section>
+            
+            <!-- Article Editing Section -->
+            <section class="article-creator__editing-section" id="editingSection" style="display: none;">
+                <div class="article-editor">
+                    <h1 class="article-editor__title" id="articleEditorTitle">
+                        <span class="article-editor__title-text" id="articleTitleText"></span>
+                    </h1>
+                    <div id="articleContent" class="article-editor__content" contenteditable="true" tabindex="0" data-placeholder=""></div>
+                    <!-- Editor chips below the editable content area -->
+                    <div class="article-editor__chips" id="editorChipsContainer"></div>
+                </div>
+            </section>
+        </main>
+    </div>
+    
+</body>
+    
+    <!-- Reference Dialog -->
+    <div class="reference-dialog" id="referenceDialog">
+        <div class="reference-dialog__content">
+            <h2 class="reference-dialog__title">
+                📎 Add Reference
+            </h2>
+            <form class="reference-dialog__form" id="referenceForm">
+                <div class="reference-dialog__field">
+                    <label class="reference-dialog__label" for="referenceUrl">
+                        Article URL or Title
+                    </label>
+                    <input 
+                        type="text" 
+                        id="referenceUrl" 
+                        class="reference-dialog__input"
+                        placeholder="https://example.com/article or Article Title"
+                        required
+                    />
+                    <div class="reference-dialog__error" id="referenceError" style="display: none;"></div>
+                </div>
+                
+                <div class="reference-dialog__field" id="referenceAccessField" style="display: none;">
+                    <label class="reference-dialog__label" for="referenceAccess">
+                        Access Date
+                    </label>
+                    <input 
+                        type="date" 
+                        id="referenceAccess" 
+                        class="reference-dialog__input"
+                    />
+                </div>
+                
+                <div class="reference-dialog__preview" id="referencePreview" style="display: none;">
+                    <div class="reference-dialog__preview-title">Preview:</div>
+                    <div id="referencePreviewContent"></div>
+                </div>
+                
+                <div class="reference-dialog__loading" id="referenceLoading" style="display: none;">
+                    <div class="reference-dialog__spinner"></div>
+                    Validating reference...
+                </div>
+            </form>
+            
+            <div class="reference-dialog__actions">
+                <button type="button" class="reference-dialog__button" id="referenceCancelBtn">
+                    Cancel
+                </button>
+                <button type="button" class="reference-dialog__button reference-dialog__button--primary" id="referenceInsertBtn" disabled>
+                    Insert Reference
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Add from Link Dialog -->
+    <div class="add-link-dialog" id="addLinkDialog">
+        <div class="add-link-dialog__content">
+            <h2 class="add-link-dialog__title">
+                🔗 Add fact from reference
+            </h2>
+            
+            <!-- Step 1: URL Input -->
+            <div class="add-link-dialog__step" id="addLinkStep1">
+                <div class="add-link-dialog__field">
+                    <label class="add-link-dialog__label" for="addLinkUrl">
+                        Link to incorporate new contents:
+                    </label>
+                    <div class="add-link-dialog__url-input">
+                        <input 
+                            type="text" 
+                            id="addLinkUrl" 
+                            class="add-link-dialog__input"
+                            placeholder="https://..."
+                            required
+                        />
+                        <button type="button" class="add-link-dialog__url-btn" id="addLinkSubmitUrl" disabled>
+                            ➜
+                        </button>
+                    </div>
+                    <div class="add-link-dialog__error" id="addLinkError" style="display: none;"></div>
+                </div>
+                
+                <div class="add-link-dialog__loading" id="addLinkLoading" style="display: none;">
+                    <div class="add-link-dialog__spinner"></div>
+                    Extracting content from link...
+                </div>
+            </div>
+            
+            <!-- Step 2: Content Extraction -->
+            <div class="add-link-dialog__step" id="addLinkStep2" style="display: none;">
+                <div class="add-link-dialog__extracted-content">
+                    <div class="add-link-dialog__source-info">
+                        <strong id="addLinkSourceTitle"></strong><br>
+                        <em id="addLinkSourceDomain"></em>
+                    </div>
+                    
+                    <div class="add-link-dialog__question-section">
+                        <label class="add-link-dialog__label" for="addLinkQuestion">
+                            Describe the contents you want to add from the linked information
+                        </label>
+                        <input 
+                            type="text" 
+                            id="addLinkQuestion" 
+                            class="add-link-dialog__input"
+                            placeholder="What can people learn from this?"
+                        />
+                    </div>
+                    
+                    <div class="add-link-dialog__suggestions">
+                        <div class="add-link-dialog__suggestions-title">Possible learnings:</div>
+                        <div class="add-link-dialog__suggestion-items" id="addLinkSuggestions">
+                            <!-- Suggestions will be populated here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Step 3: Generated Content -->
+            <div class="add-link-dialog__step" id="addLinkStep3" style="display: none;">
+                <div class="add-link-dialog__generated-content">
+                    <div class="add-link-dialog__preview-title">Generated paragraph:</div>
+                    <div class="add-link-dialog__preview-content" id="addLinkPreview">
+                        <!-- Generated content will appear here -->
+                    </div>
+                </div>
+            </div>
+            
+            <div class="add-link-dialog__actions">
+                <button type="button" class="add-link-dialog__button" id="addLinkCancelBtn">
+                    Cancel
+                </button>
+                <button type="button" class="add-link-dialog__button add-link-dialog__button--primary" id="addLinkNextBtn" style="display: none;">
+                    Generate Content
+                </button>
+                <button type="button" class="add-link-dialog__button add-link-dialog__button--primary" id="addLinkInsertBtn" style="display: none;">
+                    Insert Paragraph
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Snippet Modal Overlay -->
+    <div id="snippetModal" class="snippet-modal" style="display: none;">
+        <div class="snippet-modal__content">
+            <h2 class="snippet-modal__title">Intro Snippet for &quot;<span id="snippetTitle"></span>&quot;</h2>
+            <div id="snippetSuggestionCards" class="snippet-modal__cards"></div>
+            <div class="snippet-modal__actions">
+                <button id="snippetCancelBtn" class="cdx-button cdx-button--action-default">Close</button>
+            </div>
+        </div>
+    </div>
+</html>
