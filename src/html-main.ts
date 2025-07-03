@@ -928,8 +928,13 @@ class HTMLArticleCreator {
         // Check if this chip type has intelligent suggestions (async)
         this.getIntelligentSuggestions(detailType).then(suggestions => {
             if (suggestions.length > 0) {
-                // Create dropdown with suggestions
-                this.createIntelligentDropdown(chipElement, detailType, currentText, originalText, suggestions);
+                // Check if mobile device
+                if (this.isMobileDevice()) {
+                    this.createMobileModal(chipElement, detailType, currentText, originalText, suggestions);
+                } else {
+                    // Create dropdown with suggestions for desktop
+                    this.createIntelligentDropdown(chipElement, detailType, currentText, originalText, suggestions);
+                }
             } else {
                 // Create inline input (existing behavior)
                 this.createStandardInput(chipElement, detailType, currentText, originalText);
@@ -1322,6 +1327,114 @@ class HTMLArticleCreator {
         };
         
         return fallbacks[category]?.[detailType] || ['Custom...'];
+    }
+
+    private isMobileDevice(): boolean {
+        return window.innerWidth <= 768 || 'ontouchstart' in window;
+    }
+
+    private createMobileModal(
+        chipElement: HTMLElement,
+        detailType: string,
+        currentText: string,
+        originalText: string,
+        suggestions: string[]
+    ): void {
+        // Create mobile modal overlay
+        const overlay = document.createElement('div');
+        overlay.className = 'mobile-chip-overlay';
+        
+        // Create modal container
+        const modal = document.createElement('div');
+        modal.className = 'mobile-chip-modal';
+        
+        // Modal header
+        const header = document.createElement('div');
+        header.className = 'mobile-chip-header';
+        header.innerHTML = `
+            <h3>${detailType.replace(/_/g, ' ')}</h3>
+            <button class="mobile-chip-close">×</button>
+        `;
+        
+        // Input section
+        const inputSection = document.createElement('div');
+        inputSection.className = 'mobile-chip-input-section';
+        
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.value = currentText;
+        input.className = 'mobile-chip-input';
+        input.placeholder = `Enter ${detailType.replace(/_/g, ' ')}`;
+        
+        inputSection.appendChild(input);
+        
+        // Suggestions section
+        const suggestionsSection = document.createElement('div');
+        suggestionsSection.className = 'mobile-chip-suggestions';
+        
+        const suggestionsTitle = document.createElement('h4');
+        suggestionsTitle.textContent = 'Quick options:';
+        suggestionsSection.appendChild(suggestionsTitle);
+        
+        suggestions.forEach(suggestion => {
+            const suggestionBtn = document.createElement('button');
+            suggestionBtn.className = 'mobile-chip-suggestion';
+            suggestionBtn.textContent = suggestion;
+            suggestionBtn.addEventListener('click', () => {
+                input.value = suggestion;
+            });
+            suggestionsSection.appendChild(suggestionBtn);
+        });
+        
+        // Action buttons
+        const actions = document.createElement('div');
+        actions.className = 'mobile-chip-actions';
+        
+        const cancelBtn = document.createElement('button');
+        cancelBtn.className = 'mobile-chip-cancel';
+        cancelBtn.textContent = 'Cancel';
+        
+        const saveBtn = document.createElement('button');
+        saveBtn.className = 'mobile-chip-save';
+        saveBtn.textContent = 'Save';
+        
+        actions.appendChild(cancelBtn);
+        actions.appendChild(saveBtn);
+        
+        // Assemble modal
+        modal.appendChild(header);
+        modal.appendChild(inputSection);
+        modal.appendChild(suggestionsSection);
+        modal.appendChild(actions);
+        overlay.appendChild(modal);
+        
+        // Add event listeners
+        const closeModal = () => {
+            document.body.removeChild(overlay);
+            document.body.style.overflow = '';
+        };
+        
+        const saveValue = () => {
+            const value = input.value.trim();
+            if (value) {
+                chipElement.textContent = value;
+                chipElement.classList.remove('detail-chip--placeholder');
+            }
+            closeModal();
+        };
+        
+        header.querySelector('.mobile-chip-close')?.addEventListener('click', closeModal);
+        cancelBtn.addEventListener('click', closeModal);
+        saveBtn.addEventListener('click', saveValue);
+        overlay.addEventListener('click', (e) => {
+            if (e.target === overlay) closeModal();
+        });
+        
+        // Focus input and show modal
+        document.body.appendChild(overlay);
+        document.body.style.overflow = 'hidden'; // Prevent background scroll
+        input.focus();
+        input.select();
     }
     
     private createIntelligentDropdown(
