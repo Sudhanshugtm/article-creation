@@ -199,17 +199,30 @@ class HTMLArticleCreator {
         // Input handling with debounced search
         this.titleInput.addEventListener('input', (e) => {
             const target = e.target as HTMLInputElement;
-            this.searchTerm = target.value;
+            this.searchTerm = target.value.trim();
             this.saveState();
             
-            if (this.searchTerm.length >= 3) {
-                this.showSearchPending();
-                this.debounceHandler.debounce(() => {
-                    this.performSearch(this.searchTerm);
-                });
-            } else {
+            // Clear any pending searches if text is too short or empty
+            if (this.searchTerm.length < 3) {
+                this.debounceHandler.clearPending();
                 this.setState(WorkflowState.INPUT);
+                return;
             }
+            
+            // Only search if we have meaningful text (not just spaces or special chars)
+            const hasValidText = /[a-zA-Z0-9\u00C0-\u017F\u0100-\u024F]/.test(this.searchTerm);
+            if (!hasValidText) {
+                this.setState(WorkflowState.INPUT);
+                return;
+            }
+            
+            this.showSearchPending();
+            this.debounceHandler.debounce(() => {
+                // Double-check the search term is still valid when debounce fires
+                if (this.searchTerm.trim().length >= 3) {
+                    this.performSearch(this.searchTerm);
+                }
+            });
         });
 
         // New topic button
