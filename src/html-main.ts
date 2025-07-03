@@ -203,6 +203,7 @@ class HTMLArticleCreator {
             this.saveState();
             
             if (this.searchTerm.length >= 3) {
+                this.showSearchPending();
                 this.debounceHandler.debounce(() => {
                     this.performSearch(this.searchTerm);
                 });
@@ -238,16 +239,23 @@ class HTMLArticleCreator {
 
     private async performSearch(searchTerm: string): Promise<void> {
         try {
+            this.showSearchLoading();
             const results = await WikidataService.searchTopics(searchTerm);
             this.displayTopicResults(results);
             this.setState(WorkflowState.TOPIC_SELECTION);
         } catch (error) {
             console.error('Search failed:', error);
+            this.showSearchError();
         }
     }
 
     private displayTopicResults(results: any[]): void {
         this.topicList.innerHTML = '';
+        
+        if (results.length === 0) {
+            this.showNoResults();
+            return;
+        }
         
         results.forEach((result) => {
             const topicItem = this.createTopicItem(result);
@@ -284,6 +292,54 @@ class HTMLArticleCreator {
         this.selectedTopic = topic;
         this.saveState();
         this.showArticleCreation();
+    }
+
+    // Loading state methods
+    private showSearchPending(): void {
+        this.setState(WorkflowState.TOPIC_SELECTION);
+        this.topicList.innerHTML = `
+            <div class="search-pending">
+                <div class="pending-icon">⏳</div>
+                <p>Getting ready to search...</p>
+            </div>
+        `;
+    }
+
+    private showSearchLoading(): void {
+        this.topicList.innerHTML = `
+            <div class="search-loading">
+                <div class="loading-spinner"></div>
+                <p>Searching for "${this.searchTerm}"...</p>
+            </div>
+        `;
+    }
+
+    private showSearchError(): void {
+        this.topicList.innerHTML = `
+            <div class="search-error">
+                <div class="error-icon">⚠️</div>
+                <p>Search failed. Please try again.</p>
+                <button class="retry-search-btn" onclick="this.closest('.article-creator').querySelector('input').focus()">Try Again</button>
+            </div>
+        `;
+    }
+
+    private showNoResults(): void {
+        this.topicList.innerHTML = `
+            <div class="no-results">
+                <div class="empty-icon">🔍</div>
+                <p>No topics found for "${this.searchTerm}"</p>
+                <p class="suggestion">Try a different search term or <button class="new-topic-inline-btn">create a new topic</button></p>
+            </div>
+        `;
+        
+        // Add event listener for inline new topic button
+        const inlineBtn = this.topicList.querySelector('.new-topic-inline-btn');
+        if (inlineBtn) {
+            inlineBtn.addEventListener('click', () => {
+                this.showCategorySelection();
+            });
+        }
     }
 
     private showCategorySelection(): void {
