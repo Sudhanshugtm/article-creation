@@ -311,9 +311,9 @@ class HTMLArticleCreator {
     private showSearchPending(): void {
         this.setState(WorkflowState.TOPIC_SELECTION);
         this.topicList.innerHTML = `
-            <div class="search-pending">
-                <div class="pending-icon">⏳</div>
-                <p>Getting ready to search...</p>
+            <div class="search-loading">
+                <div class="loading-spinner"></div>
+                <p>Searching for "${this.searchTerm}"...</p>
             </div>
         `;
     }

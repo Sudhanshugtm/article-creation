@@ -2,7 +2,6 @@
 /* ABOUTME: Custom styling that extends Codex components for article creator UI */
 
 /* Loading States */
-.search-pending,
 .search-loading,
 .search-error,
 .no-results {
@@ -15,7 +14,6 @@
     color: var(--color-subtle, #72777d);
 }
 
-.search-pending .pending-icon,
 .search-error .error-icon,
 .no-results .empty-icon {
     font-size: 2rem;
