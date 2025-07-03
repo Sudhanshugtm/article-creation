@@ -23,9 +23,9 @@ var _=Object.defineProperty;var O=(u,e,t)=>e in u?_(u,e,{enumerable:!0,configura
                 <p class="topic-item__description">${e.description||"No description available"}</p>
             </div>
         `,n.addEventListener("click",()=>{this.selectTopic({wikidataId:e.id,label:e.title,description:e.description,category:e.category})}),n}selectTopic(e){this.selectedTopic=e,this.saveState(),this.showArticleCreation()}showSearchPending(){this.setState("topic-selection"),this.topicList.innerHTML=`
-            <div class="search-pending">
-                <div class="pending-icon">⏳</div>
-                <p>Getting ready to search...</p>
+            <div class="search-loading">
+                <div class="loading-spinner"></div>
+                <p>Searching for "${this.searchTerm}"...</p>
             </div>
         `}showSearchLoading(){this.topicList.innerHTML=`
             <div class="search-loading">
