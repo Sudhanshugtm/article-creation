@@ -1,7 +1,6 @@
 // ABOUTME: Main HTML-based article creator application entry point
 // ABOUTME: Manages workflow state, input handling, and component interactions
 
-import { DebounceHandler } from './DebounceHandler';
 import { WikidataService } from './WikidataService';
 import { CategoryMapper, ArticleCategory } from './CategoryMapper';
 import { TopicSelection } from './types/workflow';
@@ -24,7 +23,6 @@ import {
 
 enum WorkflowState {
     INPUT = 'input',
-    TOPIC_SELECTION = 'topic-selection',
     CATEGORY_SELECTION = 'category-selection',
     ARTICLE_CREATION = 'article-creation',
     ARTICLE_EDITING = 'article-editing'
@@ -34,16 +32,13 @@ class HTMLArticleCreator {
     private currentState: WorkflowState = WorkflowState.INPUT;
     private searchTerm: string = '';
     private selectedTopic: TopicSelection | null = null;
-    private debounceHandler: DebounceHandler;
 
     // DOM elements
     private titleInput!: HTMLInputElement;
     private inputSection!: HTMLElement;
-    private topicSection!: HTMLElement;
     private categorySection!: HTMLElement;
     private creationSection!: HTMLElement;
     private editingSection!: HTMLElement;
-    private topicList!: HTMLElement;
     private categoryList!: HTMLElement;
     private categoryTitle!: HTMLElement;
     private creationTitle!: HTMLElement;
@@ -106,7 +101,6 @@ class HTMLArticleCreator {
     private isLinkDetectionActive: boolean = false;
 
     constructor() {
-        this.debounceHandler = new DebounceHandler(2500);
         this.leadEngine = new LeadTemplateEngine(new WikidataService());
         this.intelligentEngine = new IntelligentTemplateEngine(new WikidataService());
         this.sectionEngine = new IntelligentSectionEngine(new WikidataService());
@@ -120,11 +114,9 @@ class HTMLArticleCreator {
     private initializeDOM(): void {
         this.titleInput = document.getElementById('articleTitleInput') as HTMLInputElement;
         this.inputSection = document.querySelector('.article-creator__input-section') as HTMLElement;
-        this.topicSection = document.getElementById('topicSection') as HTMLElement;
         this.categorySection = document.getElementById('categorySection') as HTMLElement;
         this.creationSection = document.getElementById('creationSection') as HTMLElement;
         this.editingSection = document.getElementById('editingSection') as HTMLElement;
-        this.topicList = document.getElementById('topicList') as HTMLElement;
         this.categoryList = document.getElementById('categoryList') as HTMLElement;
         this.categoryTitle = document.getElementById('categoryTitle') as HTMLElement;
         this.creationTitle = document.getElementById('creationTitle') as HTMLElement;
@@ -202,27 +194,12 @@ class HTMLArticleCreator {
             this.searchTerm = target.value.trim();
             this.saveState();
             
-            // Clear any pending searches if text is too short or empty
-            if (this.searchTerm.length < 3) {
-                this.debounceHandler.clearPending();
+            if (this.searchTerm.length >= 3) {
+                // Skip search, go directly to category selection
+                this.showCategorySelection();
+            } else {
                 this.setState(WorkflowState.INPUT);
-                return;
             }
-            
-            // Only search if we have meaningful text (not just spaces or special chars)
-            const hasValidText = /[a-zA-Z0-9\u00C0-\u017F\u0100-\u024F]/.test(this.searchTerm);
-            if (!hasValidText) {
-                this.setState(WorkflowState.INPUT);
-                return;
-            }
-            
-            this.showSearchPending();
-            this.debounceHandler.debounce(() => {
-                // Double-check the search term is still valid when debounce fires
-                if (this.searchTerm.trim().length >= 3) {
-                    this.performSearch(this.searchTerm);
-                }
-            });
         });
 
         // New topic button
@@ -250,110 +227,6 @@ class HTMLArticleCreator {
         this.titleInput.focus();
     }
 
-    private async performSearch(searchTerm: string): Promise<void> {
-        try {
-            this.showSearchLoading();
-            const results = await WikidataService.searchTopics(searchTerm);
-            this.displayTopicResults(results);
-            this.setState(WorkflowState.TOPIC_SELECTION);
-        } catch (error) {
-            console.error('Search failed:', error);
-            this.showSearchError();
-        }
-    }
-
-    private displayTopicResults(results: any[]): void {
-        this.topicList.innerHTML = '';
-        
-        if (results.length === 0) {
-            this.showNoResults();
-            return;
-        }
-        
-        results.forEach((result) => {
-            const topicItem = this.createTopicItem(result);
-            this.topicList.appendChild(topicItem);
-        });
-    }
-
-    private createTopicItem(result: any): HTMLElement {
-        const icon = CategoryMapper.getCategoryIcon(result.category);
-        
-        const item = document.createElement('div');
-        item.className = 'topic-item';
-        item.innerHTML = `
-            <div class="topic-item__icon">${icon}</div>
-            <div class="topic-item__content">
-                <h3 class="topic-item__title">${result.title}</h3>
-                <p class="topic-item__description">${result.description || 'No description available'}</p>
-            </div>
-        `;
-        
-        item.addEventListener('click', () => {
-            this.selectTopic({
-                wikidataId: result.id,
-                label: result.title,
-                description: result.description,
-                category: result.category
-            });
-        });
-        
-        return item;
-    }
-
-    private selectTopic(topic: TopicSelection): void {
-        this.selectedTopic = topic;
-        this.saveState();
-        this.showArticleCreation();
-    }
-
-    // Loading state methods
-    private showSearchPending(): void {
-        this.setState(WorkflowState.TOPIC_SELECTION);
-        this.topicList.innerHTML = `
-            <div class="search-loading">
-                <div class="loading-spinner"></div>
-                <p>Searching for "${this.searchTerm}"...</p>
-            </div>
-        `;
-    }
-
-    private showSearchLoading(): void {
-        this.topicList.innerHTML = `
-            <div class="search-loading">
-                <div class="loading-spinner"></div>
-                <p>Searching for "${this.searchTerm}"...</p>
-            </div>
-        `;
-    }
-
-    private showSearchError(): void {
-        this.topicList.innerHTML = `
-            <div class="search-error">
-                <div class="error-icon">⚠️</div>
-                <p>Search failed. Please try again.</p>
-                <button class="retry-search-btn" onclick="this.closest('.article-creator').querySelector('input').focus()">Try Again</button>
-            </div>
-        `;
-    }
-
-    private showNoResults(): void {
-        this.topicList.innerHTML = `
-            <div class="no-results">
-                <div class="empty-icon">🔍</div>
-                <p>No topics found for "${this.searchTerm}"</p>
-                <p class="suggestion">Try a different search term or <button class="new-topic-inline-btn">create a new topic</button></p>
-            </div>
-        `;
-        
-        // Add event listener for inline new topic button
-        const inlineBtn = this.topicList.querySelector('.new-topic-inline-btn');
-        if (inlineBtn) {
-            inlineBtn.addEventListener('click', () => {
-                this.showCategorySelection();
-            });
-        }
-    }
 
     private showCategorySelection(): void {
         this.setState(WorkflowState.CATEGORY_SELECTION);
@@ -514,7 +387,6 @@ class HTMLArticleCreator {
 
     private updateDisplay(): void {
         // Hide all sections
-        this.topicSection.style.display = 'none';
         this.categorySection.style.display = 'none';
         this.creationSection.style.display = 'none';
         this.editingSection.style.display = 'none';
@@ -531,9 +403,6 @@ class HTMLArticleCreator {
         
         // Show current section
         switch (this.currentState) {
-            case WorkflowState.TOPIC_SELECTION:
-                this.topicSection.style.display = 'block';
-                break;
             case WorkflowState.CATEGORY_SELECTION:
                 this.categorySection.style.display = 'block';
                 break;
@@ -566,9 +435,6 @@ class HTMLArticleCreator {
                 
                 if (this.searchTerm) {
                     switch (state.currentState) {
-                        case WorkflowState.TOPIC_SELECTION:
-                            this.performSearch(this.searchTerm);
-                            break;
                         case WorkflowState.CATEGORY_SELECTION:
                             this.showCategorySelection();
                             break;
