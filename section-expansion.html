@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Katie Bouman - Wikipedia</title>
+    <link rel="stylesheet" href="/src/styles/codex.css">
+    <link rel="stylesheet" href="/src/styles/section-expansion.css">
+</head>
+<body>
+    <div class="article-expansion">
+        <!-- Wikipedia-style header -->
+        <header class="article-header">
+            <div class="article-header__nav">
+                <button class="cdx-button cdx-button--action-default cdx-button--weight-quiet" onclick="window.location.href='./section-creation.html'">
+                    <span class="cdx-button__text">← Back to article selection</span>
+                </button>
+            </div>
+            <div class="article-header__title-wrapper">
+                <h1 class="article-header__title">Katie Bouman</h1>
+                <div class="article-header__subtitle">American computer scientist and engineer</div>
+            </div>
+        </header>
+
+        <!-- Article content -->
+        <main class="article-content">
+            <article class="article-body">
+                <!-- Existing section -->
+                <section class="article-section">
+                    <h2 class="article-section__title">Research and career</h2>
+                    <div class="article-section__content" id="researchCareerContent">
+                        <p>After earning her doctorate, Bouman joined <a href="#" class="wiki-link">Harvard University</a> as a <a href="#" class="wiki-link">postdoctoral fellow</a> on the Event Horizon Telescope Imaging team<sup class="reference">[18] [19][20]</sup></p>
+                        
+                        <p>Bouman joined Event Horizon Telescope project in 2013<sup class="reference">[21]</sup> She led the development of an algorithm for imaging black holes, known as <a href="#" class="wiki-link">Continuous High-resolution Image Reconstruction using Patch priors (CHIRP)</a>.<sup class="reference">[17][22][23]</sup> CHIRP inspired image validation procedures used in acquiring the first image of a black hole in April 2019, and Bouman played a significant role in the project by verifying images, selecting parameters for filtering images taken by the Event Horizon Telescope, and participating in the development of a robust imaging framework that compared the results of different image reconstruction techniques. Her group is analyzing the Event Horizon Telescope's images to learn more about <a href="#" class="wiki-link">general relativity</a> in a strong gravitational field.</p>
+                        
+                        <p>Bouman received significant media attention after a photo, showing her reaction to the detection of the black hole shadow in the EHT images, went viral. Some people in the media and on the internet falsely claimed she was a minor contributor and did not deserve the praise she received.</p>
+                    </div>
+                </section>
+
+                <!-- Placeholder for new sections -->
+                <div id="newSectionsContainer"></div>
+            </article>
+        </main>
+
+        <!-- Smart Widget -->
+        <div class="smart-widget" id="smartWidget">
+            <button class="smart-widget__trigger" id="smartWidgetTrigger">
+                <span class="smart-widget__icon">💡</span>
+                <span class="smart-widget__text">What to improve?</span>
+                <span class="smart-widget__badge" id="suggestionCount">6 ideas</span>
+            </button>
+        </div>
+
+        <!-- Suggestion Panel (hidden by default) -->
+        <div class="suggestion-panel" id="suggestionPanel" style="display: none;">
+            <div class="suggestion-panel__content">
+                <div class="suggestion-panel__header">
+                    <h3 class="suggestion-panel__title">
+                        <span class="suggestion-panel__icon">💡</span>
+                        What to improve?
+                    </h3>
+                    <span class="suggestion-panel__count">6 ideas</span>
+                    <button class="suggestion-panel__close" id="closeSuggestionPanel">×</button>
+                </div>
+
+                <!-- Add a fact section -->
+                <div class="suggestion-section">
+                    <h4 class="suggestion-section__title">Add a fact</h4>
+                    <div class="suggestion-list">
+                        <label class="suggestion-item">
+                            <input type="checkbox" class="suggestion-item__checkbox" data-fact="harvard">
+                            <div class="suggestion-item__content">
+                                <div class="suggestion-item__text">Bouman joined Harvard University as a postdoctoral fellow on the Event Horizon Telescope Imaging team (2018)</div>
+                            </div>
+                        </label>
+                        <label class="suggestion-item">
+                            <input type="checkbox" class="suggestion-item__checkbox" data-fact="caltech">
+                            <div class="suggestion-item__content">
+                                <div class="suggestion-item__text">She then joined the California Institute of Technology (Caltech) as an assistant professor in June 2019, later promoted to associate professor</div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Add a new section -->
+                <div class="suggestion-section">
+                    <h4 class="suggestion-section__title">Add a new section</h4>
+                    <div class="suggestion-list">
+                        <div class="suggestion-item suggestion-item--section" data-section="awards">
+                            <button class="suggestion-item__add-btn">+</button>
+                            <div class="suggestion-item__content">
+                                <div class="suggestion-item__text">Awards</div>
+                                <div class="suggestion-item__hint">Mention all awards received</div>
+                            </div>
+                        </div>
+                        <div class="suggestion-item suggestion-item--section" data-section="works">
+                            <button class="suggestion-item__add-btn">+</button>
+                            <div class="suggestion-item__content">
+                                <div class="suggestion-item__text">Notable Works</div>
+                                <div class="suggestion-item__hint">Highlight significant works listed on Wikidata</div>
+                            </div>
+                        </div>
+                        <div class="suggestion-item suggestion-item--section" data-section="education">
+                            <button class="suggestion-item__add-btn">+</button>
+                            <div class="suggestion-item__content">
+                                <div class="suggestion-item__text">Education</div>
+                                <div class="suggestion-item__hint">Academic background and degrees</div>
+                            </div>
+                        </div>
+                        <div class="suggestion-item suggestion-item--section" data-section="personal">
+                            <button class="suggestion-item__add-btn">+</button>
+                            <div class="suggestion-item__content">
+                                <div class="suggestion-item__text">Personal life</div>
+                                <div class="suggestion-item__hint">Background and personal information</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action buttons -->
+                <div class="suggestion-panel__actions">
+                    <button class="cdx-button cdx-button--action-progressive cdx-button--weight-primary" id="applyButton" disabled>
+                        Apply <span id="selectionCount">0</span> suggestion<span id="pluralS">s</span>
+                    </button>
+                    <button class="cdx-button cdx-button--action-default" id="clearButton">
+                        Clear
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="/src/section-expansion.ts"></script>
+</body>
+</html>

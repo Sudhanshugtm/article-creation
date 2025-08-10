@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Section Creation - Wikipedia</title>
+  <link rel="stylesheet" crossorigin href="/article-creation/assets/section-creation-CZ7IjVGR.css">
+  <link rel="stylesheet" crossorigin href="/article-creation/assets/codex-BGgWxIno.css">
+</head>
+<body>
+    <div class="section-creator">
+        <header class="section-creator__header">
+            <div class="section-creator__header-nav">
+                <button class="cdx-button cdx-button--action-default cdx-button--weight-quiet" onclick="window.location.href='./'">
+                    <span class="cdx-button__text">← Back to Prototypes</span>
+                </button>
+            </div>
+            <h1 class="section-creator__title">Expand an Article</h1>
+            <p class="section-creator__subtitle">Help improve Wikipedia by adding missing information</p>
+        </header>
+
+        <main class="section-creator__main">
+            <div class="article-selection">
+                <h2 class="article-selection__title">Select an article to expand</h2>
+                
+                <!-- Katie Bouman Article Card -->
+                <div class="article-card" id="katieBoumanCard">
+                    <div class="article-card__image">
+                        <div class="article-card__image-placeholder">
+                            <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+                                <circle cx="40" cy="40" r="39" stroke="#c8ccd1" stroke-width="2"/>
+                                <path d="M40 25C33.373 25 28 30.373 28 37C28 43.627 33.373 49 40 49C46.627 49 52 43.627 52 37C52 30.373 46.627 25 40 25Z" fill="#c8ccd1"/>
+                                <path d="M40 52C30 52 22 56 22 65V70H58V65C58 56 50 52 40 52Z" fill="#c8ccd1"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="article-card__content">
+                        <h3 class="article-card__title">Katie Bouman</h3>
+                        <p class="article-card__description">American computer scientist and engineer</p>
+                        <div class="article-card__meta">
+                            <span class="article-card__meta-item">
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="#72777d">
+                                    <path d="M8 1L10.163 5.326L15 6.004L11.5 9.414L12.326 14.234L8 11.986L3.674 14.234L4.5 9.414L1 6.004L5.837 5.326L8 1Z"/>
+                                </svg>
+                                Featured article potential
+                            </span>
+                            <span class="article-card__meta-item">
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="#72777d">
+                                    <path d="M8 2C4.686 2 2 4.686 2 8C2 11.314 4.686 14 8 14C11.314 14 14 11.314 14 8C14 4.686 11.314 2 8 2ZM8 12C5.791 12 4 10.209 4 8C4 5.791 5.791 4 8 4C10.209 4 12 5.791 12 8C12 10.209 10.209 12 8 12Z"/>
+                                    <path d="M8 6C7.448 6 7 6.448 7 7V8.5C7 9.052 7.448 9.5 8 9.5C8.552 9.5 9 9.052 9 8.5V7C9 6.448 8.552 6 8 6Z"/>
+                                </svg>
+                                Missing key sections
+                            </span>
+                        </div>
+                        <div class="article-card__stats">
+                            <div class="article-card__stat">
+                                <span class="article-card__stat-value">2</span>
+                                <span class="article-card__stat-label">Sections</span>
+                            </div>
+                            <div class="article-card__stat">
+                                <span class="article-card__stat-value">4</span>
+                                <span class="article-card__stat-label">Missing facts</span>
+                            </div>
+                            <div class="article-card__stat">
+                                <span class="article-card__stat-value">2</span>
+                                <span class="article-card__stat-label">New sections</span>
+                            </div>
+                        </div>
+                        <button class="cdx-button cdx-button--action-progressive cdx-button--weight-primary cdx-button--size-large article-card__button" onclick="enterExpansionMode()">
+                            <span class="cdx-button__text">Expand this article</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Placeholder for more articles -->
+                <div class="article-selection__more">
+                    <p class="article-selection__more-text">More articles coming soon...</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        function enterExpansionMode() {
+            // Navigate to expansion interface
+            window.location.href = './section-expansion.html';
+        }
+    </script>
+</body>
+</html>

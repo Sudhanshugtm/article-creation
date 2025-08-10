@@ -7,7 +7,9 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: resolve(__dirname, 'index.html'),
-        prototype: resolve(__dirname, 'article-creation.html')
+        prototype: resolve(__dirname, 'article-creation.html'),
+        'section-creation': resolve(__dirname, 'section-creation.html'),
+        'section-expansion': resolve(__dirname, 'section-expansion.html')
       }
     }
   },
