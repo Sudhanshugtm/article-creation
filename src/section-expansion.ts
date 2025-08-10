@@ -17,9 +17,13 @@ class SectionExpansionManager {
 
     constructor() {
         this.wikidataService = new WikidataEnhancementService();
+        this.initialize();
+    }
+
+    private async initialize(): Promise<void> {
+        await this.loadWikidataSuggestions();
         this.checkForAppliedSuggestions();
         this.updateSuggestionCount();
-        this.loadWikidataSuggestions();
     }
 
     private async loadWikidataSuggestions(): Promise<void> {
@@ -44,10 +48,21 @@ class SectionExpansionManager {
 
     private checkForAppliedSuggestions(): void {
         const selectedSuggestions = sessionStorage.getItem('selectedSuggestions');
+        const wikidataSuggestionsData = sessionStorage.getItem('wikidataSuggestions');
+        
         if (selectedSuggestions) {
+            // Load stored Wikidata suggestions first
+            if (wikidataSuggestionsData) {
+                const wikidataSuggestions = JSON.parse(wikidataSuggestionsData);
+                wikidataSuggestions.forEach((suggestion: any) => {
+                    this.wikidataSuggestions.set(suggestion.id, suggestion);
+                });
+            }
+            
             const suggestions = JSON.parse(selectedSuggestions) as string[];
             this.applySuggestions(suggestions);
             sessionStorage.removeItem('selectedSuggestions');
+            sessionStorage.removeItem('wikidataSuggestions');
         }
     }
 

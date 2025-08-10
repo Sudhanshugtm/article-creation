@@ -269,9 +269,14 @@ class SuggestionsPageManager {
         this.updateActionButtons();
     }
 
-    private applySuggestions(): void {
+    private async applySuggestions(): Promise<void> {
         // Store selections in sessionStorage for the expansion page
         sessionStorage.setItem('selectedSuggestions', JSON.stringify(Array.from(this.selectedSuggestions)));
+        
+        // Also store the Wikidata suggestions for reference
+        const existingContent = this.getExistingArticleContent();
+        const wikidataSuggestions = await this.wikidataService.getEnhancementSuggestions(existingContent);
+        sessionStorage.setItem('wikidataSuggestions', JSON.stringify(wikidataSuggestions));
         
         // Show success feedback
         this.showSuccessFeedback();
