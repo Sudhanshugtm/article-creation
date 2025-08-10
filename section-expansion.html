@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Katie Bouman - Wikipedia</title>
-  <script type="module" crossorigin src="/article-creation/assets/section-expansion-R0JVsx34.js"></script>
+  <script type="module" crossorigin src="/article-creation/assets/section-expansion-CGfhZO9G.js"></script>
   <link rel="modulepreload" crossorigin href="/article-creation/assets/modulepreload-polyfill-B5Qt9EMX.js">
   <link rel="stylesheet" crossorigin href="/article-creation/assets/section-expansion-Qg1vSYNK.css">
   <link rel="stylesheet" crossorigin href="/article-creation/assets/codex-BGgWxIno.css">
@@ -46,91 +46,11 @@
 
         <!-- Smart Widget -->
         <div class="smart-widget" id="smartWidget">
-            <button class="smart-widget__trigger" id="smartWidgetTrigger">
+            <button class="smart-widget__trigger" id="smartWidgetTrigger" onclick="window.location.href='./section-suggestions.html'">
                 <span class="smart-widget__icon">💡</span>
                 <span class="smart-widget__text">What to improve?</span>
                 <span class="smart-widget__badge" id="suggestionCount">6 ideas</span>
             </button>
-        </div>
-
-        <!-- Suggestion Panel (hidden by default) -->
-        <div class="suggestion-panel" id="suggestionPanel" style="display: none;">
-            <div class="suggestion-panel__content">
-                <div class="suggestion-panel__header">
-                    <h3 class="suggestion-panel__title">
-                        <span class="suggestion-panel__icon">💡</span>
-                        What to improve?
-                    </h3>
-                    <span class="suggestion-panel__count">6 ideas</span>
-                    <button class="suggestion-panel__close" id="closeSuggestionPanel">×</button>
-                </div>
-
-                <div class="suggestion-panel__scrollable">
-                    <!-- Add a fact section -->
-                <div class="suggestion-section">
-                    <h4 class="suggestion-section__title">Add a fact</h4>
-                    <div class="suggestion-list">
-                        <label class="suggestion-item">
-                            <input type="checkbox" class="suggestion-item__checkbox" data-fact="harvard">
-                            <div class="suggestion-item__content">
-                                <div class="suggestion-item__text">Bouman joined Harvard University as a postdoctoral fellow on the Event Horizon Telescope Imaging team (2018)</div>
-                            </div>
-                        </label>
-                        <label class="suggestion-item">
-                            <input type="checkbox" class="suggestion-item__checkbox" data-fact="caltech">
-                            <div class="suggestion-item__content">
-                                <div class="suggestion-item__text">She then joined the California Institute of Technology (Caltech) as an assistant professor in June 2019, later promoted to associate professor</div>
-                            </div>
-                        </label>
-                    </div>
-                </div>
-
-                <!-- Add a new section -->
-                <div class="suggestion-section">
-                    <h4 class="suggestion-section__title">Add a new section</h4>
-                    <div class="suggestion-list">
-                        <div class="suggestion-item suggestion-item--section" data-section="awards">
-                            <button class="suggestion-item__add-btn">+</button>
-                            <div class="suggestion-item__content">
-                                <div class="suggestion-item__text">Awards</div>
-                                <div class="suggestion-item__hint">Mention all awards received</div>
-                            </div>
-                        </div>
-                        <div class="suggestion-item suggestion-item--section" data-section="works">
-                            <button class="suggestion-item__add-btn">+</button>
-                            <div class="suggestion-item__content">
-                                <div class="suggestion-item__text">Notable Works</div>
-                                <div class="suggestion-item__hint">Highlight significant works listed on Wikidata</div>
-                            </div>
-                        </div>
-                        <div class="suggestion-item suggestion-item--section" data-section="education">
-                            <button class="suggestion-item__add-btn">+</button>
-                            <div class="suggestion-item__content">
-                                <div class="suggestion-item__text">Education</div>
-                                <div class="suggestion-item__hint">Academic background and degrees</div>
-                            </div>
-                        </div>
-                        <div class="suggestion-item suggestion-item--section" data-section="personal">
-                            <button class="suggestion-item__add-btn">+</button>
-                            <div class="suggestion-item__content">
-                                <div class="suggestion-item__text">Personal life</div>
-                                <div class="suggestion-item__hint">Background and personal information</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                </div>
-
-                <!-- Action buttons -->
-                <div class="suggestion-panel__actions">
-                    <button class="cdx-button cdx-button--action-progressive cdx-button--weight-primary" id="applyButton" disabled>
-                        Apply <span id="selectionCount">0</span> suggestion<span id="pluralS">s</span>
-                    </button>
-                    <button class="cdx-button cdx-button--action-default" id="clearButton">
-                        Clear
-                    </button>
-                </div>
-            </div>
         </div>
     </div>
 

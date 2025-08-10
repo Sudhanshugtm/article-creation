@@ -9,7 +9,8 @@ export default defineConfig({
         main: resolve(__dirname, 'index.html'),
         prototype: resolve(__dirname, 'article-creation.html'),
         'section-creation': resolve(__dirname, 'section-creation.html'),
-        'section-expansion': resolve(__dirname, 'section-expansion.html')
+        'section-expansion': resolve(__dirname, 'section-expansion.html'),
+        'section-suggestions': resolve(__dirname, 'section-suggestions.html')
       }
     }
   },

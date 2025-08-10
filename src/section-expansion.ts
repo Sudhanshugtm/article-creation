@@ -9,151 +9,27 @@ interface Suggestion {
 }
 
 class SectionExpansionManager {
-    private smartWidget: HTMLElement;
-    private smartWidgetTrigger: HTMLElement;
-    private suggestionPanel: HTMLElement;
-    private applyButton: HTMLButtonElement;
-    private clearButton: HTMLButtonElement;
-    private closePanelButton: HTMLElement;
-    private selectedSuggestions: Set<string> = new Set();
     private addedContent: Set<string> = new Set();
 
     constructor() {
-        this.smartWidget = document.getElementById('smartWidget')!;
-        this.smartWidgetTrigger = document.getElementById('smartWidgetTrigger')!;
-        this.suggestionPanel = document.getElementById('suggestionPanel')!;
-        this.applyButton = document.getElementById('applyButton') as HTMLButtonElement;
-        this.clearButton = document.getElementById('clearButton') as HTMLButtonElement;
-        this.closePanelButton = document.getElementById('closeSuggestionPanel')!;
-        
-        this.initializeEventListeners();
+        this.checkForAppliedSuggestions();
         this.updateSuggestionCount();
     }
 
-    private initializeEventListeners(): void {
-        // Toggle panel
-        this.smartWidgetTrigger.addEventListener('click', () => {
-            this.togglePanel();
-        });
-
-        // Close panel
-        this.closePanelButton.addEventListener('click', () => {
-            this.closePanel();
-        });
-
-        // Handle fact checkboxes
-        const factCheckboxes = document.querySelectorAll('.suggestion-item__checkbox');
-        factCheckboxes.forEach(checkbox => {
-            checkbox.addEventListener('change', (e) => {
-                const target = e.target as HTMLInputElement;
-                const factId = target.dataset.fact!;
-                
-                if (target.checked) {
-                    this.selectedSuggestions.add(`fact-${factId}`);
-                } else {
-                    this.selectedSuggestions.delete(`fact-${factId}`);
-                }
-                
-                this.updateActionButtons();
-            });
-        });
-
-        // Handle section add buttons
-        const sectionButtons = document.querySelectorAll('.suggestion-item__add-btn');
-        sectionButtons.forEach(button => {
-            button.addEventListener('click', (e) => {
-                const target = e.currentTarget as HTMLElement;
-                const sectionItem = target.closest('.suggestion-item--section') as HTMLElement;
-                const sectionId = sectionItem.dataset.section!;
-                const suggestionId = `section-${sectionId}`;
-                
-                if (this.selectedSuggestions.has(suggestionId)) {
-                    this.selectedSuggestions.delete(suggestionId);
-                    target.classList.remove('selected');
-                    sectionItem.classList.remove('selected');
-                } else {
-                    this.selectedSuggestions.add(suggestionId);
-                    target.classList.add('selected');
-                    sectionItem.classList.add('selected');
-                }
-                
-                this.updateActionButtons();
-            });
-        });
-
-        // Apply button
-        this.applyButton.addEventListener('click', () => {
-            this.applySuggestions();
-        });
-
-        // Clear button
-        this.clearButton.addEventListener('click', () => {
-            this.clearSelections();
-        });
-
-        // Click outside to close
-        document.addEventListener('click', (e) => {
-            if (!this.smartWidget.contains(e.target as Node) && 
-                !this.suggestionPanel.contains(e.target as Node) &&
-                this.suggestionPanel.style.display !== 'none') {
-                this.closePanel();
-            }
-        });
-    }
-
-    private togglePanel(): void {
-        if (this.suggestionPanel.style.display === 'none') {
-            this.suggestionPanel.style.display = 'flex';
-            this.smartWidgetTrigger.style.display = 'none';
-        } else {
-            this.closePanel();
+    private checkForAppliedSuggestions(): void {
+        const selectedSuggestions = sessionStorage.getItem('selectedSuggestions');
+        if (selectedSuggestions) {
+            const suggestions = JSON.parse(selectedSuggestions) as string[];
+            this.applySuggestions(suggestions);
+            sessionStorage.removeItem('selectedSuggestions');
         }
     }
 
-    private closePanel(): void {
-        this.suggestionPanel.style.display = 'none';
-        this.smartWidgetTrigger.style.display = 'flex';
-    }
-
-    private updateActionButtons(): void {
-        const count = this.selectedSuggestions.size;
-        this.applyButton.disabled = count === 0;
-        
-        const selectionCount = document.getElementById('selectionCount')!;
-        const pluralS = document.getElementById('pluralS')!;
-        
-        selectionCount.textContent = count.toString();
-        pluralS.style.display = count === 1 ? 'none' : 'inline';
-    }
-
-    private clearSelections(): void {
-        // Clear checkboxes
-        const checkboxes = document.querySelectorAll('.suggestion-item__checkbox') as NodeListOf<HTMLInputElement>;
-        checkboxes.forEach(checkbox => {
-            checkbox.checked = false;
-        });
-
-        // Clear section buttons
-        const sectionButtons = document.querySelectorAll('.suggestion-item__add-btn');
-        sectionButtons.forEach(button => {
-            button.classList.remove('selected');
-        });
-
-        // Clear section items
-        const sectionItems = document.querySelectorAll('.suggestion-item--section');
-        sectionItems.forEach(item => {
-            item.classList.remove('selected');
-        });
-
-        this.selectedSuggestions.clear();
-        this.updateActionButtons();
-    }
-
-    private applySuggestions(): void {
+    private applySuggestions(suggestions: string[]): void {
         const factsToAdd: string[] = [];
         const sectionsToAdd: string[] = [];
 
-        this.selectedSuggestions.forEach(suggestionId => {
+        suggestions.forEach(suggestionId => {
             const [type, id] = suggestionId.split('-');
             if (type === 'fact') {
                 factsToAdd.push(id);
@@ -173,18 +49,12 @@ class SectionExpansionManager {
         });
 
         // Mark as added
-        this.selectedSuggestions.forEach(id => {
+        suggestions.forEach(id => {
             this.addedContent.add(id);
         });
-
-        // Clear selections
-        this.clearSelections();
         
         // Update count
         this.updateSuggestionCount();
-        
-        // Close panel
-        this.closePanel();
 
         // Show success feedback
         this.showSuccessFeedback();
@@ -274,32 +144,14 @@ class SectionExpansionManager {
         const remainingCount = totalSuggestions - addedCount;
         
         const badge = document.getElementById('suggestionCount')!;
-        const panelCount = document.querySelector('.suggestion-panel__count')!;
         
         if (remainingCount > 0) {
             badge.textContent = `${remainingCount} ideas`;
-            panelCount.textContent = `${remainingCount} ideas`;
         } else {
             badge.textContent = 'All done!';
-            panelCount.textContent = 'All done!';
-            this.smartWidgetTrigger.style.opacity = '0.6';
+            const smartWidgetTrigger = document.getElementById('smartWidgetTrigger')!;
+            smartWidgetTrigger.style.opacity = '0.6';
         }
-
-        // Hide already added suggestions
-        this.addedContent.forEach(id => {
-            const [type, itemId] = id.split('-');
-            if (type === 'fact') {
-                const checkbox = document.querySelector(`[data-fact="${itemId}"]`) as HTMLInputElement;
-                if (checkbox) {
-                    checkbox.closest('.suggestion-item')?.remove();
-                }
-            } else if (type === 'section') {
-                const sectionItem = document.querySelector(`[data-section="${itemId}"]`);
-                if (sectionItem) {
-                    sectionItem.remove();
-                }
-            }
-        });
     }
 
     private showSuccessFeedback(): void {
