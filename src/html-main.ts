@@ -18,7 +18,8 @@ import {
     cdxIconUndo,
     cdxIconEllipsis,
     cdxIconClose,
-    cdxIconNext
+    cdxIconNext,
+    cdxIconPrevious
 } from '@wikimedia/codex-icons';
 
 enum WorkflowState {
