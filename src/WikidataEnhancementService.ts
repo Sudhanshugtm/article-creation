@@ -40,7 +40,7 @@ interface EnhancementSuggestion {
 
 export class WikidataEnhancementService {
     private readonly WIKIDATA_API = 'https://www.wikidata.org/w/api.php';
-    private readonly KATIE_BOUMAN_ID = 'Q56312040'; // Katie Bouman's Wikidata ID
+    private readonly KATIE_BOUMAN_ID = 'Q63080922'; // Katie Bouman's Wikidata ID
 
     async getEnhancementSuggestions(existingContent: string): Promise<EnhancementSuggestion[]> {
         try {

@@ -345,8 +345,14 @@ class SuggestionsPageManager {
     }
 }
 
-// Simple working solution that doesn't rely on complex class structure
+// Initialize both the API-driven class AND the permanent fix
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('=== INITIALIZING API-DRIVEN SUGGESTIONS ===');
+    
+    // First, instantiate the API-driven manager
+    const suggestionsManager = new SuggestionsPageManager();
+    
+    // Also keep the permanent fix for selection handling
     console.log('=== PERMANENT FIX: Creating working section selection ===');
     
     // Wait for DOM to be fully ready
