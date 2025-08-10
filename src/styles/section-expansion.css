@@ -142,15 +142,16 @@
     bottom: 100px;
     right: 32px;
     width: 420px;
-    max-height: 600px;
+    max-height: 500px;
     background: #fff;
     border: 1px solid #c8ccd1;
     border-radius: 8px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-    z-index: 101;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+    z-index: 1000;
     display: flex;
     flex-direction: column;
     animation: slideUp 0.3s ease;
+    overflow: hidden;
 }
 
 @keyframes slideUp {
@@ -168,6 +169,13 @@
     display: flex;
     flex-direction: column;
     height: 100%;
+    min-height: 400px;
+}
+
+.suggestion-panel__scrollable {
+    flex: 1;
+    overflow-y: auto;
+    max-height: 300px;
 }
 
 .suggestion-panel__header {
@@ -323,7 +331,9 @@
     border-top: 1px solid #eaecf0;
     display: flex;
     gap: 8px;
-    margin-top: auto;
+    background: #fff;
+    flex-shrink: 0;
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.05);
 }
 
 /* Selection States */
