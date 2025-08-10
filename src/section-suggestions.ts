@@ -245,16 +245,23 @@ class SuggestionsPageManager {
         const sectionId = sectionItem.dataset.section!;
         const suggestionId = `section-${sectionId}`;
         
+        console.log(`Section clicked: ${sectionId}, ID: ${suggestionId}`);
+        console.log(`Currently selected:`, Array.from(this.selectedSuggestions));
+        
         if (this.selectedSuggestions.has(suggestionId)) {
+            console.log(`Deselecting ${suggestionId}`);
             this.selectedSuggestions.delete(suggestionId);
             target.classList.remove('selected');
             sectionItem.classList.remove('selected');
         } else {
+            console.log(`Selecting ${suggestionId}`);
             this.selectedSuggestions.add(suggestionId);
             target.classList.add('selected');
             sectionItem.classList.add('selected');
         }
         
+        console.log(`New selection count: ${this.selectedSuggestions.size}`);
+        console.log(`Button has selected class: ${target.classList.contains('selected')}`);
         this.updateActionButtons();
     };
 
@@ -326,5 +333,6 @@ class SuggestionsPageManager {
 
 // Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
-    new SuggestionsPageManager();
+    // Store manager globally for debugging and access
+    (window as any).suggestionsPageManager = new SuggestionsPageManager();
 });
