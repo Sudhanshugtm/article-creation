@@ -37,6 +37,28 @@ body {
     margin-bottom: var(--spacing-sm, 8px);
 }
 
+.article-creator__header-nav {
+    margin-bottom: 12px;
+}
+
+.article-creator__header-nav .cdx-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--color-base20, #54595d);
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.article-creator__header-nav .cdx-button:hover {
+    color: var(--color-progressive, #36c);
+}
+
+.article-creator__header-nav .cdx-button__icon {
+    font-size: 14px;
+}
+
 .article-creator__title {
     font-size: 14px;
     font-weight: bold;
