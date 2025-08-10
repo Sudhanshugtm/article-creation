@@ -266,14 +266,28 @@ class SuggestionsPageManager {
     };
 
     private updateActionButtons(): void {
+        console.log(`updateActionButtons called with count: ${this.selectedSuggestions.size}`);
         const count = this.selectedSuggestions.size;
+        
+        if (!this.applyButton) {
+            console.error('Apply button not found!');
+            return;
+        }
+        
         this.applyButton.disabled = count === 0;
         
-        const selectionCount = document.getElementById('selectionCount')!;
-        const pluralS = document.getElementById('pluralS')!;
+        const selectionCount = document.getElementById('selectionCount');
+        const pluralS = document.getElementById('pluralS');
+        
+        if (!selectionCount || !pluralS) {
+            console.error('Selection count elements not found!', { selectionCount: !!selectionCount, pluralS: !!pluralS });
+            return;
+        }
         
         selectionCount.textContent = count.toString();
         pluralS.style.display = count === 1 ? 'none' : 'inline';
+        
+        console.log(`Updated UI: count=${count}, buttonDisabled=${this.applyButton.disabled}`);
     }
 
     private clearSelections(): void {
@@ -331,8 +345,95 @@ class SuggestionsPageManager {
     }
 }
 
-// Initialize when DOM is ready
+// Simple working solution that doesn't rely on complex class structure
 document.addEventListener('DOMContentLoaded', () => {
-    // Store manager globally for debugging and access
-    (window as any).suggestionsPageManager = new SuggestionsPageManager();
+    console.log('=== PERMANENT FIX: Creating working section selection ===');
+    
+    // Wait for DOM to be fully ready
+    setTimeout(() => {
+        const selectedSuggestions = new Set<string>();
+        
+        // Function to update the UI
+        function updateUI() {
+            const count = selectedSuggestions.size;
+            const applyButton = document.getElementById('applyButton') as HTMLButtonElement;
+            const selectionCount = document.getElementById('selectionCount');
+            const pluralS = document.getElementById('pluralS');
+            
+            if (!applyButton || !selectionCount || !pluralS) return;
+            
+            console.log(`Updating UI with count: ${count}`);
+            
+            applyButton.disabled = count === 0;
+            selectionCount.textContent = count.toString();
+            pluralS.style.display = count === 1 ? 'none' : 'inline';
+            
+            console.log(`UI updated: button disabled=${applyButton.disabled}, count=${count}`);
+        }
+        
+        // Fix section buttons
+        const sectionButtons = document.querySelectorAll('.suggestion-item__add-btn');
+        console.log(`Found ${sectionButtons.length} section buttons to fix`);
+        
+        sectionButtons.forEach((button) => {
+            button.addEventListener('click', (e) => {
+                const target = e.currentTarget as HTMLElement;
+                const sectionItem = target.closest('.suggestion-item--section') as HTMLElement;
+                const sectionId = sectionItem.dataset.section;
+                const suggestionId = `section-${sectionId}`;
+                
+                console.log(`=== PERMANENT FIX: Section ${sectionId} clicked ===`);
+                
+                if (selectedSuggestions.has(suggestionId)) {
+                    console.log(`Deselecting ${suggestionId}`);
+                    selectedSuggestions.delete(suggestionId);
+                    target.classList.remove('selected');
+                    sectionItem.classList.remove('selected');
+                } else {
+                    console.log(`Selecting ${suggestionId}`);
+                    selectedSuggestions.add(suggestionId);
+                    target.classList.add('selected');
+                    sectionItem.classList.add('selected');
+                }
+                
+                updateUI();
+                
+                // Store globally for apply button
+                (window as any).permanentSelectedSuggestions = selectedSuggestions;
+            });
+        });
+        
+        // Fix apply button
+        const applyButton = document.getElementById('applyButton');
+        if (applyButton) {
+            applyButton.addEventListener('click', () => {
+                if ((window as any).permanentSelectedSuggestions && (window as any).permanentSelectedSuggestions.size > 0) {
+                    console.log('=== APPLYING PERMANENT SELECTIONS ===', Array.from((window as any).permanentSelectedSuggestions));
+                    
+                    // Store in sessionStorage
+                    sessionStorage.setItem('selectedSuggestions', JSON.stringify(Array.from((window as any).permanentSelectedSuggestions)));
+                    
+                    // Show success message
+                    const feedback = document.createElement('div');
+                    feedback.style.cssText = `
+                        position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+                        background: #00af89; color: white; padding: 16px 32px; border-radius: 8px;
+                        font-weight: 500; z-index: 10000; box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                    `;
+                    feedback.textContent = `✓ ${(window as any).permanentSelectedSuggestions.size} suggestion${(window as any).permanentSelectedSuggestions.size === 1 ? '' : 's'} will be applied!`;
+                    document.body.appendChild(feedback);
+                    
+                    // Navigate after delay
+                    setTimeout(() => {
+                        window.location.href = './section-expansion.html';
+                    }, 1000);
+                }
+            });
+        }
+        
+        // Initialize UI
+        updateUI();
+        
+        console.log('=== PERMANENT FIX APPLIED ===');
+    }, 500); // Wait for any async loading to complete
 });
