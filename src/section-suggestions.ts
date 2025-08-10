@@ -22,9 +22,16 @@ class SuggestionsPageManager {
         this.clearButton = document.getElementById('clearButton') as HTMLButtonElement;
         this.wikidataService = new WikidataEnhancementService();
         
+        // Initialize event listeners immediately for existing DOM elements
         this.initializeEventListeners();
-        this.loadWikidataSuggestions();
         this.updateActionButtons();
+        
+        // Load Wikidata suggestions asynchronously
+        this.loadWikidataSuggestions().catch(error => {
+            console.error('Failed to load Wikidata suggestions:', error);
+            // Ensure event listeners are still attached even if Wikidata fails
+            setTimeout(() => this.initializeEventListeners(), 100);
+        });
     }
 
     private async loadWikidataSuggestions(): Promise<void> {
@@ -172,16 +179,26 @@ class SuggestionsPageManager {
         this.initializeFactCheckboxes();
         this.initializeSectionButtons();
 
-        // Apply button
-        this.applyButton.addEventListener('click', () => {
-            this.applySuggestions();
-        });
+        // Apply button (remove existing listener first)
+        if (this.applyButton) {
+            this.applyButton.removeEventListener('click', this.handleApplyClick);
+            this.applyButton.addEventListener('click', this.handleApplyClick);
+        }
 
-        // Clear button
-        this.clearButton.addEventListener('click', () => {
-            this.clearSelections();
-        });
+        // Clear button (remove existing listener first)  
+        if (this.clearButton) {
+            this.clearButton.removeEventListener('click', this.handleClearClick);
+            this.clearButton.addEventListener('click', this.handleClearClick);
+        }
     }
+
+    private handleApplyClick = () => {
+        this.applySuggestions();
+    };
+
+    private handleClearClick = () => {
+        this.clearSelections();
+    };
 
     private initializeFactCheckboxes(): void {
         // Handle fact checkboxes
@@ -196,7 +213,13 @@ class SuggestionsPageManager {
     private initializeSectionButtons(): void {
         // Handle section add buttons
         const sectionButtons = document.querySelectorAll('.suggestion-item__add-btn');
-        sectionButtons.forEach(button => {
+        console.log(`Initializing ${sectionButtons.length} section buttons`);
+        
+        sectionButtons.forEach((button, index) => {
+            const sectionItem = button.closest('.suggestion-item--section');
+            const sectionId = sectionItem?.getAttribute('data-section');
+            console.log(`Button ${index}: section-${sectionId}`);
+            
             // Remove existing listeners to prevent duplicates
             button.removeEventListener('click', this.handleSectionButtonClick);
             button.addEventListener('click', this.handleSectionButtonClick.bind(this));
