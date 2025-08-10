@@ -207,6 +207,43 @@
     20%, 80% { opacity: 1; }
 }
 
+/* Loading state */
+.suggestions-loading {
+    background: #fff;
+    border: 1px solid #c8ccd1;
+    border-radius: 8px;
+    margin-bottom: 24px;
+    padding: 40px 20px;
+    text-align: center;
+}
+
+.suggestions-loading__content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+}
+
+.suggestions-loading__spinner {
+    width: 32px;
+    height: 32px;
+    border: 3px solid #eaecf0;
+    border-top: 3px solid #3366cc;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.suggestions-loading p {
+    margin: 0;
+    color: #54595d;
+    font-size: 1rem;
+}
+
 /* Mobile responsive */
 @media (max-width: 768px) {
     .suggestions-page__main {

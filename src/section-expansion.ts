@@ -1,6 +1,8 @@
 // ABOUTME: Main TypeScript file for section expansion prototype
 // ABOUTME: Handles smart widget, suggestions, and content integration
 
+import { WikidataEnhancementService } from './WikidataEnhancementService.js';
+
 interface Suggestion {
     type: 'fact' | 'section';
     id: string;
@@ -10,10 +12,34 @@ interface Suggestion {
 
 class SectionExpansionManager {
     private addedContent: Set<string> = new Set();
+    private wikidataService: WikidataEnhancementService;
+    private wikidataSuggestions: Map<string, any> = new Map();
 
     constructor() {
+        this.wikidataService = new WikidataEnhancementService();
         this.checkForAppliedSuggestions();
         this.updateSuggestionCount();
+        this.loadWikidataSuggestions();
+    }
+
+    private async loadWikidataSuggestions(): Promise<void> {
+        try {
+            const existingContent = this.getExistingArticleContent();
+            const suggestions = await this.wikidataService.getEnhancementSuggestions(existingContent);
+            
+            // Store suggestions for later use
+            suggestions.forEach(suggestion => {
+                this.wikidataSuggestions.set(suggestion.id, suggestion);
+            });
+        } catch (error) {
+            console.error('Error loading Wikidata suggestions:', error);
+        }
+    }
+
+    private getExistingArticleContent(): string {
+        // Get the actual content from the page
+        const contentElement = document.getElementById('researchCareerContent');
+        return contentElement?.textContent || '';
     }
 
     private checkForAppliedSuggestions(): void {
@@ -64,18 +90,25 @@ class SectionExpansionManager {
         const content = document.getElementById('researchCareerContent')!;
         const firstParagraph = content.querySelector('p')!;
         
-        if (factId === 'harvard') {
-            // This fact is already in the article, so we'll just highlight it
+        // Check if this is a Wikidata-based suggestion
+        const wikidataSuggestion = this.wikidataSuggestions.get(factId);
+        if (wikidataSuggestion) {
+            // Add Wikidata fact to the content
+            const newFactHTML = `<span class="fact-highlight"> ${wikidataSuggestion.content}</span>`;
+            firstParagraph.innerHTML += newFactHTML;
+            return;
+        }
+        
+        // Fallback to hardcoded logic for backward compatibility
+        if (factId === 'harvard-fallback') {
             const harvardText = firstParagraph.innerHTML;
             firstParagraph.innerHTML = harvardText.replace(
                 'on the Event Horizon Telescope Imaging team',
                 'on the Event Horizon Telescope Imaging team <span class="fact-highlight">(2018)</span>'
             );
-        } else if (factId === 'caltech') {
-            // Add Caltech information to the first paragraph
+        } else if (factId === 'caltech-fallback') {
             const newText = ' She then joined the California Institute of Technology (Caltech) as an assistant professor in June 2019, where she was later promoted to associate professor of computing and mathematical sciences, electrical engineering, and astronomy, as well as a Rosenberg Scholar in 2024.<sup class="reference">[21]</sup>';
             
-            const firstParagraph = content.querySelector('p')!;
             const currentHTML = firstParagraph.innerHTML;
             firstParagraph.innerHTML = currentHTML.replace(
                 '</sup></p>',
@@ -87,6 +120,22 @@ class SectionExpansionManager {
     private addSection(sectionId: string): void {
         const container = document.getElementById('newSectionsContainer')!;
         
+        // Check if this is a Wikidata-based suggestion
+        const wikidataSuggestion = this.wikidataSuggestions.get(sectionId);
+        if (wikidataSuggestion) {
+            const section = document.createElement('section');
+            section.className = 'article-section article-section--new';
+            section.innerHTML = `
+                <h2 class="article-section__title">${wikidataSuggestion.title}</h2>
+                <div class="article-section__content">
+                    ${wikidataSuggestion.content}
+                </div>
+            `;
+            container.appendChild(section);
+            return;
+        }
+        
+        // Fallback to hardcoded content for backward compatibility
         const sectionContent: Record<string, { title: string; content: string }> = {
             awards: {
                 title: 'Awards',
