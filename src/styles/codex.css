@@ -1,0 +1,39 @@
+/* ABOUTME: Codex design system styles and design tokens */
+/* ABOUTME: Imports Wikimedia Codex CSS framework for consistent styling */
+
+/* Import Codex design tokens */
+@import '@wikimedia/codex-design-tokens/theme-wikimedia-ui.css';
+
+/* Import Codex component styles */
+@import '@wikimedia/codex/dist/codex.style.css';
+
+/* Import our custom component styles */
+@import './components.css';
+
+/* Custom CSS variables for our application */
+:root {
+  /* Layout variables */
+  --app-max-width: 1200px;
+  --app-padding: 20px;
+  --app-mobile-padding: 16px;
+  
+  /* Spacing scale following Codex patterns */
+  --spacing-xs: var(--spacing-25);
+  --spacing-sm: var(--spacing-50);
+  --spacing-md: var(--spacing-100);
+  --spacing-lg: var(--spacing-150);
+  --spacing-xl: var(--spacing-200);
+  
+  /* Component specific */
+  --input-height: 44px; /* Touch-friendly height */
+  --chip-gap: var(--spacing-50);
+  --list-item-padding: var(--spacing-100);
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 768px) {
+  :root {
+    --app-padding: var(--app-mobile-padding);
+    --list-item-padding: var(--spacing-75);
+  }
+}
