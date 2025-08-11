@@ -2,10 +2,10 @@
 /* ABOUTME: Imports Wikimedia Codex CSS framework for consistent styling */
 
 /* Import Codex design tokens */
-@import '@wikimedia/codex-design-tokens/theme-wikimedia-ui.css';
+@import '../../assets/theme-wikimedia-ui.css';
 
 /* Import Codex component styles */
-@import '@wikimedia/codex/dist/codex.style.css';
+@import '../../assets/codex.style.css';
 
 /* Import our custom component styles */
 @import './components.css';
