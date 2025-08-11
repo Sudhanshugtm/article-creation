@@ -644,6 +644,7 @@ class HTMLArticleCreator {
     private handleEditorChipClick(type: string): void {
         switch (type) {
             case 'snippet':
+                // Show richer Wikipedia-like options along with a fillable template
                 this.openSnippetModal();
                 break;
             case 'fact':
@@ -933,7 +934,15 @@ class HTMLArticleCreator {
         // Clear container and create cards for each lead variation
         this.snippetCardsContainer.innerHTML = '';
 
+        // Always include a template option with fillable chips so users can easily complete details
+        const chipTemplate = this.getManualLeads(
+            this.selectedTopic.label,
+            this.selectedTopic.category as ArticleCategory,
+            contextualChips
+        ).formal;
+
         const variations = [
+            { type: 'Template', content: chipTemplate, description: 'Fill-in with chips' },
             { type: 'Professional', content: leadVariations.formal, description: 'Formal tone' },
             { type: 'Concise', content: leadVariations.concise, description: 'Brief & clear' },
             { type: 'Comprehensive', content: leadVariations.detailed, description: 'Detailed coverage' }
