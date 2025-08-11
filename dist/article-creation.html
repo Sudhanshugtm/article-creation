@@ -90,18 +90,7 @@
         font-size: 18px !important;
       }
     }
-    /* Blinking caret shown after title when awaiting input */
-    @keyframes caret-blink { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
-    .article-creator--show-caret .article-creator__title::after {
-      content: '';
-      display: inline-block;
-      width: 1px;
-      height: 1em;
-      background-color: currentColor;
-      margin-left: 6px;
-      animation: caret-blink 1s steps(2, start) infinite;
-      transform: translateY(2px);
-    }
+    
     
     /* Hide the New topic chip */
     .article-creator__chips {
@@ -185,27 +174,7 @@
       padding-top: 20px !important;
     }
   </style>
-  <script>
-    (function() {
-      function updateCaret() {
-        try {
-          var root = document.getElementById('app');
-          var input = document.getElementById('articleTitleInput');
-          if (!root || !input) return;
-          var isEditing = root.classList.contains('article-creator--editing');
-          var empty = !input.value || input.value.trim() === '';
-          if (!isEditing && empty) root.classList.add('article-creator--show-caret');
-          else root.classList.remove('article-creator--show-caret');
-        } catch (e) {}
-      }
-      window.addEventListener('DOMContentLoaded', function() {
-        var input = document.getElementById('articleTitleInput');
-        if (input) input.addEventListener('input', updateCaret);
-        updateCaret();
-      });
-      window.addEventListener('pageshow', updateCaret);
-    })();
-  </script>
+  
   <script>
     (function() {
       try {
