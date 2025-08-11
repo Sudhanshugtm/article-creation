@@ -98,9 +98,12 @@
     /* Responsive toolbar design */
     .article-creator__global-toolbar {
       display: flex !important;
-      justify-content: center !important;
+      align-items: center !important;
+      justify-content: space-between !important;
       padding: 8px 20px !important;
-      margin-bottom: 24px !important;
+      width: 100% !important;
+      max-width: 800px !important;
+      margin: 0 auto 24px !important;
     }
     @media (min-width: 768px) {
       .article-creator__global-toolbar {
@@ -120,19 +123,15 @@
     
     .article-editor__toolbar-left,
     .article-editor__toolbar-right {
-      max-width: 800px !important;
-      width: 100% !important;
       display: flex !important;
-      justify-content: space-between !important;
       align-items: center !important;
     }
-    
     .article-editor__toolbar-left {
-      flex: 1 !important;
+      flex: 1 1 auto !important;
+      min-width: 0 !important;
     }
-    
     .article-editor__toolbar-right {
-      flex: 0 !important;
+      flex: 0 0 auto !important;
     }
     
     @media (max-width: 768px) {
