@@ -13,7 +13,7 @@
 /* Custom CSS variables for our application */
 :root {
   /* Layout variables */
-  --app-max-width: 1200px;
+  --app-max-width: 800px;
   --app-padding: 20px;
   --app-mobile-padding: 16px;
   

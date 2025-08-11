@@ -491,7 +491,7 @@
 
 /* Wikipedia-style Reference Dialog */
 .reference-dialog {
-  display: none;
+  display: none !important;
   position: fixed;
   top: 0;
   left: 0;
@@ -659,7 +659,7 @@
 
 /* Add from Link Dialog Styles */
 .add-link-dialog {
-  display: none;
+  display: none !important;
   position: fixed;
   top: 0;
   left: 0;

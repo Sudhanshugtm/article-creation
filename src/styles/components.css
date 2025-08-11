@@ -1,6 +1,36 @@
 /* ABOUTME: Component-specific styles for topic items, category items, and chips */
 /* ABOUTME: Custom styling that extends Codex components for article creator UI */
 
+/* Main layout responsive styles */
+.article-creator {
+  max-width: var(--app-max-width);
+  margin: 0 auto;
+  padding: 0 var(--app-padding);
+}
+
+.article-creator__main {
+  width: 100%;
+}
+
+.article-creator__category-list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-md);
+}
+
+/* Better spacing for larger screens */
+@media (min-width: 768px) {
+  .article-creator {
+    padding: 0 var(--spacing-xl);
+  }
+  
+  .article-creator__category-list {
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-md);
+  }
+}
+
 /* Mobile Chip Modal */
 .mobile-chip-overlay {
     position: fixed;
