@@ -296,4 +296,15 @@
     .suggestions-page__icon {
         font-size: 2rem;
     }
+    
+    /* Mobile placement indicators */
+    .suggestion-item__placement {
+        padding: 6px;
+        gap: 4px;
+    }
+    
+    .suggestion-item__placement-text {
+        font-size: 0.75rem;
+        line-height: 1.2;
+    }
 }
