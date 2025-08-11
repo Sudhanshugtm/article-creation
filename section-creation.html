@@ -320,17 +320,45 @@ John was the program co-chair for the 2012 International Conference on Machine L
             'henri-gouraud': {
                 title: 'Henri Gouraud',
                 description: 'French computer graphics pioneer',
-                wikipediaTitle: 'Henri Gouraud (computer scientist)'
+                wikipediaTitle: 'Henri Gouraud (computer scientist)',
+                content: `'''Henri Gouraud''' (born 1944) is a French [[computer scientist]]. He is the [[inventor]] of [[Gouraud shading]] used in [[computer graphics]]. He is the great-nephew of general [[Henri Gouraud (soldier)|Henri Gouraud]].
+
+During 1964–1967, he studied at [[École Centrale Paris]]. He received his Ph.D. from the [[University of Utah College of Engineering]] in 1971, working with [[David C. Evans (computer scientist)|Dave Evans]] and [[Ivan Sutherland]], with his dissertation titled ''[http://portal.acm.org/citation.cfm?id=905323&dl=ACM&coll=portal Computer Display of Curved Surfaces]''.
+
+In 1971, Gouraud made the first [[computer graphics]] [[geometry]] [[digitization|capture]] and representation of a human face in [[wire-frame model]], and applied his [[shader]] to produce the famous human face images showing the effect of his shading, which were done using his wife Sylvie Gouraud as the model.
+
+== Original publications ==
+* H. Gouraud, "Continuous shading of curved surfaces," ''[[IEEE Transactions on Computers]]'', C-20(6):623–629, 1971.
+* H. Gouraud, ''Computer Display of Curved Surfaces'', Doctoral Thesis, [[University of Utah]], United States, 1971.
+* H. Gouraud, ''Continuous shading of curved surfaces''. In Rosalee Wolfe (editor), [https://web.archive.org/web/20060901022041/http://www.siggraph.org/publications/seminal-graphics.html Seminal Graphics: Pioneering efforts that shaped the field], [[ACM Press]], 1998.`
             },
             'eduardo-caianiello': {
                 title: 'Eduardo R. Caianiello',
                 description: 'Italian theoretical physicist',
-                wikipediaTitle: 'Eduardo R. Caianiello'
+                wikipediaTitle: 'Eduardo R. Caianiello',
+                content: `'''Eduardo Renato Caianiello''' (June 25, 1921 – October 22, 1993) was an Italian [[physicist]]. He contributed to scientific research, especially in [[Quantum mechanics|quantum theory]] and [[cybernetics]]. He was also a pioneer in the theory of [[neural networks]]. His Caianiello's equation formalized the theory of [[Hebbian learning]].
+
+Caianiello founded and directed the Institute of Theoretical Physics of the [[University of Naples]]; the Laboratory of Cybernetics of the [[Consiglio Nazionale delle Ricerche]] at Arco Felice (Naples), the Faculty of Mathematical, Physical and Natural Sciences of the [[University of Salerno]], the International Institute for Senior Scientific Studies (IIASS) at [[Vietri sul Mare]] (Salerno) and the School of Specialization in Cyber and Physical Sciences.
+
+The name of the [[Hafnian]] was coined by Caianiello "to mark the fruitful period of stay in [[Copenhagen]] (Hafnia in Latin)."`
             },
             'patrick-mchale': {
                 title: 'Patrick McHale',
                 description: 'American animator and musician',
-                wikipediaTitle: 'Patrick McHale (artist)'
+                wikipediaTitle: 'Patrick McHale (artist)',
+                content: `'''Patrick Nolen McHale''' (born November 17, 1983) is an American animator, storyboard artist, screenwriter, director, and musician. He is well known for creating the animated television miniseries ''[[Over the Garden Wall]]''.
+
+== Life and career ==
+
+=== Early career ===
+McHale graduated from the [[California Institute of the Arts]] in [[Santa Clarita, California|Santa Clarita]] in 2006 with a [[Bachelor of Fine Arts|BFA]] in [[character animation]]. He began his professional career at [[Cartoon Network Studios]] in 2007, as a writer and [[storyboard]] artist on [[Thurop Van Orman]]'s ''[[The Marvelous Misadventures of Flapjack]]''. He helped Van Orman create ten episodes. The one-shot character Punsie McKale was inspired by and modeled after McHale.
+
+After leaving ''Flapjack'', he joined fellow CalArts alum and ''Flapjack'' storyboard artist [[Pendleton Ward]] to help develop Ward's ''Adventure Time'' short into an animated series, ''[[Adventure Time]]''. Once the show was picked up, McHale stayed as the show's [[creative director]] through the show's second season. Then he moved to [[New York City]] with his wife and fellow filmmaker Jiwook Kim. He continued to freelance for the show in the capacity of writing some songs and providing input on story outlines until the middle of season five.
+
+=== ''Tome of the Unknown'' and ''Over the Garden Wall'' ===
+In October 2011, he began to make the eight-minute animated short ''[[Tome of the Unknown]]'', which was produced as part of Cartoon Network's [[Cartoon Network Shorts Department|shorts development program]]. Unlike the other pilots, released online on [[Cartoon Network Video]], the film was showcased during the festival circuit throughout 2013 and early 2014. It received The Bruce Corwin Award for Best Animated Short Film at the [[Santa Barbara International Film Festival]] in [[Santa Barbara, California]].
+
+The short became the basis for a ten-part [[miniseries]] ''Over the Garden Wall'', which premiered over five consecutive nights in November 2014. ''Tome of the Unknown'' was streamed online in May 2015. McHale won a National Cartoonists Society Reuben award as the creator of ''Over the Garden Wall'', in the category for TV Animation. The series won an [[Emmy Award]] for Best Animated Program. In the same year, McHale's ''Over the Garden Wall'' won Best Animated Feature at the [[Ottawa International Animation Festival]] in [[Ottawa|Ottawa, Canada]]. In 2016, McHale received an [[Eisner Awards|Eisner Award]] for Best Publication for Kids as the creator and a writer of the ''[[Over the Garden Wall]]'' comic book featuring the characters who first appeared in the television series.`
             }
         };
 
@@ -339,11 +367,12 @@ John was the program co-chair for the 2012 International Conference on Machine L
             const article = articleData[articleId];
             if (article) {
                 sessionStorage.setItem('selectedArticleId', articleId);
-                sessionStorage.setItem('selectedArticleMeta', JSON.stringify({
+                sessionStorage.setItem('selectedArticle', JSON.stringify({
                     id: articleId,
                     title: article.title,
                     description: article.description,
-                    wikipediaTitle: article.wikipediaTitle
+                    wikipediaTitle: article.wikipediaTitle,
+                    content: article.content
                 }));
                 
                 // Navigate to expansion interface - it will fetch real content via MediaWiki

@@ -47,18 +47,14 @@
     <script>
         // Load selected article content from sessionStorage
         document.addEventListener('DOMContentLoaded', function() {
-            const selectedArticleMeta = sessionStorage.getItem('selectedArticleMeta');
+            const selectedArticleData = sessionStorage.getItem('selectedArticle');
             
-            if (selectedArticleMeta) {
-                const articleMeta = JSON.parse(selectedArticleMeta);
-                loadWikipediaArticle(articleMeta);
+            if (selectedArticleData) {
+                const article = JSON.parse(selectedArticleData);
+                loadArticleContent(article);
             } else {
                 // Fallback to Katie Bouman if no selection found
-                loadWikipediaArticle({
-                    title: 'Katie Bouman',
-                    description: 'American computer scientist and engineer',
-                    wikipediaTitle: 'Katie Bouman'
-                });
+                loadDefaultContent();
             }
         });
 
