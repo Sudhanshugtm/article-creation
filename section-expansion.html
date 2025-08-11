@@ -39,7 +39,7 @@
             <button class="smart-widget__trigger" id="smartWidgetTrigger" onclick="window.location.href='./section-suggestions.html'">
                 <span class="smart-widget__icon">💡</span>
                 <span class="smart-widget__text">What to improve?</span>
-                <span class="smart-widget__badge" id="suggestionCount">8 ideas</span>
+                <span class="smart-widget__badge" id="suggestionCount">6 ideas</span>
             </button>
         </div>
     </div>
@@ -67,6 +67,9 @@
             // Convert MediaWiki markup to HTML
             const htmlContent = convertMediaWikiToHTML(article.content);
             document.getElementById('articleBody').innerHTML = htmlContent;
+            
+            // Update suggestion count in the smart widget
+            updateSuggestionCount(article.id || 'katie-bouman');
         }
 
         function convertMediaWikiToHTML(mediaWikiText) {
@@ -117,6 +120,7 @@
 
         function loadDefaultContent() {
             const defaultArticle = {
+                id: 'katie-bouman',
                 title: 'Katie Bouman',
                 description: 'American computer scientist and engineer',
                 content: `'''Katherine Louise Bouman''' (born 1989) is an American [[engineer]] and [[computer scientist]] working in the field of [[computational imaging]]. She led the development of an [[algorithm]] for imaging [[black hole]]s, known as [[CHIRP (algorithm)|Continuous High-resolution Image Reconstruction using Patch priors]] (CHIRP), and was a member of the [[Event Horizon Telescope]] team that captured the first image of a black hole.
@@ -131,6 +135,40 @@ After earning her doctorate, Bouman joined [[Harvard University]] as a [[postdoc
 She was recognized as one of the [[BBC]]'s [[100 Women (BBC)#2019|100 women of 2019]]. In 2024, Bouman was awarded a [[Sloan Research Fellowship]].`
             };
             loadArticleContent(defaultArticle);
+        }
+
+        function updateSuggestionCount(articleId) {
+            // Same suggestion sets as in section-suggestions.html
+            const suggestionSets = {
+                'katie-bouman': {
+                    facts: 2, // Harvard, Caltech
+                    sections: 2 // Awards, Notable Works
+                },
+                'john-langford': {
+                    facts: 3, // Education, PhD, Microsoft
+                    sections: 3 // Education, Career, Research
+                },
+                'henri-gouraud': {
+                    facts: 3, // Birth, nephew, face-capture
+                    sections: 2 // Early life, Legacy
+                },
+                'eduardo-caianiello': {
+                    facts: 3, // Institutes, cybernetics, hafnian
+                    sections: 3 // Career, Research, Legacy
+                },
+                'patrick-mchale': {
+                    facts: 3, // Birth, CalArts, awards
+                    sections: 1 // Awards and recognition
+                }
+            };
+
+            const suggestions = suggestionSets[articleId] || suggestionSets['katie-bouman'];
+            const totalCount = suggestions.facts + suggestions.sections;
+            
+            const suggestionCountElement = document.getElementById('suggestionCount');
+            if (suggestionCountElement) {
+                suggestionCountElement.textContent = `${totalCount} ideas`;
+            }
         }
     </script>
     
