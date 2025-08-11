@@ -584,7 +584,7 @@ class HTMLArticleCreator {
         if (editorChipsContainer) {
             editorChipsContainer.innerHTML = '';
             const chipDefs = [
-                { type: 'snippet', icon: cdxIconAdd, label: 'Snippet' },
+                { type: 'snippet', icon: cdxIconAdd, label: 'Introduction' },
                 { type: 'fact', icon: cdxIconAdd, label: 'Fact' },
                 { type: 'more', icon: cdxIconEllipsis, label: 'More' }
             ];
