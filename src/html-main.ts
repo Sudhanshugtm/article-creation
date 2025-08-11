@@ -110,6 +110,9 @@ class HTMLArticleCreator {
         this.initializeDOM();
         this.setupEventListeners();
         this.restoreState();
+
+        // Expose a global handle for robustness/fallbacks
+        try { (window as any).articleCreatorApp = this; } catch {}
     }
 
     private initializeDOM(): void {

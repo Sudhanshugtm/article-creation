@@ -22,203 +22,15 @@ class SuggestionsPageManager {
         this.clearButton = document.getElementById('clearButton') as HTMLButtonElement;
         this.wikidataService = new WikidataEnhancementService();
         
-        // Immediately hide any existing loading state
-        this.hideLoadingState();
-        
-        // Don't load suggestions here - let the HTML script handle article-specific suggestions
-        console.log('Class-based manager initialized - HTML script will handle suggestion loading');
+        // No API calls needed - suggestions are static and handled by HTML
+        console.log('Suggestions manager initialized - using static article-specific suggestions');
     }
 
-    private async loadCachedOrFreshSuggestions(): Promise<void> {
-        // First check if we have cached suggestions
-        const cachedSuggestions = sessionStorage.getItem('wikidataSuggestionsCache');
-        const cacheTimestamp = sessionStorage.getItem('wikidataCacheTimestamp');
-        
-        if (cachedSuggestions && cacheTimestamp) {
-            const cacheAge = Date.now() - parseInt(cacheTimestamp);
-            const CACHE_DURATION = 30 * 60 * 1000; // 30 minutes
-            
-            if (cacheAge < CACHE_DURATION) {
-                console.log('Using cached Wikidata suggestions - rendering immediately without loading state');
-                const suggestions = JSON.parse(cachedSuggestions);
-                
-                // Remove any existing loading state first
-                this.hideLoadingState();
-                
-                // Render cached suggestions immediately
-                this.renderSuggestions(suggestions);
-                this.updateSuggestionCount(suggestions.length);
-                return; // Exit early - no API call or loading needed
-            } else {
-                console.log('Cache expired - clearing old cache and fetching fresh data');
-                sessionStorage.removeItem('wikidataSuggestionsCache');
-                sessionStorage.removeItem('wikidataCacheTimestamp');
-            }
-        }
-        
-        // No valid cache found - fetch fresh data with loading state
-        console.log('No valid cache found - fetching fresh Wikidata suggestions with loading state');
-        await this.loadWikidataSuggestions();
-    }
+    // Removed API loading methods - using static article-specific suggestions from HTML
 
-    private async loadWikidataSuggestions(): Promise<void> {
-        this.isLoading = true;
-        this.showLoadingState();
+    // Removed render methods - suggestions are now static and rendered by HTML
 
-        try {
-            // Get existing article content (we'll simulate this for now)
-            const existingContent = this.getExistingArticleContent();
-            
-            // Fetch suggestions from Wikidata
-            const suggestions = await this.wikidataService.getEnhancementSuggestions(existingContent);
-            
-            // Cache the suggestions for future visits
-            sessionStorage.setItem('wikidataSuggestionsCache', JSON.stringify(suggestions));
-            sessionStorage.setItem('wikidataCacheTimestamp', Date.now().toString());
-            console.log('Cached Wikidata suggestions for future use');
-            
-            // Replace hardcoded suggestions with Wikidata suggestions
-            this.renderSuggestions(suggestions);
-            this.updateSuggestionCount(suggestions.length);
-            
-        } catch (error) {
-            console.error('Error loading Wikidata suggestions:', error);
-            // Keep the existing hardcoded suggestions as fallback
-        } finally {
-            this.isLoading = false;
-            this.hideLoadingState();
-        }
-    }
-
-    private getExistingArticleContent(): string {
-        // For now, return a simplified version of the current Katie Bouman article content
-        // In a real implementation, this would fetch the actual article content
-        return `
-            Katie Bouman is an American computer scientist and engineer.
-            After earning her doctorate, Bouman joined Harvard University as a postdoctoral fellow 
-            on the Event Horizon Telescope Imaging team. Bouman joined Event Horizon Telescope project in 2013.
-            She led the development of an algorithm for imaging black holes, known as Continuous High-resolution 
-            Image Reconstruction using Patch priors (CHIRP). Bouman received significant media attention after 
-            a photo, showing her reaction to the detection of the black hole shadow in the EHT images, went viral.
-        `;
-    }
-
-    private renderSuggestions(suggestions: any[]): void {
-        // Group suggestions by type
-        const factSuggestions = suggestions.filter(s => s.type === 'fact');
-        const sectionSuggestions = suggestions.filter(s => s.type === 'section');
-
-        // Render fact suggestions
-        if (factSuggestions.length > 0) {
-            this.renderFactSuggestions(factSuggestions);
-        }
-
-        // Render section suggestions
-        if (sectionSuggestions.length > 0) {
-            this.renderSectionSuggestions(sectionSuggestions);
-        }
-
-        // Re-initialize event listeners for new elements
-        this.reinitializeEventListeners();
-    }
-
-    private renderFactSuggestions(suggestions: any[]): void {
-        const factSection = document.querySelector('.suggestion-section');
-        if (!factSection) return;
-
-        const suggestionList = factSection.querySelector('.suggestion-list');
-        if (!suggestionList) return;
-
-        // Clear existing suggestions
-        suggestionList.innerHTML = '';
-
-        // Add new suggestions
-        suggestions.forEach(suggestion => {
-            const item = document.createElement('label');
-            item.className = 'suggestion-item';
-            item.innerHTML = `
-                <input type="checkbox" class="suggestion-item__checkbox" data-fact="${suggestion.id}">
-                <div class="suggestion-item__content">
-                    <div class="suggestion-item__text">${suggestion.content}</div>
-                    ${suggestion.hint ? `<div class="suggestion-item__hint">${suggestion.hint}</div>` : ''}
-                </div>
-            `;
-            suggestionList.appendChild(item);
-        });
-    }
-
-    private renderSectionSuggestions(suggestions: any[]): void {
-        const sectionSuggestions = document.querySelectorAll('.suggestion-section');
-        const sectionSection = sectionSuggestions[1]; // Second section is for new sections
-        if (!sectionSection) return;
-
-        const suggestionList = sectionSection.querySelector('.suggestion-list');
-        if (!suggestionList) return;
-
-        // Clear existing suggestions
-        suggestionList.innerHTML = '';
-
-        // Add new suggestions
-        suggestions.forEach(suggestion => {
-            const item = document.createElement('div');
-            item.className = 'suggestion-item suggestion-item--section';
-            item.dataset.section = suggestion.id;
-            item.innerHTML = `
-                <button class="suggestion-item__add-btn">+</button>
-                <div class="suggestion-item__content">
-                    <div class="suggestion-item__text">${suggestion.title}</div>
-                    <div class="suggestion-item__hint">${suggestion.hint || 'From Wikidata'}</div>
-                </div>
-            `;
-            suggestionList.appendChild(item);
-        });
-    }
-
-    private reinitializeEventListeners(): void {
-        // Re-initialize event listeners for dynamically created elements
-        this.initializeFactCheckboxes();
-        this.initializeSectionButtons();
-        
-        // Re-initialize apply and clear button listeners
-        if (this.applyButton) {
-            this.applyButton.removeEventListener('click', this.handleApplyClick);
-            this.applyButton.addEventListener('click', this.handleApplyClick);
-        }
-
-        if (this.clearButton) {
-            this.clearButton.removeEventListener('click', this.handleClearClick);
-            this.clearButton.addEventListener('click', this.handleClearClick);
-        }
-    }
-
-    private showLoadingState(): void {
-        const loadingMessage = document.createElement('div');
-        loadingMessage.id = 'loading-suggestions';
-        loadingMessage.className = 'suggestions-loading';
-        loadingMessage.innerHTML = `
-            <div class="suggestions-loading__content">
-                <div class="suggestions-loading__spinner"></div>
-                <p>Loading suggestions from Wikidata...</p>
-            </div>
-        `;
-        document.querySelector('.suggestions-page__main')?.prepend(loadingMessage);
-    }
-
-    private hideLoadingState(): void {
-        // Remove any existing loading elements by ID
-        const loading = document.getElementById('loading-suggestions');
-        if (loading) {
-            loading.remove();
-        }
-        
-        // Also remove any loading elements by class as a fallback
-        const loadingElements = document.querySelectorAll('.suggestions-loading');
-        loadingElements.forEach(element => {
-            element.remove();
-        });
-        
-        console.log('Loading state hidden - removed any existing loading elements');
-    }
+    // Removed loading state methods - not needed for static suggestions
 
     private updateSuggestionCount(count: number): void {
         const countElement = document.getElementById('suggestionCount');
@@ -383,8 +195,7 @@ class SuggestionsPageManager {
         // Show success feedback immediately
         this.showSuccessFeedback();
         
-        // Store Wikidata suggestions in background, but don't let it block navigation
-        this.storeWikidataBackground();
+        // No API calls needed - suggestions are static
         
         // Navigate immediately with shorter delay
         setTimeout(() => {
