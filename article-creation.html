@@ -6,6 +6,43 @@
     <title>Article Creator</title>
   <script type="module" crossorigin src="/article-creation/assets/prototype-BKE4pTt0.js"></script>
   <link rel="modulepreload" crossorigin href="/article-creation/assets/modulepreload-polyfill-B5Qt9EMX.js">
+  <style>
+    /* Hide reference dialogs that shouldn't be visible */
+    .reference-dialog,
+    .add-link-dialog {
+      display: none !important;
+    }
+    
+    /* Main layout responsive styles */
+    .article-creator {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+    
+    .article-creator__main {
+      width: 100%;
+    }
+    
+    .article-creator__category-list {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+      margin-top: 16px;
+    }
+    
+    /* Better spacing for larger screens */
+    @media (min-width: 768px) {
+      .article-creator {
+        padding: 0 32px;
+      }
+      
+      .article-creator__category-list {
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+      }
+    }
+  </style>
 </head>
 <body>
     <!-- Canvas version (to be phased out) -->
