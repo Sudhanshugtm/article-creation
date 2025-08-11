@@ -473,16 +473,22 @@ class HTMLArticleCreator {
         this.articleContent.setAttribute('data-placeholder', `${topic} is ...`);
         // Focus the body and place the caret at the beginning so the ghost placeholder remains visible
         this.articleContent.focus();
-        try {
-            const range = document.createRange();
-            range.selectNodeContents(this.articleContent);
-            range.collapse(true);
-            const sel = window.getSelection();
-            if (sel) {
-                sel.removeAllRanges();
-                sel.addRange(range);
-            }
-        } catch {}
+        const placeCaretAtStart = () => {
+            try {
+                // Ensure truly empty so :empty placeholder renders in all browsers
+                this.articleContent.innerHTML = '';
+                const range = document.createRange();
+                range.selectNodeContents(this.articleContent);
+                range.collapse(true);
+                const sel = window.getSelection();
+                if (sel) {
+                    sel.removeAllRanges();
+                    sel.addRange(range);
+                }
+            } catch {}
+        };
+        placeCaretAtStart();
+        setTimeout(placeCaretAtStart, 0);
     }
 
     private exitArticleEditor(): void {
