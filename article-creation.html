@@ -178,7 +178,15 @@
       try {
         var params = new URLSearchParams(window.location.search);
         if (params.has('fresh')) {
-          localStorage.removeItem('articleCreatorState');
+          // Clear any saved app state
+          try { localStorage.removeItem('articleCreatorState'); } catch (e) {}
+          // Explicitly clear any browser-restored input value
+          var clearInput = function() {
+            var el = document.getElementById('articleTitleInput');
+            if (el && typeof el.value !== 'undefined') { el.value = ''; }
+          };
+          window.addEventListener('DOMContentLoaded', clearInput);
+          window.addEventListener('pageshow', clearInput);
         }
       } catch (e) {}
     })();
