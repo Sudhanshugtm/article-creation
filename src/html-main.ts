@@ -2082,36 +2082,13 @@ class HTMLArticleCreator {
         
         console.log('Generating intelligent intro for:', this.selectedTopic.label);
         
-        // Prefer intelligent, Wikipedia-like patterns; fall back to manual chips
-        try {
-            const topicObj = {
-                id: this.selectedTopic.wikidataId || '',
-                title: this.selectedTopic.label,
-                description: this.getCategoryContextualDescription(this.selectedTopic.category as ArticleCategory, this.selectedTopic.label),
-                category: this.selectedTopic.category,
-                instanceOf: [] as string[]
-            };
-            const intelligent = await this.intelligentEngine.generateIntelligentLeads(
-                topicObj,
-                this.selectedTopic.category as ArticleCategory
-            );
-            let intro = intelligent.detailed || intelligent.formal || intelligent.concise;
-            // Ensure fillable chips are present for missing details
-            intro = this.chipifyPlaceholders(intro);
-            this.insertSelectedSnippet(intro);
-            console.log('Intelligent intro inserted');
-            return;
-        } catch (e) {
-            console.warn('Intelligent intro generation failed, using manual template:', e);
-        }
-        
-        // Fallback to chip-based manual template (detailed)
+        // Use improved Wikipedia-style manual templates (they're better than the intelligent engine now)
         const manual = this.getManualLeads(
             this.selectedTopic.label,
             this.selectedTopic.category as ArticleCategory
         ).detailed;
         this.insertSelectedSnippet(manual);
-        console.log('Manual template intro inserted');
+        console.log('Wikipedia-style template intro inserted');
     }
 
     private chipifyPlaceholders(text: string): string {
