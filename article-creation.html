@@ -99,7 +99,7 @@
     .article-creator__global-toolbar {
       display: flex !important;
       align-items: center !important;
-      justify-content: space-between !important;
+      justify-content: flex-start !important;
       padding: 8px 20px !important;
       width: 100% !important;
       max-width: 800px !important;
@@ -110,6 +110,10 @@
       .article-creator__global-toolbar {
         margin-bottom: 32px !important;
       }
+    }
+    /* Utility to push items to the right in a single-row toolbar */
+    .article-creator__global-toolbar .push-right {
+      margin-left: auto !important;
     }
 
     /* Ensure the header (with "New article") has space from anything above */
@@ -167,31 +171,27 @@
     <div id="app" class="article-creator">
         <!-- Global Toolbar (shown only in editing mode) -->
         <div class="article-creator__global-toolbar" id="globalToolbar" style="display: none;">
-            <div class="article-editor__toolbar-left">
-                <button class="cdx-button cdx-button--action-default cdx-button--weight-quiet cdx-button--size-medium article-editor__tool" id="closeBtn" title="Close">
-                    <span class="cdx-button__icon"></span>
-                </button>
-                <button class="cdx-button cdx-button--action-default cdx-button--weight-quiet cdx-button--size-medium article-editor__tool" id="boldBtn" title="Bold">
-                    <span class="cdx-button__icon"></span>
-                </button>
-                <button class="cdx-button cdx-button--action-default cdx-button--weight-quiet cdx-button--size-medium article-editor__tool" id="italicBtn" title="Italic">
-                    <span class="cdx-button__icon"></span>
-                </button>
-                <button class="cdx-button cdx-button--action-default cdx-button--weight-quiet cdx-button--size-medium article-editor__tool" id="linkBtn" title="Link">
-                    <span class="cdx-button__icon"></span>
-                </button>
-                <button class="cdx-button cdx-button--action-default cdx-button--weight-quiet cdx-button--size-medium article-editor__tool" id="undoBtn" title="Undo">
-                    <span class="cdx-button__icon"></span>
-                </button>
-                <button class="cdx-button cdx-button--action-default cdx-button--weight-quiet cdx-button--size-medium article-editor__tool" id="moreBtn" title="More">
-                    <span class="cdx-button__icon"></span>
-                </button>
-            </div>
-            <div class="article-editor__toolbar-right">
-                <button class="cdx-button cdx-button--action-progressive cdx-button--weight-primary cdx-button--size-medium article-editor__tool" id="nextBtn" title="Next">
-                    <span class="cdx-button__icon"></span>
-                </button>
-            </div>
+            <button class="cdx-button cdx-button--action-default cdx-button--weight-quiet cdx-button--size-medium article-editor__tool" id="closeBtn" title="Close">
+                <span class="cdx-button__icon"></span>
+            </button>
+            <button class="cdx-button cdx-button--action-default cdx-button--weight-quiet cdx-button--size-medium article-editor__tool" id="boldBtn" title="Bold">
+                <span class="cdx-button__icon"></span>
+            </button>
+            <button class="cdx-button cdx-button--action-default cdx-button--weight-quiet cdx-button--size-medium article-editor__tool" id="italicBtn" title="Italic">
+                <span class="cdx-button__icon"></span>
+            </button>
+            <button class="cdx-button cdx-button--action-default cdx-button--weight-quiet cdx-button--size-medium article-editor__tool" id="linkBtn" title="Link">
+                <span class="cdx-button__icon"></span>
+            </button>
+            <button class="cdx-button cdx-button--action-default cdx-button--weight-quiet cdx-button--size-medium article-editor__tool" id="undoBtn" title="Undo">
+                <span class="cdx-button__icon"></span>
+            </button>
+            <button class="cdx-button cdx-button--action-default cdx-button--weight-quiet cdx-button--size-medium article-editor__tool" id="moreBtn" title="More">
+                <span class="cdx-button__icon"></span>
+            </button>
+            <button class="cdx-button cdx-button--action-progressive cdx-button--weight-primary cdx-button--size-medium article-editor__tool push-right" id="nextBtn" title="Next">
+                <span class="cdx-button__icon"></span>
+            </button>
         </div>
         
         <header class="article-creator__header">
