@@ -58,89 +58,79 @@
             }
         });
 
-        async function loadWikipediaArticle(articleMeta) {
-            try {
-                // Update page title and header immediately
-                document.getElementById('pageTitle').textContent = articleMeta.title + ' - Wikipedia';
-                document.getElementById('articleTitle').textContent = articleMeta.title;
-                document.getElementById('articleSubtitle').textContent = articleMeta.description;
-                
-                // Show loading state
-                document.getElementById('articleBody').innerHTML = '<div class="loading-content">Loading article content...</div>';
-                
-                // Fetch article content from Wikipedia API
-                const response = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(articleMeta.wikipediaTitle)}`);
-                const summary = await response.json();
-                
-                // Fetch full content
-                const contentResponse = await fetch(`https://en.wikipedia.org/w/api.php?action=parse&format=json&page=${encodeURIComponent(articleMeta.wikipediaTitle)}&prop=text&section=0&origin=*`);
-                const contentData = await contentResponse.json();
-                
-                if (contentData.parse && contentData.parse.text) {
-                    // Create simplified article content
-                    const articleContent = createSimplifiedArticleContent(summary, contentData.parse.text['*']);
-                    document.getElementById('articleBody').innerHTML = articleContent;
-                } else {
-                    throw new Error('Failed to fetch article content');
+        function loadArticleContent(article) {
+            // Update page title and header
+            document.getElementById('pageTitle').textContent = article.title + ' - Wikipedia';
+            document.getElementById('articleTitle').textContent = article.title;
+            document.getElementById('articleSubtitle').textContent = article.description;
+            
+            // Convert MediaWiki markup to HTML
+            const htmlContent = convertMediaWikiToHTML(article.content);
+            document.getElementById('articleBody').innerHTML = htmlContent;
+        }
+
+        function convertMediaWikiToHTML(mediaWikiText) {
+            let html = mediaWikiText;
+            
+            // Convert section headers
+            html = html.replace(/^== (.+?) ==$/gm, '<section class="article-section"><h2 class="article-section__title">$1</h2><div class="article-section__content">');
+            html = html.replace(/^=== (.+?) ===$/gm, '<h3 class="article-subsection__title">$1</h3>');
+            
+            // Convert paragraphs - split by double newlines and wrap non-markup text in <p> tags
+            html = html.split('\n\n').map(paragraph => {
+                paragraph = paragraph.trim();
+                if (paragraph === '') return '';
+                if (paragraph.startsWith('<section') || paragraph.startsWith('<h3') || paragraph.startsWith('*') || paragraph.startsWith('{{')) {
+                    return paragraph;
                 }
-                
-            } catch (error) {
-                console.error('Error loading Wikipedia article:', error);
-                loadFallbackContent(articleMeta);
-            }
+                return '<p>' + paragraph + '</p>';
+            }).join('\n');
+            
+            // Close section divs before new sections
+            html = html.replace(/<section class="article-section">/g, '</div></section><section class="article-section">');
+            html = html.replace(/^<\/div><\/section>/, ''); // Remove first closing tags
+            
+            // Convert lists
+            html = html.replace(/^\* (.+)$/gm, '<li>$1</li>');
+            html = html.replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>');
+            
+            // Convert wiki links to regular links (simplified)
+            html = html.replace(/\[\[([^\]|]+)(\|[^\]]+)?\]\]/g, '<a href="#" class="wiki-link">$1</a>');
+            
+            // Convert external links (simplified)
+            html = html.replace(/\[([^\s]+) ([^\]]+)\]/g, '<a href="$1" class="external-link">$2</a>');
+            
+            // Convert bold text
+            html = html.replace(/'''(.+?)'''/g, '<strong>$1</strong>');
+            
+            // Convert italic text
+            html = html.replace(/''(.+?)''/g, '<em>$1</em>');
+            
+            // Add closing div for last section
+            html += '</div></section>';
+            
+            // Add placeholder for new sections
+            html += '<div id="newSectionsContainer"></div>';
+            
+            return html;
         }
 
-        function createSimplifiedArticleContent(summary, fullHtml) {
-            // Create a simplified version using the summary and basic structure
-            let content = `
-                <section class="article-section">
-                    <div class="article-section__content">
-                        <p><strong>${summary.title}</strong> ${summary.extract}</p>
-                    </div>
-                </section>
-            `;
-            
-            // Add placeholder sections for expansion
-            content += `
-                <section class="article-section">
-                    <h2 class="article-section__title">Research and career</h2>
-                    <div class="article-section__content" id="researchCareerContent">
-                        <p>This section could be expanded with more details about the person's work and contributions.</p>
-                    </div>
-                </section>
-                
-                <section class="article-section">
-                    <h2 class="article-section__title">Recognition</h2>
-                    <div class="article-section__content">
-                        <p>Awards and recognition could be added here.</p>
-                    </div>
-                </section>
-                
-                <div id="newSectionsContainer"></div>
-            `;
-            
-            return content;
-        }
+        function loadDefaultContent() {
+            const defaultArticle = {
+                title: 'Katie Bouman',
+                description: 'American computer scientist and engineer',
+                content: `'''Katherine Louise Bouman''' (born 1989) is an American [[engineer]] and [[computer scientist]] working in the field of [[computational imaging]]. She led the development of an [[algorithm]] for imaging [[black hole]]s, known as [[CHIRP (algorithm)|Continuous High-resolution Image Reconstruction using Patch priors]] (CHIRP), and was a member of the [[Event Horizon Telescope]] team that captured the first image of a black hole.
 
-        function loadFallbackContent(articleMeta) {
-            const fallbackContent = `
-                <section class="article-section">
-                    <div class="article-section__content">
-                        <p><strong>${articleMeta.title}</strong> - ${articleMeta.description}</p>
-                        <p>This article is available for expansion. You can add missing facts and new sections to improve its content.</p>
-                    </div>
-                </section>
-                
-                <section class="article-section">
-                    <h2 class="article-section__title">Research and career</h2>
-                    <div class="article-section__content" id="researchCareerContent">
-                        <p>This section could be expanded with more details.</p>
-                    </div>
-                </section>
-                
-                <div id="newSectionsContainer"></div>
-            `;
-            document.getElementById('articleBody').innerHTML = fallbackContent;
+== Early life and education ==
+Bouman grew up in [[West Lafayette, Indiana]]. Her father, [[Charles Bouman]], is a professor of [[electrical and computer engineering]] and [[biomedical engineering]] at [[Purdue University]].
+
+== Research and career ==
+After earning her doctorate, Bouman joined [[Harvard University]] as a [[postdoctoral fellow]] on the Event Horizon Telescope Imaging team. She led the development of an algorithm for imaging black holes, known as [[CHIRP (algorithm)|Continuous High-resolution Image Reconstruction using Patch priors]] (CHIRP).
+
+== Recognition ==
+She was recognized as one of the [[BBC]]'s [[100 Women (BBC)#2019|100 women of 2019]]. In 2024, Bouman was awarded a [[Sloan Research Fellowship]].`
+            };
+            loadArticleContent(defaultArticle);
         }
     </script>
     
