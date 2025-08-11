@@ -25,13 +25,8 @@ class SuggestionsPageManager {
         // Immediately hide any existing loading state
         this.hideLoadingState();
         
-        // Check for cached suggestions first to avoid unnecessary API calls
-        console.log('Class-based manager: Checking cache before loading API data');
-        
-        // Load cached suggestions or fetch from Wikidata if needed
-        this.loadCachedOrFreshSuggestions().catch(error => {
-            console.error('Failed to load suggestions:', error);
-        });
+        // Don't load suggestions here - let the HTML script handle article-specific suggestions
+        console.log('Class-based manager initialized - HTML script will handle suggestion loading');
     }
 
     private async loadCachedOrFreshSuggestions(): Promise<void> {

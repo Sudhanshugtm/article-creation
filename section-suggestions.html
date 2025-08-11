@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>What to improve? - Katie Bouman</title>
+    <title id="pageTitle">What to improve?</title>
   <script type="module" src="./assets/section-suggestions-MRwgCG-a.js"></script>
   <link rel="modulepreload" crossorigin href="/article-creation/assets/codex-BYAibwde.js">
   <link rel="modulepreload" crossorigin href="/article-creation/assets/WikidataEnhancementService-2MvXLlqh.js">
@@ -27,7 +27,7 @@
                     <span class="suggestions-page__icon">💡</span>
                     What to improve?
                 </h1>
-                <p class="suggestions-page__subtitle">Katie Bouman article • <span id="suggestionCount">8 ideas</span></p>
+                <p class="suggestions-page__subtitle" id="articleSubtitle">Katie Bouman article • <span id="suggestionCount">8 ideas</span></p>
             </div>
         </header>
 
@@ -147,6 +147,266 @@
             </button>
         </div>
     </div>
+
+    <script>
+        // Make the suggestions page dynamic based on selected article
+        document.addEventListener('DOMContentLoaded', function() {
+            const selectedArticleData = sessionStorage.getItem('selectedArticle');
+            
+            if (selectedArticleData) {
+                const article = JSON.parse(selectedArticleData);
+                updatePageForArticle(article);
+            } else {
+                // Fallback to Katie Bouman if no selection found
+                updatePageForArticle({
+                    title: 'Katie Bouman',
+                    description: 'American computer scientist and engineer'
+                });
+            }
+        });
+
+        function updatePageForArticle(article) {
+            // Update page title and subtitle
+            document.getElementById('pageTitle').textContent = `What to improve? - ${article.title}`;
+            document.getElementById('articleSubtitle').innerHTML = `${article.title} article • <span id="suggestionCount">8 ideas</span>`;
+            
+            // Load article-specific suggestions
+            loadArticleSpecificSuggestions(article.id || 'katie-bouman');
+        }
+
+        function loadArticleSpecificSuggestions(articleId) {
+            const suggestionSets = {
+                'katie-bouman': {
+                    facts: [
+                        {
+                            id: 'harvard',
+                            text: 'Bouman joined Harvard University as a postdoctoral fellow on the Event Horizon Telescope Imaging team (2018)',
+                            placement: 'Will be added to "Research and career" section, first paragraph'
+                        },
+                        {
+                            id: 'caltech',
+                            text: 'She then joined the California Institute of Technology (Caltech) as an assistant professor in June 2019, later promoted to associate professor',
+                            placement: 'Will be added to "Research and career" section, after paragraph about Caltech'
+                        }
+                    ],
+                    sections: [
+                        {
+                            id: 'awards',
+                            title: 'Awards',
+                            hint: 'Mention all awards received',
+                            placement: 'Will be positioned after "Recognition" section'
+                        },
+                        {
+                            id: 'works',
+                            title: 'Notable Works',
+                            hint: 'Highlight significant works listed on Wikidata',
+                            placement: 'Will be positioned after "Research and career" section'
+                        }
+                    ]
+                },
+                'john-langford': {
+                    facts: [
+                        {
+                            id: 'education',
+                            text: 'Langford studied Physics and Computer Science at Caltech, earning a double bachelor\'s degree in 1997',
+                            placement: 'Will be added to new "Education" section'
+                        },
+                        {
+                            id: 'phd',
+                            text: 'He received his Ph.D. in computer science from Carnegie Mellon University in 2002',
+                            placement: 'Will be added to new "Education" section, after bachelor\'s degree'
+                        },
+                        {
+                            id: 'microsoft',
+                            text: 'He works at Microsoft Research New York, of which he was one of the founding members',
+                            placement: 'Will be added to new "Career" section'
+                        }
+                    ],
+                    sections: [
+                        {
+                            id: 'education',
+                            title: 'Education',
+                            hint: 'Academic background and degrees',
+                            placement: 'Will be positioned after introduction'
+                        },
+                        {
+                            id: 'career',
+                            title: 'Career',
+                            hint: 'Professional positions and roles',
+                            placement: 'Will be positioned after "Education" section'
+                        },
+                        {
+                            id: 'research',
+                            title: 'Research',
+                            hint: 'Detailed research contributions',
+                            placement: 'Will be positioned after "Career" section'
+                        }
+                    ]
+                },
+                'henri-gouraud': {
+                    facts: [
+                        {
+                            id: 'birth',
+                            text: 'Henri Gouraud was born in 1944 in France',
+                            placement: 'Will be added to new "Early life" section'
+                        },
+                        {
+                            id: 'nephew',
+                            text: 'He is the great-nephew of general Henri Gouraud',
+                            placement: 'Will be added to new "Early life" section, after birth year'
+                        },
+                        {
+                            id: 'face-capture',
+                            text: 'In 1971, Gouraud made the first computer graphics geometry capture of a human face in wire-frame model, using his wife Sylvie as the model',
+                            placement: 'Will be added to existing text, after dissertation mention'
+                        }
+                    ],
+                    sections: [
+                        {
+                            id: 'early-life',
+                            title: 'Early life',
+                            hint: 'Birth and family background',
+                            placement: 'Will be positioned after introduction'
+                        },
+                        {
+                            id: 'legacy',
+                            title: 'Legacy and impact',
+                            hint: 'Influence on computer graphics field',
+                            placement: 'Will be positioned after "Original publications" section'
+                        }
+                    ]
+                },
+                'eduardo-caianiello': {
+                    facts: [
+                        {
+                            id: 'institutes',
+                            text: 'Caianiello founded and directed multiple institutes including the Institute of Theoretical Physics of the University of Naples',
+                            placement: 'Will be added to new "Career" section'
+                        },
+                        {
+                            id: 'cybernetics',
+                            text: 'He founded the Laboratory of Cybernetics of the Consiglio Nazionale delle Ricerche at Arco Felice (Naples)',
+                            placement: 'Will be added to new "Career" section, after University of Naples'
+                        },
+                        {
+                            id: 'hafnian',
+                            text: 'The name of the Hafnian was coined by Caianiello "to mark the fruitful period of stay in Copenhagen (Hafnia in Latin)"',
+                            placement: 'Will be added to new "Research contributions" section'
+                        }
+                    ],
+                    sections: [
+                        {
+                            id: 'career',
+                            title: 'Career',
+                            hint: 'Academic positions and institutes founded',
+                            placement: 'Will be positioned after introduction'
+                        },
+                        {
+                            id: 'research',
+                            title: 'Research contributions',
+                            hint: 'Key scientific contributions and theories',
+                            placement: 'Will be positioned after "Career" section'
+                        },
+                        {
+                            id: 'legacy',
+                            title: 'Legacy',
+                            hint: 'Impact on physics and cybernetics',
+                            placement: 'Will be positioned after "Research contributions" section'
+                        }
+                    ]
+                },
+                'patrick-mchale': {
+                    facts: [
+                        {
+                            id: 'birth',
+                            text: 'Patrick Nolen McHale was born November 17, 1983',
+                            placement: 'Will be added to "Life and career" section, beginning'
+                        },
+                        {
+                            id: 'calarts',
+                            text: 'McHale graduated from the California Institute of the Arts in Santa Clarita in 2006 with a BFA in character animation',
+                            placement: 'Will be added to "Early career" subsection'
+                        },
+                        {
+                            id: 'awards',
+                            text: 'McHale won a National Cartoonists Society Reuben award and an Emmy Award for Best Animated Program for Over the Garden Wall',
+                            placement: 'Will be added to existing "Over the Garden Wall" subsection'
+                        }
+                    ],
+                    sections: [
+                        {
+                            id: 'awards',
+                            title: 'Awards and recognition',
+                            hint: 'Emmy, Reuben award, and other accolades',
+                            placement: 'Will be positioned after existing content'
+                        }
+                    ]
+                }
+            };
+
+            const suggestions = suggestionSets[articleId] || suggestionSets['katie-bouman'];
+            updateSuggestionContent(suggestions);
+        }
+
+        function updateSuggestionContent(suggestions) {
+            // Update fact suggestions
+            const factList = document.querySelector('.suggestion-section .suggestion-list');
+            if (factList && suggestions.facts) {
+                factList.innerHTML = '';
+                suggestions.facts.forEach(fact => {
+                    const item = document.createElement('label');
+                    item.className = 'suggestion-item';
+                    item.innerHTML = `
+                        <input type="checkbox" class="suggestion-item__checkbox" data-fact="${fact.id}">
+                        <div class="suggestion-item__content">
+                            <div class="suggestion-item__text">${fact.text}</div>
+                            <div class="suggestion-item__placement">
+                                <span class="cdx-icon cdx-icon--x-small suggestion-item__placement-icon">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+                                        <path d="M8 0L6.586 1.414 12.172 7H0v2h12.172l-5.586 5.586L8 16l8-8z"/>
+                                    </svg>
+                                </span>
+                                <span class="suggestion-item__placement-text">${fact.placement}</span>
+                            </div>
+                        </div>
+                    `;
+                    factList.appendChild(item);
+                });
+            }
+
+            // Update section suggestions
+            const sectionLists = document.querySelectorAll('.suggestion-section .suggestion-list');
+            const sectionList = sectionLists[1]; // Second list is for sections
+            if (sectionList && suggestions.sections) {
+                sectionList.innerHTML = '';
+                suggestions.sections.forEach(section => {
+                    const item = document.createElement('div');
+                    item.className = 'suggestion-item suggestion-item--section';
+                    item.dataset.section = section.id;
+                    item.innerHTML = `
+                        <button class="suggestion-item__add-btn">+</button>
+                        <div class="suggestion-item__content">
+                            <div class="suggestion-item__text">${section.title}</div>
+                            <div class="suggestion-item__hint">${section.hint}</div>
+                            <div class="suggestion-item__placement">
+                                <span class="cdx-icon cdx-icon--x-small suggestion-item__placement-icon">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+                                        <path d="M2 3v2h12V3H2zm0 4v2h12V7H2zm0 4v2h12v-2H2z"/>
+                                    </svg>
+                                </span>
+                                <span class="suggestion-item__placement-text">${section.placement}</span>
+                            </div>
+                        </div>
+                    `;
+                    sectionList.appendChild(item);
+                });
+            }
+
+            // Update suggestion count
+            const totalSuggestions = (suggestions.facts?.length || 0) + (suggestions.sections?.length || 0);
+            document.getElementById('suggestionCount').textContent = `${totalSuggestions} ideas`;
+        }
+    </script>
 
 </body>
 </html>
