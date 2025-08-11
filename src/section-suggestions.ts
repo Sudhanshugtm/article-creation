@@ -22,6 +22,9 @@ class SuggestionsPageManager {
         this.clearButton = document.getElementById('clearButton') as HTMLButtonElement;
         this.wikidataService = new WikidataEnhancementService();
         
+        // Immediately hide any existing loading state
+        this.hideLoadingState();
+        
         // Check for cached suggestions first to avoid unnecessary API calls
         console.log('Class-based manager: Checking cache before loading API data');
         
@@ -207,10 +210,19 @@ class SuggestionsPageManager {
     }
 
     private hideLoadingState(): void {
+        // Remove any existing loading elements by ID
         const loading = document.getElementById('loading-suggestions');
         if (loading) {
             loading.remove();
         }
+        
+        // Also remove any loading elements by class as a fallback
+        const loadingElements = document.querySelectorAll('.suggestions-loading');
+        loadingElements.forEach(element => {
+            element.remove();
+        });
+        
+        console.log('Loading state hidden - removed any existing loading elements');
     }
 
     private updateSuggestionCount(count: number): void {
