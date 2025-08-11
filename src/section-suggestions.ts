@@ -143,6 +143,17 @@ class SuggestionsPageManager {
         // Re-initialize event listeners for dynamically created elements
         this.initializeFactCheckboxes();
         this.initializeSectionButtons();
+        
+        // Re-initialize apply and clear button listeners
+        if (this.applyButton) {
+            this.applyButton.removeEventListener('click', this.handleApplyClick);
+            this.applyButton.addEventListener('click', this.handleApplyClick);
+        }
+
+        if (this.clearButton) {
+            this.clearButton.removeEventListener('click', this.handleClearClick);
+            this.clearButton.addEventListener('click', this.handleClearClick);
+        }
     }
 
     private showLoadingState(): void {
@@ -172,7 +183,7 @@ class SuggestionsPageManager {
         }
     }
 
-    private initializeEventListeners(): void {
+    public initializeEventListeners(): void {
         this.initializeFactCheckboxes();
         this.initializeSectionButtons();
 
@@ -200,10 +211,11 @@ class SuggestionsPageManager {
     private initializeFactCheckboxes(): void {
         // Handle fact checkboxes
         const factCheckboxes = document.querySelectorAll('.suggestion-item__checkbox');
+        console.log(`Initializing ${factCheckboxes.length} fact checkboxes`);
         factCheckboxes.forEach(checkbox => {
             // Remove existing listeners to prevent duplicates
             checkbox.removeEventListener('change', this.handleFactCheckboxChange);
-            checkbox.addEventListener('change', this.handleFactCheckboxChange.bind(this));
+            checkbox.addEventListener('change', this.handleFactCheckboxChange);
         });
     }
 
@@ -219,7 +231,7 @@ class SuggestionsPageManager {
             
             // Remove existing listeners to prevent duplicates
             button.removeEventListener('click', this.handleSectionButtonClick);
-            button.addEventListener('click', this.handleSectionButtonClick.bind(this));
+            button.addEventListener('click', this.handleSectionButtonClick);
         });
     }
 
@@ -311,21 +323,47 @@ class SuggestionsPageManager {
     }
 
     private async applySuggestions(): Promise<void> {
+        console.log('=== APPLY SUGGESTIONS CALLED ===');
+        console.log('Selected suggestions:', Array.from(this.selectedSuggestions));
+        
+        if (this.selectedSuggestions.size === 0) {
+            console.warn('No suggestions selected');
+            return;
+        }
+        
         // Store selections in sessionStorage for the expansion page
-        sessionStorage.setItem('selectedSuggestions', JSON.stringify(Array.from(this.selectedSuggestions)));
+        const selectedArray = Array.from(this.selectedSuggestions);
+        sessionStorage.setItem('selectedSuggestions', JSON.stringify(selectedArray));
+        console.log('Stored in sessionStorage:', selectedArray);
         
-        // Also store the Wikidata suggestions for reference
-        const existingContent = this.getExistingArticleContent();
-        const wikidataSuggestions = await this.wikidataService.getEnhancementSuggestions(existingContent);
-        sessionStorage.setItem('wikidataSuggestions', JSON.stringify(wikidataSuggestions));
-        
-        // Show success feedback
+        // Show success feedback immediately
         this.showSuccessFeedback();
         
-        // Navigate back to expansion page after brief delay
+        // Store Wikidata suggestions in background, but don't let it block navigation
+        this.storeWikidataBackground();
+        
+        // Navigate immediately with shorter delay
         setTimeout(() => {
-            window.location.href = './section-expansion.html';
-        }, 1000);
+            console.log('Navigating to expansion page...');
+            try {
+                window.location.assign('./section-expansion.html');
+            } catch (error) {
+                console.error('Navigation failed, trying alternative:', error);
+                window.location.replace('./section-expansion.html');
+            }
+        }, 500);
+    }
+
+    private async storeWikidataBackground(): Promise<void> {
+        try {
+            console.log('Starting background Wikidata storage...');
+            const existingContent = this.getExistingArticleContent();
+            const wikidataSuggestions = await this.wikidataService.getEnhancementSuggestions(existingContent);
+            sessionStorage.setItem('wikidataSuggestions', JSON.stringify(wikidataSuggestions));
+            console.log('Background: Stored Wikidata suggestions:', wikidataSuggestions);
+        } catch (error) {
+            console.error('Background: Error storing Wikidata suggestions:', error);
+        }
     }
 
     private showSuccessFeedback(): void {
@@ -342,116 +380,13 @@ class SuggestionsPageManager {
     }
 }
 
-// Initialize API-driven suggestions with optimized selection handling
+// Initialize the suggestions page
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('=== INITIALIZING API-DRIVEN SUGGESTIONS ===');
+    console.log('=== INITIALIZING SUGGESTIONS PAGE ===');
     
-    // First, instantiate the API-driven manager for data loading
+    // Single, unified manager instance
     const suggestionsManager = new SuggestionsPageManager();
     
-    // Optimized instant selection handling
-    console.log('=== OPTIMIZED SELECTION: Creating instant response ===');
-    
-    // Initialize selection state
-    const selectedSuggestions = new Set<string>();
-    
-    // Function to update the UI instantly
-    function updateUI() {
-        const count = selectedSuggestions.size;
-        const applyButton = document.getElementById('applyButton') as HTMLButtonElement;
-        const selectionCount = document.getElementById('selectionCount');
-        const pluralS = document.getElementById('pluralS');
-        
-        if (!applyButton || !selectionCount || !pluralS) return;
-        
-        console.log(`INSTANT UPDATE: count=${count}`);
-        
-        applyButton.disabled = count === 0;
-        selectionCount.textContent = count.toString();
-        pluralS.style.display = count === 1 ? 'none' : 'inline';
-    }
-    
-    // Attach event listeners with immediate visual feedback
-    function attachInstantListeners() {
-        const sectionButtons = document.querySelectorAll('.suggestion-item__add-btn');
-        console.log(`Attaching instant listeners to ${sectionButtons.length} buttons`);
-        
-        sectionButtons.forEach((button) => {
-            button.addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                
-                const target = e.currentTarget as HTMLElement;
-                const sectionItem = target.closest('.suggestion-item--section') as HTMLElement;
-                const sectionId = sectionItem.dataset.section;
-                const suggestionId = `section-${sectionId}`;
-                
-                // INSTANT visual feedback - no delays
-                if (selectedSuggestions.has(suggestionId)) {
-                    selectedSuggestions.delete(suggestionId);
-                    target.classList.remove('selected');
-                    sectionItem.classList.remove('selected');
-                } else {
-                    selectedSuggestions.add(suggestionId);
-                    target.classList.add('selected');
-                    sectionItem.classList.add('selected');
-                }
-                
-                // Update UI instantly
-                updateUI();
-                
-                // Store for apply functionality
-                (window as any).optimizedSelectedSuggestions = selectedSuggestions;
-                
-                console.log(`INSTANT: ${sectionId} ${selectedSuggestions.has(suggestionId) ? 'selected' : 'deselected'}`);
-            }, { passive: false });
-        });
-    }
-    
-    // Attach immediately and re-attach after API loads new content
-    attachInstantListeners();
-    
-    // Re-attach when new content is loaded
-    const observer = new MutationObserver(() => {
-        attachInstantListeners();
-    });
-    
-    observer.observe(document.querySelector('.suggestions-page__main') || document.body, {
-        childList: true,
-        subtree: true
-    });
-        
-    // Fix apply button with optimized selections
-    const applyButton = document.getElementById('applyButton');
-    if (applyButton) {
-        applyButton.addEventListener('click', () => {
-            const selections = (window as any).optimizedSelectedSuggestions || selectedSuggestions;
-            if (selections && selections.size > 0) {
-                console.log('=== APPLYING OPTIMIZED SELECTIONS ===', Array.from(selections));
-                
-                // Store in sessionStorage
-                sessionStorage.setItem('selectedSuggestions', JSON.stringify(Array.from(selections)));
-                
-                // Show success message
-                const feedback = document.createElement('div');
-                feedback.style.cssText = `
-                    position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-                    background: #00af89; color: white; padding: 16px 32px; border-radius: 8px;
-                    font-weight: 500; z-index: 10000; box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-                `;
-                feedback.textContent = `✓ ${selections.size} suggestion${selections.size === 1 ? '' : 's'} will be applied!`;
-                document.body.appendChild(feedback);
-                
-                // Navigate after delay
-                setTimeout(() => {
-                    window.location.href = './section-expansion.html';
-                }, 1000);
-            }
-        });
-    }
-    
-    // Initialize UI
-    updateUI();
-    
-    console.log('=== OPTIMIZED SELECTION APPLIED ===');
+    // Initialize event listeners through the manager
+    suggestionsManager.initializeEventListeners();
 });

@@ -231,7 +231,7 @@ class HTMLArticleCreator {
 
     private showCategorySelection(): void {
         this.setState(WorkflowState.CATEGORY_SELECTION);
-        this.categoryTitle.textContent = `Help us categorize "${this.searchTerm}"`;
+        this.categoryTitle.textContent = `What is ${this.searchTerm}?`;
         this.displayCategories();
         this.renderChips(this.chipsContainer, null);
     }

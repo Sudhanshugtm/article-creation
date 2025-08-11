@@ -50,19 +50,27 @@ class SectionExpansionManager {
         const selectedSuggestions = sessionStorage.getItem('selectedSuggestions');
         const wikidataSuggestionsData = sessionStorage.getItem('wikidataSuggestions');
         
+        console.log('Checking for applied suggestions...');
+        console.log('Selected suggestions from storage:', selectedSuggestions);
+        console.log('Wikidata suggestions from storage:', wikidataSuggestionsData);
+        
         if (selectedSuggestions) {
             // Load stored Wikidata suggestions first
             if (wikidataSuggestionsData) {
                 const wikidataSuggestions = JSON.parse(wikidataSuggestionsData);
+                console.log('Loading Wikidata suggestions:', wikidataSuggestions);
                 wikidataSuggestions.forEach((suggestion: any) => {
                     this.wikidataSuggestions.set(suggestion.id, suggestion);
                 });
             }
             
             const suggestions = JSON.parse(selectedSuggestions) as string[];
+            console.log('Applying suggestions:', suggestions);
             this.applySuggestions(suggestions);
             sessionStorage.removeItem('selectedSuggestions');
             sessionStorage.removeItem('wikidataSuggestions');
+        } else {
+            console.log('No suggestions to apply');
         }
     }
 
@@ -105,39 +113,48 @@ class SectionExpansionManager {
         const content = document.getElementById('researchCareerContent')!;
         const firstParagraph = content.querySelector('p')!;
         
+        console.log(`Adding fact: ${factId}`);
+        
         // Check if this is a Wikidata-based suggestion
         const wikidataSuggestion = this.wikidataSuggestions.get(factId);
         if (wikidataSuggestion) {
             // Add Wikidata fact to the content
             const newFactHTML = `<span class="fact-highlight"> ${wikidataSuggestion.content}</span>`;
             firstParagraph.innerHTML += newFactHTML;
+            console.log(`Added Wikidata fact: ${wikidataSuggestion.content}`);
             return;
         }
         
         // Fallback to hardcoded logic for backward compatibility
-        if (factId === 'harvard-fallback') {
+        if (factId === 'harvard') {
             const harvardText = firstParagraph.innerHTML;
             firstParagraph.innerHTML = harvardText.replace(
                 'on the Event Horizon Telescope Imaging team',
                 'on the Event Horizon Telescope Imaging team <span class="fact-highlight">(2018)</span>'
             );
-        } else if (factId === 'caltech-fallback') {
+            console.log('Added Harvard fact');
+        } else if (factId === 'caltech') {
             const newText = ' She then joined the California Institute of Technology (Caltech) as an assistant professor in June 2019, where she was later promoted to associate professor of computing and mathematical sciences, electrical engineering, and astronomy, as well as a Rosenberg Scholar in 2024.<sup class="reference">[21]</sup>';
             
-            const currentHTML = firstParagraph.innerHTML;
-            firstParagraph.innerHTML = currentHTML.replace(
-                '</sup></p>',
-                '</sup>' + '<span class="fact-highlight">' + newText + '</span></p>'
-            );
+            // Add the fact to the end of the first paragraph
+            const span = document.createElement('span');
+            span.className = 'fact-highlight';
+            span.innerHTML = newText;
+            firstParagraph.appendChild(span);
+            console.log('Added Caltech fact');
         }
     }
 
     private addSection(sectionId: string): void {
         const container = document.getElementById('newSectionsContainer')!;
         
+        console.log(`Adding section: ${sectionId}`);
+        console.log('Available Wikidata suggestions:', Array.from(this.wikidataSuggestions.keys()));
+        
         // Check if this is a Wikidata-based suggestion
         const wikidataSuggestion = this.wikidataSuggestions.get(sectionId);
         if (wikidataSuggestion) {
+            console.log(`Found Wikidata suggestion for ${sectionId}:`, wikidataSuggestion);
             const section = document.createElement('section');
             section.className = 'article-section article-section--new';
             section.innerHTML = `
@@ -147,6 +164,7 @@ class SectionExpansionManager {
                 </div>
             `;
             container.appendChild(section);
+            console.log(`Added Wikidata section: ${wikidataSuggestion.title}`);
             return;
         }
         
@@ -190,6 +208,7 @@ class SectionExpansionManager {
         };
 
         if (sectionContent[sectionId]) {
+            console.log(`Found hardcoded content for ${sectionId}: ${sectionContent[sectionId].title}`);
             const section = document.createElement('section');
             section.className = 'article-section article-section--new';
             section.innerHTML = `
@@ -199,6 +218,10 @@ class SectionExpansionManager {
                 </div>
             `;
             container.appendChild(section);
+            console.log(`Added hardcoded section: ${sectionContent[sectionId].title}`);
+        } else {
+            console.warn(`No content found for section ID: ${sectionId}`);
+            console.log('Available hardcoded sections:', Object.keys(sectionContent));
         }
     }
 
