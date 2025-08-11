@@ -111,10 +111,8 @@
         margin-bottom: 32px !important;
       }
     }
-    /* Utility to push items to the right in a single-row toolbar */
-    .article-creator__global-toolbar .push-right {
-      margin-left: auto !important;
-    }
+    /* Compact spacing between toolbar buttons */
+    .article-creator__global-toolbar { gap: 8px !important; }
     /* Ensure the header (with "New article") has space from anything above */
     .article-creator__header {
       margin-top: 24px !important;
@@ -188,7 +186,7 @@
             <button class="cdx-button cdx-button--action-default cdx-button--weight-quiet cdx-button--size-medium article-editor__tool" id="moreBtn" title="More">
                 <span class="cdx-button__icon"></span>
             </button>
-            <button class="cdx-button cdx-button--action-progressive cdx-button--weight-primary cdx-button--size-medium article-editor__tool push-right" id="nextBtn" title="Next">
+            <button class="cdx-button cdx-button--action-progressive cdx-button--weight-primary cdx-button--size-medium article-editor__tool" id="nextBtn" title="Next">
                 <span class="cdx-button__icon"></span>
             </button>
         </div>
