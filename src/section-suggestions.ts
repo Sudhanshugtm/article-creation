@@ -41,16 +41,20 @@ class SuggestionsPageManager {
             const CACHE_DURATION = 30 * 60 * 1000; // 30 minutes
             
             if (cacheAge < CACHE_DURATION) {
-                console.log('Using cached Wikidata suggestions - no API call needed');
+                console.log('Using cached Wikidata suggestions - no API call or loading state needed');
                 const suggestions = JSON.parse(cachedSuggestions);
                 this.renderSuggestions(suggestions);
                 this.updateSuggestionCount(suggestions.length);
-                return; // Exit early - no API call needed
+                return; // Exit early - no API call or loading needed
+            } else {
+                console.log('Cache expired - clearing old cache and fetching fresh data');
+                sessionStorage.removeItem('wikidataSuggestionsCache');
+                sessionStorage.removeItem('wikidataCacheTimestamp');
             }
         }
         
-        // No valid cache found - fetch fresh data
-        console.log('No valid cache found - fetching fresh Wikidata suggestions');
+        // No valid cache found - fetch fresh data with loading state
+        console.log('No valid cache found - fetching fresh Wikidata suggestions with loading state');
         await this.loadWikidataSuggestions();
     }
 
