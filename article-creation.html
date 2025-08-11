@@ -258,6 +258,50 @@
       padding: 6px;
       min-width: 180px;
     }
+    /* Fillable chips inside the editor */
+    .detail-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px;
+      margin: 0 2px;
+      border: 1px dashed var(--border-color-interactive, #c8ccd1);
+      border-radius: 999px;
+      background: var(--background-color-interactive-subtle, #f8f9fa);
+      color: var(--color-base, #202122);
+      font-size: 13px;
+      line-height: 1.4;
+      cursor: pointer;
+      user-select: none;
+    }
+    .detail-chip:hover {
+      background: #f0f2f5;
+      border-color: var(--border-color-progressive, #36c);
+    }
+    .detail-chip--filled {
+      border-style: solid;
+      background: #ffffff;
+    }
+    .detail-chip--editing {
+      background: #fff;
+      border-color: var(--border-color-progressive, #36c);
+    }
+    .detail-chip__input {
+      border: none;
+      outline: none;
+      background: transparent;
+      font: inherit;
+      padding: 2px 0;
+      min-width: 140px;
+    }
+    .detail-chip--reference {
+      background: #eef6ff;
+      border-color: #36c;
+    }
+    .detail-chip--more {
+      background: #fff8e6;
+      border-color: #f3cc6b;
+    }
     .detail-chip__menu-option {
       font-size: 13px;
       padding: 8px 10px;
