@@ -172,6 +172,16 @@
       padding-top: 20px !important;
     }
   </style>
+  <script>
+    (function() {
+      try {
+        var params = new URLSearchParams(window.location.search);
+        if (params.has('fresh')) {
+          localStorage.removeItem('articleCreatorState');
+        }
+      } catch (e) {}
+    })();
+  </script>
   <script type="module" crossorigin src="/article-creation/assets/prototype-BKE4pTt0.js"></script>
   <link rel="modulepreload" crossorigin href="/article-creation/assets/modulepreload-polyfill-B5Qt9EMX.js">
 </head>
