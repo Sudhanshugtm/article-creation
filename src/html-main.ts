@@ -549,6 +549,8 @@ class HTMLArticleCreator {
         };
         placeCaretAtStart();
         setTimeout(placeCaretAtStart, 0);
+        // Render confidence badge (non-blocking)
+        this.renderLeadConfidence().catch(() => {});
     }
 
     private exitArticleEditor(): void {
@@ -599,6 +601,43 @@ class HTMLArticleCreator {
                 chip.addEventListener('click', () => this.handleEditorChipClick(def.type));
                 editorChipsContainer.appendChild(chip);
             });
+        }
+    }
+
+    private async renderLeadConfidence(): Promise<void> {
+        if (!this.selectedTopic) return;
+        const parent = document.querySelector('.article-editor') as HTMLElement;
+        if (!parent) return;
+        let badge = document.getElementById('leadConfidenceBadge');
+        if (!badge) {
+            badge = document.createElement('div');
+            badge.id = 'leadConfidenceBadge';
+            badge.className = 'lead-confidence';
+            const chips = document.getElementById('editorChipsContainer');
+            if (chips && chips.parentNode) {
+                chips.parentNode.insertBefore(badge, chips);
+            } else {
+                parent.appendChild(badge);
+            }
+        }
+        const topicObj = {
+            id: this.selectedTopic.wikidataId || '',
+            title: this.selectedTopic.label,
+            description: this.getCategoryContextualDescription(this.selectedTopic.category as ArticleCategory, this.selectedTopic.label),
+            category: this.selectedTopic.category,
+            instanceOf: [] as string[]
+        };
+        try {
+            const result = await this.intelligentEngine.generateIntelligentLeads(
+                topicObj,
+                this.selectedTopic.category as ArticleCategory
+            );
+            const pct = Math.round((result.confidence || 0) * 100);
+            const missing = (result.missingSlots || []).join(', ');
+            (badge as HTMLElement).innerHTML = `Intro confidence: <strong>${pct}%</strong>${missing ? ` • Missing: ${missing}` : ''}`;
+            (badge as HTMLElement).style.display = 'inline-flex';
+        } catch (e) {
+            (badge as HTMLElement).style.display = 'none';
         }
     }
     

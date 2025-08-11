@@ -296,7 +296,7 @@ export class IntelligentTemplateEngine {
   async generateIntelligentLeads(
     topic: WikidataTopic,
     category: ArticleCategory
-  ): Promise<{ formal: string; concise: string; detailed: string; contextualChips: string[] }> {
+  ): Promise<{ formal: string; concise: string; detailed: string; contextualChips: string[]; confidence: number; missingSlots: string[] }> {
     const template = this.intelligentTemplates.get(category);
     if (!template) {
       return this.generateFallbackLeads(topic, category);
@@ -316,11 +316,14 @@ export class IntelligentTemplateEngine {
     // Fetch enhanced properties
     const entityData = await this.fetchIntelligentProperties(topic.id, template, topic, subcategory);
 
+    const coverage = this.computeCoverage(category, entityData);
     return {
       formal: this.fillIntelligentTemplate(selectedTemplate.formal, entityData),
       concise: this.fillIntelligentTemplate(selectedTemplate.concise, entityData),
       detailed: this.fillIntelligentTemplate(selectedTemplate.detailed, entityData),
-      contextualChips
+      contextualChips,
+      confidence: coverage.confidence,
+      missingSlots: coverage.missing
     };
   }
 
@@ -555,12 +558,14 @@ export class IntelligentTemplateEngine {
   }
 
   private generateFallbackLeads(topic: WikidataTopic, category: ArticleCategory): 
-    { formal: string; concise: string; detailed: string; contextualChips: string[] } {
+    { formal: string; concise: string; detailed: string; contextualChips: string[]; confidence: number; missingSlots: string[] } {
     return {
       formal: `${topic.title} is ${topic.description}.`,
       concise: `${topic.title}: ${topic.description}.`,
       detailed: `${topic.title} is ${topic.description}.`,
-      contextualChips: this.getDefaultChipsForCategory(category)
+      contextualChips: this.getDefaultChipsForCategory(category),
+      confidence: 0.7,
+      missingSlots: []
     };
   }
 
@@ -642,5 +647,27 @@ export class IntelligentTemplateEngine {
     
     const lowerTitle = title.toLowerCase();
     return cityRegions[lowerTitle] || '+ region/state, + country';
+  }
+
+  private computeCoverage(category: ArticleCategory, data: Record<string, string>): { confidence: number; missing: string[] } {
+    let required: string[] = [];
+    switch (category) {
+      case ArticleCategory.PERSON:
+        required = ['FULL_NAME', 'NATIONALITY', 'OCCUPATION'];
+        break;
+      case ArticleCategory.LOCATION:
+        required = ['NAME', 'TYPE', 'PARENT_LOCATION'];
+        break;
+      case ArticleCategory.SPECIES:
+        required = ['COMMON_NAME', 'SCIENTIFIC_NAME', 'TAXON_RANK'];
+        break;
+      default:
+        required = ['NAME'];
+        break;
+    }
+    const missing = required.filter(k => !(data[k] && String(data[k]).trim().length > 0));
+    const present = required.length - missing.length;
+    const confidence = required.length ? Math.round((present / required.length) * 100) / 100 : 0.5;
+    return { confidence, missing };
   }
 }
