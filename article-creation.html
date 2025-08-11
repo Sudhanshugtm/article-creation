@@ -163,17 +163,36 @@
     }
     
     /* Direct targeting approaches for toolbar spacing */
-    #editingSection {
-      padding-top: 120px !important;
-    }
+    #editingSection { padding-top: 24px !important; }
     
     #articleContent {
       margin-top: 40px !important;
     }
     
-    .article-editor__content {
-      padding-top: 20px !important;
+    .article-editor__content { padding-top: 12px !important; }
+    /* Editing view polish */
+    .article-editor { max-width: 800px; margin: 0 auto; }
+    .article-editor__title { font-size: 24px; font-weight: 600; margin: 12px 0 16px 0; }
+    #articleContent[contenteditable="true"] {
+      min-height: 240px;
+      padding: 16px 20px;
+      border: 1px solid var(--border-color-subtle, #eaecf0);
+      border-radius: 6px;
+      background: #fff;
+      line-height: 1.7;
+      font-size: 16px;
     }
+    #articleContent[contenteditable="true"]:focus {
+      outline: 2px solid rgba(54,102,204,0.25);
+      border-color: var(--border-color-progressive, #36c);
+    }
+    /* Placeholder for empty contenteditable */
+    #articleContent[contenteditable="true"][data-placeholder]:empty:before {
+      content: attr(data-placeholder);
+      color: var(--color-disabled, #a2a9b1);
+      pointer-events: none;
+    }
+    .article-lead { margin-bottom: 12px; color: var(--color-base, #202122); }
   </style>
   
   <script>

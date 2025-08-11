@@ -464,8 +464,20 @@ class HTMLArticleCreator {
         // Set up link detection for this editing session
         // Link detection will be manual via link button
         
-        // Focus the editable article body to enable typing
+        // Focus the editable article body to enable typing and place caret at end
         this.articleContent.focus();
+        try {
+            const range = document.createRange();
+            range.selectNodeContents(this.articleContent);
+            range.collapse(false);
+            const sel = window.getSelection();
+            if (sel) {
+                sel.removeAllRanges();
+                sel.addRange(range);
+            }
+        } catch (e) {
+            // no-op
+        }
     }
 
     private exitArticleEditor(): void {
@@ -489,6 +501,7 @@ class HTMLArticleCreator {
         
         // Clear any existing article content when setting up editor
         this.articleContent.innerHTML = '';
+        this.articleContent.setAttribute('data-placeholder', 'Start writing your article...');
         
         // Set the article title
         const articleTitle = this.searchTerm;
