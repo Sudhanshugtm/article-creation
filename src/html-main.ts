@@ -464,16 +464,19 @@ class HTMLArticleCreator {
         // Set up link detection for this editing session
         // Link detection will be manual via link button
         
-        // Prepare and focus the editable article title (simple editor view)
+        // Prepare title and body for a typical editing flow
         const titleEl = this.articleTitleText as HTMLElement;
         titleEl.setAttribute('contenteditable', 'true');
-        titleEl.setAttribute('data-placeholder', 'Title...');
-        titleEl.textContent = '';
-        titleEl.focus();
+        titleEl.textContent = this.searchTerm;
+        // Set contextual placeholder for the body
+        const topic = this.searchTerm || (this.selectedTopic?.label ?? '');
+        this.articleContent.setAttribute('data-placeholder', `${topic} is ...`);
+        // Focus the body and place the caret at the beginning so the ghost placeholder remains visible
+        this.articleContent.focus();
         try {
             const range = document.createRange();
-            range.selectNodeContents(titleEl);
-            range.collapse(false);
+            range.selectNodeContents(this.articleContent);
+            range.collapse(true);
             const sel = window.getSelection();
             if (sel) {
                 sel.removeAllRanges();
@@ -503,9 +506,10 @@ class HTMLArticleCreator {
         
         // Clear any existing article content when setting up editor
         this.articleContent.innerHTML = '';
-        this.articleContent.setAttribute('data-placeholder', 'Start writing your article...');
+        const articleTitle = this.searchTerm;
+        this.articleContent.setAttribute('data-placeholder', `${articleTitle} is ...`);
         
-        // Do not prefill title or body; title is editable and body is hidden in this simplified view
+        // Do not prefill body; user starts with contextual placeholder and chips
         // Render editor action chips below the content area
         const editorChipsContainer = document.getElementById('editorChipsContainer') as HTMLElement;
         if (editorChipsContainer) {
