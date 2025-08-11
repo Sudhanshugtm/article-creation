@@ -22,13 +22,36 @@ class SuggestionsPageManager {
         this.clearButton = document.getElementById('clearButton') as HTMLButtonElement;
         this.wikidataService = new WikidataEnhancementService();
         
-        // Only load API data - selection is handled by optimized system
-        console.log('Class-based manager: Loading API data only');
+        // Check for cached suggestions first to avoid unnecessary API calls
+        console.log('Class-based manager: Checking cache before loading API data');
         
-        // Load Wikidata suggestions asynchronously
-        this.loadWikidataSuggestions().catch(error => {
-            console.error('Failed to load Wikidata suggestions:', error);
+        // Load cached suggestions or fetch from Wikidata if needed
+        this.loadCachedOrFreshSuggestions().catch(error => {
+            console.error('Failed to load suggestions:', error);
         });
+    }
+
+    private async loadCachedOrFreshSuggestions(): Promise<void> {
+        // First check if we have cached suggestions
+        const cachedSuggestions = sessionStorage.getItem('wikidataSuggestionsCache');
+        const cacheTimestamp = sessionStorage.getItem('wikidataCacheTimestamp');
+        
+        if (cachedSuggestions && cacheTimestamp) {
+            const cacheAge = Date.now() - parseInt(cacheTimestamp);
+            const CACHE_DURATION = 30 * 60 * 1000; // 30 minutes
+            
+            if (cacheAge < CACHE_DURATION) {
+                console.log('Using cached Wikidata suggestions - no API call needed');
+                const suggestions = JSON.parse(cachedSuggestions);
+                this.renderSuggestions(suggestions);
+                this.updateSuggestionCount(suggestions.length);
+                return; // Exit early - no API call needed
+            }
+        }
+        
+        // No valid cache found - fetch fresh data
+        console.log('No valid cache found - fetching fresh Wikidata suggestions');
+        await this.loadWikidataSuggestions();
     }
 
     private async loadWikidataSuggestions(): Promise<void> {
@@ -41,6 +64,11 @@ class SuggestionsPageManager {
             
             // Fetch suggestions from Wikidata
             const suggestions = await this.wikidataService.getEnhancementSuggestions(existingContent);
+            
+            // Cache the suggestions for future visits
+            sessionStorage.setItem('wikidataSuggestionsCache', JSON.stringify(suggestions));
+            sessionStorage.setItem('wikidataCacheTimestamp', Date.now().toString());
+            console.log('Cached Wikidata suggestions for future use');
             
             // Replace hardcoded suggestions with Wikidata suggestions
             this.renderSuggestions(suggestions);
