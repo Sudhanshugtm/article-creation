@@ -2094,19 +2094,50 @@ class HTMLArticleCreator {
             return;
         }
         
-        console.log('Generating template-based intro for:', this.selectedTopic.label);
+        console.log('Generating intelligent intro for:', this.selectedTopic.label);
         
-        // Use our chip-based lead generator and insert the detailed variant by default
-        const leadVariations = this.getManualLeads(
+        // Prefer intelligent, Wikipedia-like patterns; fall back to manual chips
+        try {
+            const topicObj = {
+                id: this.selectedTopic.wikidataId || '',
+                title: this.selectedTopic.label,
+                description: this.getCategoryContextualDescription(this.selectedTopic.category as ArticleCategory, this.selectedTopic.label),
+                category: this.selectedTopic.category,
+                instanceOf: [] as string[]
+            };
+            const intelligent = await this.intelligentEngine.generateIntelligentLeads(
+                topicObj,
+                this.selectedTopic.category as ArticleCategory
+            );
+            let intro = intelligent.detailed || intelligent.formal || intelligent.concise;
+            // Ensure fillable chips are present for missing details
+            intro = this.chipifyPlaceholders(intro);
+            this.insertSelectedSnippet(intro);
+            console.log('Intelligent intro inserted');
+            return;
+        } catch (e) {
+            console.warn('Intelligent intro generation failed, using manual template:', e);
+        }
+        
+        // Fallback to chip-based manual template (detailed)
+        const manual = this.getManualLeads(
             this.selectedTopic.label,
             this.selectedTopic.category as ArticleCategory
-        );
-        const basicIntro = leadVariations.detailed;
-        
-        // Insert directly using the same method as snippet modal
-        this.insertSelectedSnippet(basicIntro);
-        
-        console.log('Template-based intro inserted:', basicIntro);
+        ).detailed;
+        this.insertSelectedSnippet(manual);
+        console.log('Manual template intro inserted');
+    }
+
+    private chipifyPlaceholders(text: string): string {
+        try {
+            // Convert occurrences of "+ label" into fillable chips
+            return text.replace(/\+\s([A-Za-z][A-Za-z _-]+)/g, (_m, label) => {
+                const key = String(label).toLowerCase().trim().replace(/\s+/g, '_');
+                return `<span class="detail-chip" data-detail="${key}">+ ${label}</span>`;
+            });
+        } catch {
+            return text;
+        }
     }
     
     private _handleEditorMoreOption(action: string): void {
