@@ -644,11 +644,10 @@ class HTMLArticleCreator {
     private handleEditorChipClick(type: string): void {
         switch (type) {
             case 'snippet':
-                // TODO: implement new snippet interaction (modal disabled)
-                console.log('Snippet clicked - modal disabled for now');
+                this.openSnippetModal();
                 break;
             case 'fact':
-                // TODO: implement fact insertion
+                this.openAddLinkDialog();
                 break;
             case 'more':
                 this.showEditorMoreMenu();
