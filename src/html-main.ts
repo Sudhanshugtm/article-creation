@@ -1745,54 +1745,35 @@ class HTMLArticleCreator {
             return;
         }
         
-        // Create inline expandable section
+        // Create inline expandable section (only "Add a new section" with cards)
         moreSection = document.createElement('div');
         moreSection.id = 'editorMoreSection';
         moreSection.className = 'editor-more-section';
-        
-        // Create the structure matching the user's image
         moreSection.innerHTML = `
             <div class="editor-more-subsection">
-                <h3 class="editor-more-subsection__title">Add...</h3>
-            </div>
-            
-            <div class="editor-more-subsection">
-                <h3 class="editor-more-subsection__title">Snippets</h3>
-                <div class="editor-more-card" data-action="snippet-intro">
-                    <div class="editor-more-card__title">The basic intro</div>
-                    <div class="editor-more-card__subtitle">Wikisaurus (...) is a genus of...</div>
-                </div>
-            </div>
-            
-            <div class="editor-more-subsection">
-                <h3 class="editor-more-subsection__title">New fact</h3>
-                <div class="editor-more-card" data-action="add-from-link">
-                    <div class="editor-more-card__title">Add from link</div>
-                </div>
-            </div>
-            
-            <div class="editor-more-subsection">
-                <h3 class="editor-more-subsection__title">New section</h3>
+                <h3 class="editor-more-subsection__title">Add a new section</h3>
                 <div id="intelligentSectionsContainer">
                     <!-- Intelligent sections will be populated here -->
                 </div>
             </div>
         `;
         
-        // Add click handlers to cards
-        const cards = moreSection.querySelectorAll('.editor-more-card');
-        cards.forEach(card => {
-            card.addEventListener('click', () => {
-                const action = card.getAttribute('data-action');
-                this.handleEditorMoreCardClick(action || '');
+        // Add click handlers to any cards that get rendered (intelligent sections)
+        const bindCardHandlers = () => {
+            const cards = moreSection.querySelectorAll('.editor-more-card');
+            cards.forEach(card => {
+                card.addEventListener('click', () => {
+                    const action = card.getAttribute('data-action') || '';
+                    this.handleEditorMoreCardClick(action);
+                });
             });
-        });
+        };
         
         // Insert after the chips container
         editorChipsContainer.parentNode?.insertBefore(moreSection, editorChipsContainer.nextSibling);
         
-        // Populate intelligent sections
-        this.populateIntelligentSections();
+        // Populate intelligent sections and then bind handlers
+        this.populateIntelligentSections().then(() => bindCardHandlers());
     }
     
     private async populateIntelligentSections(): Promise<void> {
