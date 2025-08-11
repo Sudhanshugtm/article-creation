@@ -209,17 +209,7 @@ class SuggestionsPageManager {
         }, 500);
     }
 
-    private async storeWikidataBackground(): Promise<void> {
-        try {
-            console.log('Starting background Wikidata storage...');
-            const existingContent = this.getExistingArticleContent();
-            const wikidataSuggestions = await this.wikidataService.getEnhancementSuggestions(existingContent);
-            sessionStorage.setItem('wikidataSuggestions', JSON.stringify(wikidataSuggestions));
-            console.log('Background: Stored Wikidata suggestions:', wikidataSuggestions);
-        } catch (error) {
-            console.error('Background: Error storing Wikidata suggestions:', error);
-        }
-    }
+    // Removed background API storage - not needed for static suggestions
 
     private showSuccessFeedback(): void {
         const count = this.selectedSuggestions.size;
