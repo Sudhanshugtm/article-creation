@@ -472,7 +472,80 @@ export class IntelligentSectionEngine {
   }
 
   private generateGenericSectionContent(entityName: string, category: ArticleCategory, suggestions: any[], sectionType: string): string {
-    return `${entityName} <span class="detail-chip" data-detail="section_content">${sectionType} information</span>. <span class="detail-chip" data-detail="details">Additional details</span> about <span class="detail-chip" data-detail="specific_information">specific aspects</span>.`;
+    const lowerSectionType = sectionType.toLowerCase();
+    
+    // Use section-specific templates instead of generic ones
+    if (lowerSectionType.includes('history')) {
+      return this.generateHistorySection(entityName, category);
+    } else if (lowerSectionType.includes('geography') || lowerSectionType.includes('climate')) {
+      return this.generateGeographySection(entityName, category);
+    } else if (lowerSectionType.includes('culture') || lowerSectionType.includes('society')) {
+      return this.generateCultureSection(entityName, category);
+    } else if (lowerSectionType.includes('economy') || lowerSectionType.includes('economic')) {
+      return this.generateEconomySection(entityName, category);
+    } else if (lowerSectionType.includes('government') || lowerSectionType.includes('politics')) {
+      return this.generateGovernmentSection(entityName, category);
+    } else if (lowerSectionType.includes('demographic') || lowerSectionType.includes('population')) {
+      return this.generateDemographicsSection(entityName, category);
+    }
+    
+    // Enhanced generic fallback with better placeholders
+    return `${entityName} has a significant role in <span class="detail-chip" data-detail="primary_significance">+ primary significance</span> and is known for <span class="detail-chip" data-detail="notable_features">+ notable features</span>. Key aspects include <span class="detail-chip" data-detail="key_characteristics">+ key characteristics</span> and <span class="detail-chip" data-detail="important_elements">+ important elements</span>.
+
+The development of ${entityName} involves <span class="detail-chip" data-detail="development_history">+ development history</span> and <span class="detail-chip" data-detail="major_influences">+ major influences</span>. Current status includes <span class="detail-chip" data-detail="current_situation">+ current situation</span> and <span class="detail-chip" data-detail="recent_changes">+ recent changes</span>.`;
+  }
+
+  private generateHistorySection(entityName: string, category: ArticleCategory): string {
+    if (category === ArticleCategory.LOCATION) {
+      return `The history of ${entityName} dates back to <span class="detail-chip" data-detail="earliest_settlement">+ earliest settlement</span> when <span class="detail-chip" data-detail="first_inhabitants">+ first inhabitants</span> established <span class="detail-chip" data-detail="early_settlements">+ early settlements</span>. During the <span class="detail-chip" data-detail="ancient_period">+ ancient period</span>, the region was known for <span class="detail-chip" data-detail="ancient_significance">+ ancient significance</span>.
+
+In medieval times, ${entityName} became important as <span class="detail-chip" data-detail="medieval_role">+ medieval role</span> and was ruled by <span class="detail-chip" data-detail="historical_rulers">+ historical rulers</span>. The area experienced <span class="detail-chip" data-detail="major_historical_events">+ major historical events</span> and <span class="detail-chip" data-detail="cultural_developments">+ cultural developments</span>.
+
+Modern history of ${entityName} includes <span class="detail-chip" data-detail="modern_developments">+ modern developments</span> and <span class="detail-chip" data-detail="contemporary_changes">+ contemporary changes</span>. Recent decades have seen <span class="detail-chip" data-detail="recent_transformations">+ recent transformations</span> and <span class="detail-chip" data-detail="current_trends">+ current trends</span>.`;
+    }
+    
+    // Generic history fallback
+    return `${entityName} has a rich history spanning <span class="detail-chip" data-detail="time_span">+ time period</span>. Key historical periods include <span class="detail-chip" data-detail="major_periods">+ major periods</span> and <span class="detail-chip" data-detail="significant_eras">+ significant eras</span>.`;
+  }
+
+  private generateGeographySection(entityName: string, category: ArticleCategory): string {
+    return `${entityName} is located at <span class="detail-chip" data-detail="coordinates">+ coordinates</span> and covers an area of <span class="detail-chip" data-detail="total_area">+ total area</span>. The terrain consists of <span class="detail-chip" data-detail="terrain_type">+ terrain type</span> and <span class="detail-chip" data-detail="topographical_features">+ topographical features</span>.
+
+The region's climate is characterized by <span class="detail-chip" data-detail="climate_type">+ climate type</span> with <span class="detail-chip" data-detail="seasonal_patterns">+ seasonal patterns</span>. Annual precipitation averages <span class="detail-chip" data-detail="rainfall_amount">+ rainfall amount</span> and temperatures range from <span class="detail-chip" data-detail="temperature_range">+ temperature range</span>.
+
+Natural resources include <span class="detail-chip" data-detail="natural_resources">+ natural resources</span> and the area is known for <span class="detail-chip" data-detail="environmental_features">+ environmental features</span>. <span class="detail-chip" data-detail="water_bodies">+ Water bodies</span> and <span class="detail-chip" data-detail="mountain_ranges">+ mountain ranges</span> define the landscape.`;
+  }
+
+  private generateCultureSection(entityName: string, category: ArticleCategory): string {
+    return `The culture of ${entityName} is characterized by <span class="detail-chip" data-detail="cultural_traditions">+ cultural traditions</span> and <span class="detail-chip" data-detail="distinctive_practices">+ distinctive practices</span>. Traditional arts include <span class="detail-chip" data-detail="traditional_arts">+ traditional arts</span> and <span class="detail-chip" data-detail="cultural_expressions">+ cultural expressions</span>.
+
+Language and literature reflect <span class="detail-chip" data-detail="linguistic_heritage">+ linguistic heritage</span> with <span class="detail-chip" data-detail="notable_works">+ notable works</span> and <span class="detail-chip" data-detail="literary_traditions">+ literary traditions</span>. Festivals and celebrations include <span class="detail-chip" data-detail="major_festivals">+ major festivals</span> and <span class="detail-chip" data-detail="cultural_events">+ cultural events</span>.
+
+Modern cultural life features <span class="detail-chip" data-detail="contemporary_culture">+ contemporary culture</span> and <span class="detail-chip" data-detail="cultural_institutions">+ cultural institutions</span>. The influence of <span class="detail-chip" data-detail="cultural_influences">+ cultural influences</span> continues to shape <span class="detail-chip" data-detail="evolving_traditions">+ evolving traditions</span>.`;
+  }
+
+  private generateEconomySection(entityName: string, category: ArticleCategory): string {
+    return `The economy of ${entityName} is based primarily on <span class="detail-chip" data-detail="primary_industries">+ primary industries</span> and <span class="detail-chip" data-detail="main_economic_sectors">+ main economic sectors</span>. Major employers include <span class="detail-chip" data-detail="major_employers">+ major employers</span> and <span class="detail-chip" data-detail="key_companies">+ key companies</span>.
+
+Agriculture contributes <span class="detail-chip" data-detail="agricultural_output">+ agricultural output</span> with main crops including <span class="detail-chip" data-detail="main_crops">+ main crops</span>. Manufacturing focuses on <span class="detail-chip" data-detail="manufacturing_specialties">+ manufacturing specialties</span> and <span class="detail-chip" data-detail="industrial_products">+ industrial products</span>.
+
+The service sector provides <span class="detail-chip" data-detail="service_contributions">+ service contributions</span> through <span class="detail-chip" data-detail="service_industries">+ service industries</span>. Tourism generates <span class="detail-chip" data-detail="tourism_revenue">+ tourism revenue</span> and supports <span class="detail-chip" data-detail="tourism_employment">+ tourism employment</span>.`;
+  }
+
+  private generateGovernmentSection(entityName: string, category: ArticleCategory): string {
+    return `${entityName} operates under <span class="detail-chip" data-detail="government_type">+ government type</span> with <span class="detail-chip" data-detail="administrative_structure">+ administrative structure</span>. The current leader is <span class="detail-chip" data-detail="current_leader">+ current leader</span> who serves as <span class="detail-chip" data-detail="leadership_role">+ leadership role</span>.
+
+Administrative divisions include <span class="detail-chip" data-detail="administrative_divisions">+ administrative divisions</span> governed by <span class="detail-chip" data-detail="local_government">+ local government</span>. Key government institutions are <span class="detail-chip" data-detail="government_institutions">+ government institutions</span> and <span class="detail-chip" data-detail="civic_organizations">+ civic organizations</span>.
+
+Political representation includes <span class="detail-chip" data-detail="political_parties">+ political parties</span> and <span class="detail-chip" data-detail="elected_officials">+ elected officials</span>. Recent political developments involve <span class="detail-chip" data-detail="recent_policies">+ recent policies</span> and <span class="detail-chip" data-detail="political_changes">+ political changes</span>.`;
+  }
+
+  private generateDemographicsSection(entityName: string, category: ArticleCategory): string {
+    return `The population of ${entityName} is approximately <span class="detail-chip" data-detail="total_population">+ total population</span> with a population density of <span class="detail-chip" data-detail="population_density">+ population density</span>. The demographic composition includes <span class="detail-chip" data-detail="ethnic_groups">+ ethnic groups</span> and <span class="detail-chip" data-detail="demographic_breakdown">+ demographic breakdown</span>.
+
+Age distribution shows <span class="detail-chip" data-detail="age_demographics">+ age demographics</span> with <span class="detail-chip" data-detail="median_age">+ median age</span>. Education levels include <span class="detail-chip" data-detail="education_statistics">+ education statistics</span> and <span class="detail-chip" data-detail="literacy_rate">+ literacy rate</span>.
+
+Languages spoken include <span class="detail-chip" data-detail="primary_languages">+ primary languages</span> and <span class="detail-chip" data-detail="minority_languages">+ minority languages</span>. Religious affiliations consist of <span class="detail-chip" data-detail="religious_demographics">+ religious demographics</span> and <span class="detail-chip" data-detail="spiritual_practices">+ spiritual practices</span>.`;
   }
 
   private generateSimpleContextualTemplate(section: SectionTemplate, topic: WikidataTopic, category: ArticleCategory): string {
