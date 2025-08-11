@@ -312,6 +312,31 @@
     .detail-chip__menu-option:hover {
       background: var(--background-color-interactive-subtle, #f8f9fa);
     }
+    /* Codex-based chips for inline placeholders */
+    .cdx-placeholder-chip {
+      border: 1px dashed var(--border-color-interactive, #c8ccd1);
+      background: var(--background-color-interactive-subtle, #f8f9fa);
+      cursor: pointer;
+      user-select: none;
+    }
+    .cdx-info-chip--editing {
+      border: 1px solid var(--border-color-progressive, #36c);
+      background: #fff;
+    }
+    .cdx-info-chip--filled {
+      border-style: solid;
+      background: #fff;
+    }
+    .cdx-chip--reference { background: #eef6ff; border-color: #36c; }
+    .cdx-chip--more { background: #fff8e6; border-color: #f3cc6b; }
+    .cdx-info-chip__input {
+      border: none;
+      outline: none;
+      background: transparent;
+      font: inherit;
+      padding: 2px 0;
+      min-width: 140px;
+    }
   </style>
   <script type="module" crossorigin src="/article-creation/assets/prototype-BKE4pTt0.js?v=20250811a"></script>
   
