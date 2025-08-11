@@ -644,8 +644,8 @@ class HTMLArticleCreator {
     private handleEditorChipClick(type: string): void {
         switch (type) {
             case 'snippet':
-                // Show richer Wikipedia-like options along with a fillable template
-                this.openSnippetModal();
+                // Insert a detailed, chip-filled template by default (no modal for simpler UX)
+                this.insertBasicIntro();
                 break;
             case 'fact':
                 this.openAddLinkDialog();
@@ -2096,12 +2096,12 @@ class HTMLArticleCreator {
         
         console.log('Generating template-based intro for:', this.selectedTopic.label);
         
-        // Always use template-based generation for new article creation
-        // This creates fillable templates rather than pre-filled content
-        const leadVariations = this.getManualLeads(this.selectedTopic.label, this.selectedTopic.category as ArticleCategory);
-        
-        // Use the formal version as the "basic intro" template
-        const basicIntro = leadVariations.formal;
+        // Use our chip-based lead generator and insert the detailed variant by default
+        const leadVariations = this.getManualLeads(
+            this.selectedTopic.label,
+            this.selectedTopic.category as ArticleCategory
+        );
+        const basicIntro = leadVariations.detailed;
         
         // Insert directly using the same method as snippet modal
         this.insertSelectedSnippet(basicIntro);
