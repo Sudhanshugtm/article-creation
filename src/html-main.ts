@@ -376,9 +376,26 @@ class HTMLArticleCreator {
         this.articleContent.innerHTML = '';
         
         if (this.selectedTopic) {
-            this.creationTitle.textContent = `Creating ${this.selectedTopic.category} article about "${this.searchTerm}"`;
+            // Use more natural, user-friendly messaging
+            const friendlyTitle = this.getFriendlyCreationTitle(this.selectedTopic.category, this.searchTerm);
+            this.creationTitle.textContent = friendlyTitle;
             this.renderChips(this.creationChipsContainer, this.selectedTopic);
         }
+    }
+
+    private getFriendlyCreationTitle(category: string, searchTerm: string): string {
+        // Map internal categories to user-friendly messages
+        const categoryMessages: Record<string, string> = {
+            'Person/Biography': `Ready to write about ${searchTerm}`,
+            'Geographic Location': `Let's create an article about ${searchTerm}`,
+            'Species/Biology': `Creating information about ${searchTerm}`,
+            'Organization': `Getting ready to document ${searchTerm}`,
+            'Event/History': `Preparing to chronicle ${searchTerm}`,
+            'Creative Work': `Ready to describe ${searchTerm}`,
+            'Concept/Abstract': `Let's define ${searchTerm}`
+        };
+        
+        return categoryMessages[category] || `Creating article about ${searchTerm}`;
     }
 
     private renderChips(container: HTMLElement, selectedTopic: TopicSelection | null): void {
