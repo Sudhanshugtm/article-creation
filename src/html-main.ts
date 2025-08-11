@@ -663,9 +663,9 @@ class HTMLArticleCreator {
             case ArticleCategory.LOCATION:
                 // Pattern: India, officially the Republic of India, is a country in South Asia.
                 return {
-                    formal: `${title} is ${article} ${chip('location_type', 'country/city/region')} in ${chip('parent_location', 'location')}.`,
+                    formal: `${title} is ${article} ${chip('location_type', 'country')} in ${chip('parent_location', 'location')}.`,
                     concise: `${title}: ${chip('location_type', 'type')} in ${chip('parent_location', 'location')}.`,
-                    detailed: `${title}, officially ${chip('official_name', 'the [Official Name]')}, is ${article} ${chip('location_type', 'country')} in ${chip('parent_location', 'South Asia')}. It is the ${chip('size_rank', 'seventh-largest')} ${chip('location_type', 'country')} by ${chip('area', 'area')} and has a population of ${chip('population', '[population]')}. ${chip('notable_feature', 'It is known for [notable features]')}.`
+                    detailed: `${title}, officially ${chip('official_name', 'the Republic of India')}, is ${article} ${chip('location_type', 'country')} in ${chip('parent_location', 'South Asia')}. It is the ${chip('size_rank', 'seventh-largest')} country by ${chip('area', 'area')} and has a population of ${chip('population', '1.4 billion')}. ${chip('notable_feature', 'It is known for its diverse culture')}.`
                 };
             case ArticleCategory.PERSON:
                 // Pattern: Albert Einstein (14 March 1879 – 18 April 1955) was a German-born theoretical physicist
@@ -1133,18 +1133,6 @@ class HTMLArticleCreator {
     private async getLocationSuggestions(detailType: string): Promise<string[]> {
         try {
             switch (detailType) {
-                case 'population':
-                    // Get population data from similar cities
-                    const populationQuery = `
-                        SELECT DISTINCT ?population WHERE {
-                            ?city wdt:P31/wdt:P279* wd:Q515 .
-                            ?city wdt:P17 wd:Q668 .
-                            ?city wdt:P1082 ?population .
-                            FILTER(?population > 100000)
-                        } ORDER BY DESC(?population) LIMIT 10
-                    `;
-                    const popResult = await this.queryWikidata(populationQuery);
-                    return this.formatPopulationSuggestions(popResult);
                     
                 case 'administrative_role':
                     // Get administrative roles from similar cities
@@ -1172,6 +1160,27 @@ class HTMLArticleCreator {
                     `;
                     const geoResult = await this.queryWikidata(geoQuery);
                     return this.extractLabels(geoResult);
+                    
+                case 'official_name':
+                    return ['the Republic of India', 'the State of California', 'the Kingdom of Thailand', 'the United States of America', 'the People\'s Republic of China'];
+                
+                case 'location_type':
+                    return ['country', 'city', 'state', 'province', 'region', 'territory', 'municipality', 'district'];
+                
+                case 'parent_location':
+                    return ['South Asia', 'Southeast Asia', 'Western Europe', 'North America', 'East Africa', 'the Mediterranean', 'the Pacific Ocean'];
+                
+                case 'size_rank':
+                    return ['largest', 'second-largest', 'third-largest', 'seventh-largest', 'tenth-largest', 'most populous', 'smallest'];
+                
+                case 'area':
+                    return ['area', 'land area', 'total area', 'surface area'];
+                
+                case 'population':
+                    return ['1.4 billion', '330 million', '67 million', '83 million', '126 million', '25 million', '10 million'];
+                
+                case 'notable_feature':
+                    return ['It is known for its diverse culture', 'It is famous for its historical landmarks', 'It is renowned for its natural beauty', 'It is celebrated for its cuisine', 'It is recognized for its economic development'];
                     
                 default:
                     return [];
