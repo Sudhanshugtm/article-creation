@@ -41,8 +41,13 @@ class SuggestionsPageManager {
             const CACHE_DURATION = 30 * 60 * 1000; // 30 minutes
             
             if (cacheAge < CACHE_DURATION) {
-                console.log('Using cached Wikidata suggestions - no API call or loading state needed');
+                console.log('Using cached Wikidata suggestions - rendering immediately without loading state');
                 const suggestions = JSON.parse(cachedSuggestions);
+                
+                // Remove any existing loading state first
+                this.hideLoadingState();
+                
+                // Render cached suggestions immediately
                 this.renderSuggestions(suggestions);
                 this.updateSuggestionCount(suggestions.length);
                 return; // Exit early - no API call or loading needed
