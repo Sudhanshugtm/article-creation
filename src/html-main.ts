@@ -1918,9 +1918,9 @@ class HTMLArticleCreator {
     }
 
     private async createFallbackSectionWithChips(sectionTitle: string): Promise<string> {
-        // Create intelligent fallback content with chips based on section type
+        // Create rich, multi-paragraph fallback content with chips based on section type
         const lowerTitle = sectionTitle.toLowerCase();
-        console.log('Creating intelligent fallback section for:', sectionTitle, 'lowercased:', lowerTitle);
+        console.log('Creating rich fallback section for:', sectionTitle, 'lowercased:', lowerTitle);
         
         // Get the entity name and category from the current topic
         const entityName = this.selectedTopic?.label || 'entity';
@@ -1947,44 +1947,80 @@ class HTMLArticleCreator {
             // Get contextual entity name instead of generic "Entity name"
             const entityChip = this.getIntelligentEntityChip(entityName, category);
             
-            // Early Life & Education
+            // Early Life & Education - Rich multi-paragraph version
             if (lowerTitle.includes('early life') || lowerTitle.includes('education') || lowerTitle.includes('childhood') || lowerTitle.includes('youth')) {
-                return `${entityChip} was born <span class="detail-chip" data-detail="birth_date">birth date</span> in <span class="detail-chip" data-detail="birth_place">birth place</span>. <span class="detail-chip" data-detail="family_background">Family background</span> and <span class="detail-chip" data-detail="early_education">early education</span> shaped their development.`;
+                return `${entityChip} was born on <span class="detail-chip" data-detail="birth_date">+ birth date</span> in <span class="detail-chip" data-detail="birth_place">+ birth place</span>. They were the <span class="detail-chip" data-detail="birth_order">+ child order</span> of <span class="detail-chip" data-detail="parents">+ parents</span>, who worked as <span class="detail-chip" data-detail="parents_occupation">+ parents' occupations</span>.
+
+Growing up in <span class="detail-chip" data-detail="hometown_details">+ hometown description</span>, ${entityName} showed early interest in <span class="detail-chip" data-detail="early_interests">+ early interests</span>. Their family background included <span class="detail-chip" data-detail="family_heritage">+ family heritage</span>, which influenced their later <span class="detail-chip" data-detail="cultural_influences">+ cultural influences</span>.
+
+${entityChip} attended <span class="detail-chip" data-detail="primary_school">+ primary school</span> and later <span class="detail-chip" data-detail="secondary_school">+ secondary school</span>. During their education, they excelled in <span class="detail-chip" data-detail="academic_strengths">+ academic subjects</span> and participated in <span class="detail-chip" data-detail="extracurricular">+ extracurricular activities</span>. Their teachers noted their <span class="detail-chip" data-detail="notable_traits">+ notable traits</span>.`;
             } 
-            // Career & Research  
+            // Career & Research - Rich multi-paragraph version
             else if (lowerTitle.includes('career') || lowerTitle.includes('research') || lowerTitle.includes('work') || lowerTitle.includes('profession')) {
-                return `${entityChip} began their career at <span class="detail-chip" data-detail="career_start_institution">institution</span> in <span class="detail-chip" data-detail="career_start_year">year</span>. Their work focused on <span class="detail-chip" data-detail="primary_research">research area</span> and <span class="detail-chip" data-detail="major_contributions">key contributions</span>.`;
+                return `${entityChip} began their professional career in <span class="detail-chip" data-detail="career_start_year">+ start year</span> at <span class="detail-chip" data-detail="first_workplace">+ first workplace</span> as <span class="detail-chip" data-detail="first_position">+ initial position</span>. Their early work focused on <span class="detail-chip" data-detail="initial_projects">+ early projects</span> under the mentorship of <span class="detail-chip" data-detail="early_mentors">+ mentors</span>.
+
+During the <span class="detail-chip" data-detail="career_peak_period">+ peak period</span>, ${entityName} made significant contributions to <span class="detail-chip" data-detail="field_contributions">+ field contributions</span>. Their research on <span class="detail-chip" data-detail="major_research_topics">+ research topics</span> led to breakthrough discoveries in <span class="detail-chip" data-detail="breakthrough_areas">+ breakthrough areas</span>. They published <span class="detail-chip" data-detail="publication_count">+ number</span> papers and collaborated with <span class="detail-chip" data-detail="collaborators">+ key collaborators</span>.
+
+Later in their career, ${entityName} transitioned to <span class="detail-chip" data-detail="later_roles">+ later positions</span> and became known for <span class="detail-chip" data-detail="expertise_areas">+ areas of expertise</span>. Their work influenced <span class="detail-chip" data-detail="field_impact">+ field impact</span> and established new standards in <span class="detail-chip" data-detail="standards_set">+ standards established</span>.`;
             }
-            // Political Career
+            // Political Career - Rich multi-paragraph version
             else if (lowerTitle.includes('political') || lowerTitle.includes('government') || lowerTitle.includes('office') || lowerTitle.includes('leadership')) {
-                return `${entityChip} entered politics in <span class="detail-chip" data-detail="political_start_year">year</span> as <span class="detail-chip" data-detail="first_office">first position</span>. They later served as <span class="detail-chip" data-detail="major_offices">major positions</span> and achieved <span class="detail-chip" data-detail="political_achievements">key accomplishments</span>.`;
+                return `${entityChip} entered politics in <span class="detail-chip" data-detail="political_entry_year">+ entry year</span> as a member of the <span class="detail-chip" data-detail="political_party">+ political party</span>. Their first political position was <span class="detail-chip" data-detail="first_office">+ first office</span>, where they focused on <span class="detail-chip" data-detail="early_policy_focus">+ early policy issues</span>.
+
+During their tenure as <span class="detail-chip" data-detail="major_office">+ major office</span> from <span class="detail-chip" data-detail="office_term">+ term period</span>, ${entityName} championed <span class="detail-chip" data-detail="key_policies">+ key policies</span>. Their administration was marked by <span class="detail-chip" data-detail="administration_achievements">+ major achievements</span> and faced challenges including <span class="detail-chip" data-detail="political_challenges">+ political challenges</span>.
+
+${entityChip}'s political legacy includes <span class="detail-chip" data-detail="legislative_achievements">+ legislative achievements</span> and their role in <span class="detail-chip" data-detail="historical_events">+ historical events</span>. They were known for their stance on <span class="detail-chip" data-detail="policy_positions">+ policy positions</span> and their ability to <span class="detail-chip" data-detail="political_skills">+ political skills</span>.`;
             }
-            // Personal Life
+            // Personal Life - Rich multi-paragraph version
             else if (lowerTitle.includes('personal') || lowerTitle.includes('family') || lowerTitle.includes('private')) {
-                return `${entityChip} married <span class="detail-chip" data-detail="spouse_name">spouse</span> in <span class="detail-chip" data-detail="marriage_year">year</span>. They have <span class="detail-chip" data-detail="children_details">children information</span> and <span class="detail-chip" data-detail="personal_interests">personal interests</span>.`;
+                return `${entityChip} married <span class="detail-chip" data-detail="spouse_name">+ spouse name</span> on <span class="detail-chip" data-detail="marriage_date">+ marriage date</span> in <span class="detail-chip" data-detail="marriage_location">+ marriage location</span>. Their relationship began when <span class="detail-chip" data-detail="relationship_origin">+ how they met</span>, and they were known for their <span class="detail-chip" data-detail="relationship_character">+ relationship dynamic</span>.
+
+The couple had <span class="detail-chip" data-detail="children_count">+ number of children</span>: <span class="detail-chip" data-detail="children_names">+ children's names</span>. As parents, they emphasized <span class="detail-chip" data-detail="parenting_values">+ parenting values</span> and ensured their children received <span class="detail-chip" data-detail="children_education">+ children's education</span>. The family lived in <span class="detail-chip" data-detail="family_residence">+ family home</span> and often <span class="detail-chip" data-detail="family_activities">+ family activities</span>.
+
+Outside of their professional life, ${entityName} enjoyed <span class="detail-chip" data-detail="hobbies">+ hobbies</span> and was passionate about <span class="detail-chip" data-detail="personal_interests">+ personal interests</span>. They were known in their community for <span class="detail-chip" data-detail="community_involvement">+ community involvement</span> and regularly <span class="detail-chip" data-detail="philanthropic_activities">+ philanthropic activities</span>.`;
             }
-            // Legacy & Death
+            // Legacy & Death - Rich multi-paragraph version
             else if (lowerTitle.includes('legacy') || lowerTitle.includes('death') || lowerTitle.includes('later life') || lowerTitle.includes('impact')) {
-                return `${entityChip} passed away <span class="detail-chip" data-detail="death_date">date</span> in <span class="detail-chip" data-detail="death_place">place</span>. Their legacy includes <span class="detail-chip" data-detail="lasting_impact">lasting contributions</span> and <span class="detail-chip" data-detail="commemorations">commemorations</span>.`;
+                return `In their later years, ${entityChip} continued to <span class="detail-chip" data-detail="later_activities">+ later activities</span> and remained active in <span class="detail-chip" data-detail="continued_involvement">+ continued involvement</span>. They spent their final years in <span class="detail-chip" data-detail="final_residence">+ final residence</span>, surrounded by <span class="detail-chip" data-detail="final_companions">+ final companions</span>.
+
+${entityChip} passed away on <span class="detail-chip" data-detail="death_date">+ death date</span> in <span class="detail-chip" data-detail="death_place">+ death location</span> due to <span class="detail-chip" data-detail="death_cause">+ cause of death</span>. They were <span class="detail-chip" data-detail="age_at_death">+ age at death</span> years old. Their funeral was attended by <span class="detail-chip" data-detail="funeral_attendees">+ funeral attendees</span> and held at <span class="detail-chip" data-detail="funeral_location">+ funeral location</span>.
+
+The legacy of ${entityName} includes their lasting impact on <span class="detail-chip" data-detail="legacy_fields">+ fields impacted</span>. They are remembered for <span class="detail-chip" data-detail="remembered_for">+ what they're remembered for</span> and their contributions to <span class="detail-chip" data-detail="contributions_to">+ contributions to</span>. <span class="detail-chip" data-detail="memorials">+ Memorials</span> have been established in their honor, and their work continues to influence <span class="detail-chip" data-detail="ongoing_influence">+ ongoing influence</span>.`;
             }
-            // Awards & Recognition
+            // Awards & Recognition - Rich multi-paragraph version
             else if (lowerTitle.includes('awards') || lowerTitle.includes('recognition') || lowerTitle.includes('honors') || lowerTitle.includes('achievements')) {
-                return `${entityChip} received <span class="detail-chip" data-detail="major_awards">major awards</span> including <span class="detail-chip" data-detail="prestigious_honors">prestigious honors</span>. Their work was recognized by <span class="detail-chip" data-detail="recognition_institutions">institutions</span> and <span class="detail-chip" data-detail="peer_recognition">peers</span>.`;
+                return `Throughout their career, ${entityChip} received numerous accolades for their contributions to <span class="detail-chip" data-detail="recognition_fields">+ fields of recognition</span>. Their first major recognition came in <span class="detail-chip" data-detail="first_award_year">+ first award year</span> when they received the <span class="detail-chip" data-detail="first_major_award">+ first major award</span> for <span class="detail-chip" data-detail="first_award_reason">+ reason for first award</span>.
+
+Among their most prestigious honors was the <span class="detail-chip" data-detail="most_prestigious_award">+ most prestigious award</span>, awarded in <span class="detail-chip" data-detail="prestigious_award_year">+ award year</span>. This recognition came as a result of their groundbreaking work on <span class="detail-chip" data-detail="award_winning_work">+ award-winning work</span>. The award committee specifically cited their <span class="detail-chip" data-detail="citation_reasons">+ citation reasons</span>.
+
+${entityChip} also received international recognition, including <span class="detail-chip" data-detail="international_awards">+ international awards</span> and honorary degrees from <span class="detail-chip" data-detail="honorary_degree_institutions">+ institutions</span>. Professional organizations honored them with <span class="detail-chip" data-detail="professional_honors">+ professional honors</span>, and they were inducted into <span class="detail-chip" data-detail="halls_of_fame">+ halls of fame</span> in <span class="detail-chip" data-detail="induction_years">+ induction years</span>.`;
             }
-            // Publications & Works
+            // Publications & Works - Rich multi-paragraph version
             else if (lowerTitle.includes('publications') || lowerTitle.includes('works') || lowerTitle.includes('writings') || lowerTitle.includes('books')) {
-                return `${entityChip} published <span class="detail-chip" data-detail="major_publications">major works</span> including <span class="detail-chip" data-detail="notable_books">notable books</span>. Their <span class="detail-chip" data-detail="publication_themes">key themes</span> influenced <span class="detail-chip" data-detail="field_impact">field impact</span>.`;
+                return `${entityChip}'s literary career began with their first publication, <span class="detail-chip" data-detail="first_publication">+ first publication</span>, which appeared in <span class="detail-chip" data-detail="first_publication_venue">+ publication venue</span> in <span class="detail-chip" data-detail="first_publication_year">+ publication year</span>. This early work established their reputation for <span class="detail-chip" data-detail="early_writing_style">+ early writing characteristics</span> and introduced themes that would recur throughout their career.
+
+Their major works include <span class="detail-chip" data-detail="major_works_list">+ major works</span>, with their masterpiece being <span class="detail-chip" data-detail="masterpiece_title">+ masterpiece title</span> published in <span class="detail-chip" data-detail="masterpiece_year">+ masterpiece year</span>. This work was groundbreaking for its <span class="detail-chip" data-detail="groundbreaking_aspects">+ innovative aspects</span> and received critical acclaim for <span class="detail-chip" data-detail="critical_praise">+ critical praise</span>.
+
+${entityChip}'s complete bibliography includes over <span class="detail-chip" data-detail="total_publications">+ total publications</span> spanning <span class="detail-chip" data-detail="career_span">+ career span</span>. Their work has been translated into <span class="detail-chip" data-detail="translation_languages">+ languages</span> and continues to influence <span class="detail-chip" data-detail="influenced_fields">+ influenced fields</span>. Scholars have noted their contribution to <span class="detail-chip" data-detail="scholarly_contributions">+ scholarly contributions</span> and their role in shaping <span class="detail-chip" data-detail="field_development">+ field development</span>.`;
             }
-            // Generic fallback - but make it contextual
+            // Generic fallback - Rich multi-paragraph version
             else {
-                console.log('Using intelligent generic fallback for section:', sectionTitle);
-                return `${entityChip} <span class="detail-chip" data-detail="section_context">section context</span>. <span class="detail-chip" data-detail="key_information">Key information</span> about <span class="detail-chip" data-detail="specific_details">specific details</span> and <span class="detail-chip" data-detail="relevant_facts">relevant facts</span>.`;
+                console.log('Using rich generic fallback for section:', sectionTitle);
+                return `${entityChip} played a significant role in <span class="detail-chip" data-detail="significant_role">+ role description</span> during the <span class="detail-chip" data-detail="time_period">+ time period</span>. Their involvement began when <span class="detail-chip" data-detail="involvement_origin">+ how involvement started</span> and continued throughout <span class="detail-chip" data-detail="involvement_duration">+ duration of involvement</span>.
+
+The key aspects of ${entityName}'s contribution to this area include <span class="detail-chip" data-detail="key_contributions">+ key contributions</span> and their innovative approach to <span class="detail-chip" data-detail="innovative_approaches">+ innovative approaches</span>. They worked closely with <span class="detail-chip" data-detail="collaborators">+ collaborators</span> and influenced <span class="detail-chip" data-detail="influenced_people">+ people influenced</span> in the field.
+
+This work resulted in <span class="detail-chip" data-detail="results_achieved">+ results achieved</span> and established <span class="detail-chip" data-detail="standards_established">+ standards established</span>. The impact of their efforts can be seen in <span class="detail-chip" data-detail="visible_impact">+ visible impact</span> and continues to affect <span class="detail-chip" data-detail="ongoing_effects">+ ongoing effects</span> today.`;
             }
         } catch (error) {
-            console.error('Error generating intelligent section content:', error);
-            // Fallback to simple entity name
-            const simpleEntityChip = `<span class="detail-chip" data-detail="entity_name">${entityName}</span>`;
-            return `${simpleEntityChip} <span class="detail-chip" data-detail="section_context">section context</span>. <span class="detail-chip" data-detail="key_information">Key information</span> about <span class="detail-chip" data-detail="specific_details">specific details</span> and <span class="detail-chip" data-detail="relevant_facts">relevant facts</span>.`;
+            console.error('Error generating rich section content:', error);
+            // Rich fallback to simple entity name with substantial content
+            const simpleEntityChip = `<span class="detail-chip" data-detail="entity_name">+ ${entityName}</span>`;
+            return `${simpleEntityChip} has a complex history involving <span class="detail-chip" data-detail="complex_history">+ historical context</span> and <span class="detail-chip" data-detail="key_developments">+ key developments</span>. The significance of their role in <span class="detail-chip" data-detail="role_significance">+ role significance</span> became apparent through <span class="detail-chip" data-detail="evidence_sources">+ evidence sources</span>.
+
+Further research into ${entityName} reveals <span class="detail-chip" data-detail="research_findings">+ research findings</span> and connections to <span class="detail-chip" data-detail="related_topics">+ related topics</span>. Their influence extended to <span class="detail-chip" data-detail="influence_areas">+ areas of influence</span> and affected <span class="detail-chip" data-detail="affected_communities">+ communities affected</span>.
+
+The lasting importance of ${entityName} can be measured by <span class="detail-chip" data-detail="importance_metrics">+ importance measures</span> and their continued relevance to <span class="detail-chip" data-detail="continued_relevance">+ areas of continued relevance</span>. Modern perspectives on their contributions include <span class="detail-chip" data-detail="modern_perspectives">+ modern perspectives</span>.`;
         }
     }
 
