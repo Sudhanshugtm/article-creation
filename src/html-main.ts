@@ -653,65 +653,65 @@ class HTMLArticleCreator {
                 <span class="cdx-info-chip__text">… More</span>
             </span>`;
         
-        // Wikipedia-inspired lead generation based on real article analysis
+        // Wikipedia-inspired lead generation with + placeholder chips
         const chip = (detail: string, label: string) => `
             <span class="cdx-info-chip cdx-info-chip--notice cdx-placeholder-chip" data-detail="${detail}">
-                <span class="cdx-info-chip__text">${label}</span>
+                <span class="cdx-info-chip__text">+ ${label}</span>
             </span>`;
         
         switch (category) {
             case ArticleCategory.LOCATION:
                 // Pattern: India, officially the Republic of India, is a country in South Asia.
                 return {
-                    formal: `${title} is ${article} ${chip('location_type', 'country')} in ${chip('parent_location', 'location')}.`,
+                    formal: `${title} is ${article} ${chip('location_type', 'type')} in ${chip('parent_location', 'location')}.`,
                     concise: `${title}: ${chip('location_type', 'type')} in ${chip('parent_location', 'location')}.`,
-                    detailed: `${title}, officially ${chip('official_name', 'the Republic of India')}, is ${article} ${chip('location_type', 'country')} in ${chip('parent_location', 'South Asia')}. It is the ${chip('size_rank', 'seventh-largest')} country by ${chip('area', 'area')} and has a population of ${chip('population', '1.4 billion')}. ${chip('notable_feature', 'It is known for its diverse culture')}.`
+                    detailed: `${title}, officially ${chip('official_name', 'official name')}, is ${article} ${chip('location_type', 'type')} in ${chip('parent_location', 'location')}. It is the ${chip('size_rank', 'rank')} ${chip('location_type', 'type')} by ${chip('area', 'area')} and has a population of ${chip('population', 'population')}. ${chip('notable_feature', 'notable feature')}.`
                 };
             case ArticleCategory.PERSON:
                 // Pattern: Albert Einstein (14 March 1879 – 18 April 1955) was a German-born theoretical physicist
                 return {
                     formal: `${title} (${chip('birth_death', 'dates')}) was ${article} ${chip('nationality', 'nationality')} ${chip('profession', 'profession')}.`,
                     concise: `${title}: ${chip('nationality', 'nationality')} ${chip('profession', 'profession')} (${chip('period', 'period')}).`,
-                    detailed: `${title} (${chip('birth_death', '14 March 1879 – 18 April 1955')}) was ${article} ${chip('nationality', 'German-born')} ${chip('profession', 'theoretical physicist')} who is best known for ${chip('known_for', 'developing the theory of relativity')}. ${chip('achievement', 'Einstein also made important contributions to [field]')}. ${chip('recognition', 'He received the [year] Nobel Prize in [field]')}.`
+                    detailed: `${title} (${chip('birth_death', 'birth-death dates')}) was ${article} ${chip('nationality', 'nationality')} ${chip('profession', 'profession')} who is best known for ${chip('known_for', 'achievement')}. ${chip('additional_contribution', 'additional contribution')}. ${chip('recognition', 'recognition or award')}.`
                 };
             case ArticleCategory.SPECIES:
                 // Pattern: The tiger (Panthera tigris) is a large cat and a member of the genus Panthera native to Asia
                 return {
-                    formal: `The ${title.toLowerCase()} (${chip('scientific_name', 'Scientific name')}) is ${article} ${chip('classification', 'classification')} native to ${chip('native_region', 'region')}.`,
+                    formal: `The ${title.toLowerCase()} (${chip('scientific_name', 'scientific name')}) is ${article} ${chip('classification', 'classification')} native to ${chip('native_region', 'region')}.`,
                     concise: `${title}: ${chip('classification', 'type')} from ${chip('native_region', 'region')}.`,
-                    detailed: `The ${title.toLowerCase()} (${chip('scientific_name', 'Panthera tigris')}) is ${article} ${chip('size_description', 'large')} ${chip('classification', 'cat')} and a member of the genus ${chip('genus', 'Panthera')} native to ${chip('native_region', 'Asia')}. It has ${chip('physical_description', 'distinctive physical features')} and ${chip('behavior', 'behavioral characteristics')}. ${chip('habitat', 'It inhabits [habitat types]')}.`
+                    detailed: `The ${title.toLowerCase()} (${chip('scientific_name', 'scientific name')}) is ${article} ${chip('size_description', 'size')} ${chip('classification', 'classification')} and a member of the genus ${chip('genus', 'genus')} native to ${chip('native_region', 'region')}. It has ${chip('physical_description', 'physical features')} and ${chip('behavior', 'behavior')}. ${chip('habitat', 'habitat')}.`
                 };
             case ArticleCategory.ORGANIZATION:
                 // Pattern: Microsoft Corporation is an American multinational corporation and technology company
                 return {
                     formal: `${title} is ${article} ${chip('nationality', 'nationality')} ${chip('org_type', 'organization type')} founded in ${chip('founding_year', 'year')}.`,
                     concise: `${title}: ${chip('org_type', 'type')} founded in ${chip('founding_year', 'year')}.`,
-                    detailed: `${title} is ${article} ${chip('nationality', 'American')} ${chip('org_type', 'multinational corporation')} and ${chip('industry', 'technology company')} headquartered in ${chip('headquarters', 'location')}. Founded in ${chip('founding_year', '1975')}, the company ${chip('primary_business', 'became influential in [field]')}. ${chip('current_status', 'It is [current position/status]')}.`
+                    detailed: `${title} is ${article} ${chip('nationality', 'nationality')} ${chip('org_type', 'organization type')} and ${chip('industry', 'industry')} headquartered in ${chip('headquarters', 'location')}. Founded in ${chip('founding_year', 'year')}, the company ${chip('primary_business', 'primary business')}. ${chip('current_status', 'current status')}.`
                 };
             case ArticleCategory.EVENT:
                 // Pattern: World War II was a global conflict between two coalitions: the Allies and the Axis powers
                 return {
-                    formal: `${title} was ${article} ${chip('event_type', 'conflict/event')} that occurred ${chip('time_period', 'dates')}.`,
+                    formal: `${title} was ${article} ${chip('event_type', 'event type')} that occurred ${chip('time_period', 'time period')}.`,
                     concise: `${title}: ${chip('event_type', 'type')} (${chip('dates', 'dates')}).`,
-                    detailed: `${title} (${chip('dates', '1 September 1939 – 2 September 1945')}) was ${article} ${chip('scope', 'global')} ${chip('event_type', 'conflict')} between ${chip('participants', 'two coalitions')}. ${chip('significance', 'It was significant because [reason]')}. ${chip('impact', 'The event resulted in [consequences]')}.`
+                    detailed: `${title} (${chip('dates', 'dates')}) was ${article} ${chip('scope', 'scope')} ${chip('event_type', 'event type')} between ${chip('participants', 'participants')}. ${chip('significance', 'significance')}. ${chip('impact', 'impact')}.`
                 };
             case ArticleCategory.CREATIVE_WORK:
                 return {
                     formal: `${title} is ${article} ${chip('work_type', 'work type')} by ${chip('creator', 'creator')} published in ${chip('year', 'year')}.`,
                     concise: `${title}: ${chip('work_type', 'type')} by ${chip('creator', 'creator')} (${chip('year', 'year')}).`,
-                    detailed: `${title} is ${article} ${chip('work_type', 'novel/film/artwork')} created by ${chip('creator', 'author/director/artist')} and ${chip('publication_info', 'published/released')} in ${chip('year', 'year')}. ${chip('theme', 'The work explores [themes]')}. ${chip('reception', 'It has been [critical reception]')}.`
+                    detailed: `${title} is ${article} ${chip('work_type', 'work type')} created by ${chip('creator', 'creator')} and ${chip('publication_info', 'publication info')} in ${chip('year', 'year')}. ${chip('theme', 'theme')}. ${chip('reception', 'reception')}.`
                 };
             case ArticleCategory.CONCEPT:
                 return {
-                    formal: `${title} is ${article} ${chip('concept_type', 'concept/theory/principle')} in ${chip('field', 'field')}.`,
+                    formal: `${title} is ${article} ${chip('concept_type', 'concept type')} in ${chip('field', 'field')}.`,
                     concise: `${title}: ${chip('concept_type', 'type')} in ${chip('field', 'field')}.`,
-                    detailed: `${title} is ${article} ${chip('concept_type', 'fundamental concept')} in ${chip('field', 'field of study')} that ${chip('definition', 'describes/explains [phenomenon]')}. ${chip('development', 'It was developed by [person/group]')}. ${chip('applications', 'The concept is used in [applications]')}.`
+                    detailed: `${title} is ${article} ${chip('concept_type', 'concept type')} in ${chip('field', 'field')} that ${chip('definition', 'definition')}. ${chip('development', 'development')}. ${chip('applications', 'applications')}.`
                 };
             default:
                 return {
-                    formal: `${title} is ${article} ${chip('type', 'type')} ${chip('description', 'that [description]')}.`,
-                    concise: `${title}: ${chip('type', 'type')} ${chip('context', '[context]')}.`,
-                    detailed: `${title} is ${article} ${chip('type', 'notable')} ${categoryDescription} ${chip('significance', 'known for [key aspects]')}. ${chip('details', 'Additional details about [topic]')}.`
+                    formal: `${title} is ${article} ${chip('type', 'type')} ${chip('description', 'description')}.`,
+                    concise: `${title}: ${chip('type', 'type')} ${chip('context', 'context')}.`,
+                    detailed: `${title} is ${article} ${chip('type', 'type')} ${categoryDescription} ${chip('significance', 'significance')}. ${chip('details', 'additional details')}.`
                 };
         }
     }
