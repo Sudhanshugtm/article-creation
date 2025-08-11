@@ -681,8 +681,14 @@ class HTMLArticleCreator {
         const baseChips = contextualChips && contextualChips.length > 0 ? 
             this.getContextualChips(contextualChips) : 
             this.getCategorySpecificChips(category);
-        const referenceChip = '<span class="detail-chip detail-chip--reference" data-detail="reference">📎 Reference</span>';
-        const moreChip = '<span class="detail-chip detail-chip--more" data-detail="more">...more</span>';
+        const referenceChip = `
+            <span class="cdx-info-chip cdx-info-chip--notice cdx-chip--reference" data-detail="reference">
+                <span class="cdx-info-chip__text">📎 Reference</span>
+            </span>`;
+        const moreChip = `
+            <span class="cdx-info-chip cdx-info-chip--notice cdx-chip--more" data-detail="more">
+                <span class="cdx-info-chip__text">… More</span>
+            </span>`;
         
         switch (category) {
             case ArticleCategory.SPECIES:
@@ -737,7 +743,10 @@ class HTMLArticleCreator {
     }
     
     private getContextualChips(contextualChips: string[]): Record<string, string> {
-        const chip = (detail: string, label: string) => `<span class="detail-chip" data-detail="${detail}">${label}</span>`;
+        const chip = (detail: string, label: string) => `
+            <span class="cdx-info-chip cdx-info-chip--notice cdx-placeholder-chip" data-detail="${detail}">
+                <span class="cdx-info-chip__text">+ ${label}</span>
+            </span>`;
         
         // Convert contextual chips array to the expected format
         const chips: Record<string, string> = {};
@@ -759,7 +768,10 @@ class HTMLArticleCreator {
     }
     
     private getCategorySpecificChips(category: ArticleCategory): Record<string, string> {
-        const chip = (detail: string, label: string) => `<span class="detail-chip" data-detail="${detail}">+ ${label}</span>`;
+        const chip = (detail: string, label: string) => `
+            <span class="cdx-info-chip cdx-info-chip--notice cdx-placeholder-chip" data-detail="${detail}">
+                <span class="cdx-info-chip__text">+ ${label}</span>
+            </span>`;
         
         switch (category) {
             case ArticleCategory.SPECIES:
@@ -988,7 +1000,7 @@ class HTMLArticleCreator {
         this.articleContent.innerHTML = text;
         
         // Add click handlers to detail chips
-        const detailChips = this.articleContent.querySelectorAll('.detail-chip');
+        const detailChips = this.articleContent.querySelectorAll('.detail-chip, .cdx-info-chip[data-detail]');
         console.log('Found chips:', detailChips.length);
         detailChips.forEach(chip => {
             const detail = chip.getAttribute('data-detail');
@@ -1061,13 +1073,13 @@ class HTMLArticleCreator {
         const input = document.createElement('input');
         input.type = 'text';
         input.value = currentText;
-        input.className = 'detail-chip__input';
+        input.className = 'cdx-info-chip__input';
         input.placeholder = `Enter ${detailType}`;
         
         // Replace chip content with input
         chipElement.innerHTML = '';
         chipElement.appendChild(input);
-        chipElement.classList.add('detail-chip--editing');
+        chipElement.classList.add('cdx-info-chip--editing');
         
         // Focus and select text
         input.focus();
@@ -1081,17 +1093,17 @@ class HTMLArticleCreator {
         const saveValue = () => {
             const newValue = input.value.trim();
             if (newValue) {
-                chipElement.textContent = newValue;
-                chipElement.classList.add('detail-chip--filled');
+                chipElement.innerHTML = `<span class="cdx-info-chip__text">${newValue}</span>`;
+                chipElement.classList.add('cdx-info-chip--filled');
             } else {
-                chipElement.textContent = originalText;
+                chipElement.innerHTML = `<span class="cdx-info-chip__text">${originalText}</span>`;
             }
-            chipElement.classList.remove('detail-chip--editing');
+            chipElement.classList.remove('cdx-info-chip--editing');
         };
         
         const cancelEdit = () => {
-            chipElement.textContent = originalText;
-            chipElement.classList.remove('detail-chip--editing');
+            chipElement.innerHTML = `<span class="cdx-info-chip__text">${originalText}</span>`;
+            chipElement.classList.remove('cdx-info-chip--editing');
         };
         
         // Event listeners
@@ -2130,10 +2142,13 @@ class HTMLArticleCreator {
 
     private chipifyPlaceholders(text: string): string {
         try {
-            // Convert occurrences of "+ label" into fillable chips
+            // Convert occurrences of "+ label" into Codex chips
             return text.replace(/\+\s([A-Za-z][A-Za-z _-]+)/g, (_m, label) => {
                 const key = String(label).toLowerCase().trim().replace(/\s+/g, '_');
-                return `<span class="detail-chip" data-detail="${key}">+ ${label}</span>`;
+                return `
+                    <span class="cdx-info-chip cdx-info-chip--notice cdx-placeholder-chip" data-detail="${key}">
+                        <span class="cdx-info-chip__text">+ ${label}</span>
+                    </span>`;
             });
         } catch {
             return text;
