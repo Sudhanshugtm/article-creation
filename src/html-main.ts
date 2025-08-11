@@ -219,6 +219,20 @@ class HTMLArticleCreator {
             this.exitArticleEditor();
         });
 
+        // Formatting buttons
+        this.boldBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            this.applyInlineFormat('bold');
+        });
+        this.italicBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            this.applyInlineFormat('italic');
+        });
+        this.undoBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            this.applyUndo();
+        });
+
         // Link button for manual Wikipedia link detection
         this.linkBtn.addEventListener('click', () => {
             this.detectLinksManually();
@@ -226,6 +240,49 @@ class HTMLArticleCreator {
 
         // Focus input on load
         this.titleInput.focus();
+    }
+
+    private getActiveEditable(): HTMLElement | null {
+        const sel = window.getSelection();
+        if (!sel || sel.rangeCount === 0) return null;
+        const node = sel.anchorNode as Node | null;
+        if (!node) return null;
+        const el = (node.nodeType === 1 ? node as Element : node.parentElement) as HTMLElement | null;
+        if (!el) return null;
+        const editableRoot = el.closest('[contenteditable="true"]') as HTMLElement | null;
+        return editableRoot;
+    }
+
+    private applyInlineFormat(command: 'bold' | 'italic'): void {
+        // Ensure focus is within an editable region (title or body)
+        const target = this.getActiveEditable() || this.articleContent || this.articleTitleText;
+        if (target) target.focus();
+        try {
+            // Prefer execCommand for quick prototype formatting
+            document.execCommand(command);
+        } catch (e) {
+            // Fallback: wrap selection
+            const sel = window.getSelection();
+            if (!sel || sel.rangeCount === 0) return;
+            const range = sel.getRangeAt(0);
+            const wrapper = document.createElement(command === 'bold' ? 'strong' : 'em');
+            wrapper.appendChild(range.extractContents());
+            range.insertNode(wrapper);
+            sel.removeAllRanges();
+            range.selectNodeContents(wrapper);
+            sel.addRange(range);
+        }
+    }
+
+    private applyUndo(): void {
+        try {
+            if (!document.execCommand('undo')) {
+                // If execCommand is unavailable, rely on browser native undo via keybinding
+                // no-op fallback
+            }
+        } catch {
+            // no-op
+        }
     }
 
 
@@ -495,16 +552,17 @@ class HTMLArticleCreator {
         // Hide the global toolbar and remove editing class
         this.globalToolbar.style.display = 'none';
         document.querySelector('.article-creator')?.classList.remove('article-creator--editing');
-        
-        // Return to article creation state
-        this.showArticleCreation();
-        
-        // Focus the title input to provide clear visual indicator of where user is
-        // Small delay to ensure DOM has updated after state change
+        // Reset all state so user sees a clean title-entry screen
+        this.searchTerm = '';
+        this.selectedTopic = null;
+        try { localStorage.removeItem('articleCreatorState'); } catch {}
+        this.titleInput.value = '';
+        // Go to input state
+        this.setState(WorkflowState.INPUT);
+        // Focus the title input with blinking caret in an empty field
         setTimeout(() => {
             this.titleInput.focus();
-            this.titleInput.select(); // Also select the text for easy editing
-        }, 100);
+        }, 0);
     }
 
     private setupArticleEditor(): void {
