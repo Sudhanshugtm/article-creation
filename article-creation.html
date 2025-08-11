@@ -127,32 +127,69 @@
       }
     }
     
+    /* Fix toolbar height and spacing */
+    .article-creator__global-toolbar {
+      min-height: 56px !important;
+      padding: 12px 20px !important;
+    }
+    
     /* Add proper spacing between toolbar and content */
     .article-creator--editing {
-      padding-top: 80px !important;
+      padding-top: 100px !important;
     }
     
     .article-creator--editing .article-editor {
-      padding-top: 32px !important;
+      padding-top: 40px !important;
+      max-width: 800px !important;
+      margin: 0 auto !important;
+      padding-left: 20px !important;
+      padding-right: 20px !important;
     }
     
     .article-creator--editing .article-editor__title {
       margin-top: 0 !important;
-      margin-bottom: 24px !important;
+      margin-bottom: 32px !important;
+      font-size: 28px !important;
+      line-height: 1.2 !important;
     }
     
-    /* Ensure editing section has proper spacing */
-    .article-creator__editing-section {
-      padding-top: 24px !important;
+    /* Better spacing for creation section */
+    .article-creator__creation-section {
+      padding: 40px 0 !important;
+      max-width: 800px !important;
+      margin: 0 auto !important;
+      padding-left: 20px !important;
+      padding-right: 20px !important;
+    }
+    
+    .article-creator__creation-section h2 {
+      margin-bottom: 24px !important;
+      font-size: 24px !important;
     }
     
     @media (max-width: 768px) {
+      .article-creator__global-toolbar {
+        min-height: 48px !important;
+        padding: 8px 16px !important;
+      }
+      
       .article-creator--editing {
-        padding-top: 70px !important;
+        padding-top: 80px !important;
       }
       
       .article-creator--editing .article-editor {
-        padding-top: 24px !important;
+        padding-top: 32px !important;
+        padding-left: 16px !important;
+        padding-right: 16px !important;
+      }
+      
+      .article-creator--editing .article-editor__title {
+        font-size: 24px !important;
+        margin-bottom: 24px !important;
+      }
+      
+      .article-creator__creation-section {
+        padding: 32px 16px !important;
       }
     }
   </style>
