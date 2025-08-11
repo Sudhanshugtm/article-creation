@@ -152,7 +152,7 @@ var P=Object.defineProperty;var b=(u,e,t)=>e in u?P(u,e,{enumerable:!0,configura
 
 ## Origin of the name
 
-[Add information about the name origin]`;this.articleContent.innerHTML+=t;break;default:console.log("Unknown card action:",e)}this.closeEditorMoreSection(),this.articleContent.focus()}closeEditorMoreSection(){const e=document.getElementById("editorMoreSection");e&&e.remove()}async insertBasicIntro(){if(!this.selectedTopic){console.log("No selected topic for intro generation");return}console.log("Generating template-based intro for:",this.selectedTopic.label);const t=this.getManualLeads(this.selectedTopic.label,this.selectedTopic.category).formal;this.insertSelectedSnippet(t),console.log("Template-based intro inserted:",t)}_handleEditorMoreOption(e){console.log("Editor more option selected:",e);const n={image:"[Image placeholder]",list:`
+[Add information about the name origin]`;this.articleContent.innerHTML+=t;break;default:console.log("Unknown card action:",e)}this.closeEditorMoreSection(),this.articleContent.focus()}closeEditorMoreSection(){const e=document.getElementById("editorMoreSection");e&&e.remove()}async insertBasicIntro(){if(!this.selectedTopic){console.log("No selected topic for intro generation");return}console.log("Generating template-based intro for:",this.selectedTopic.label);const t=this.getManualLeads(this.selectedTopic.label,this.selectedTopic.category ).detailed;this.insertSelectedSnippet(t),console.log("Template-based intro inserted:",t)}_handleEditorMoreOption(e){console.log("Editor more option selected:",e);const n={image:"[Image placeholder]",list:`
 • Item 1
 • Item 2
 • Item 3`,table:`
