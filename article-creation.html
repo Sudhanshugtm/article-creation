@@ -96,6 +96,36 @@
     .article-creator__chips {
       display: none !important;
     }
+    
+    /* Responsive toolbar design */
+    .article-creator__global-toolbar {
+      display: flex !important;
+      justify-content: center !important;
+      padding: 8px 20px !important;
+    }
+    
+    .article-editor__toolbar-left,
+    .article-editor__toolbar-right {
+      max-width: 800px !important;
+      width: 100% !important;
+      display: flex !important;
+      justify-content: space-between !important;
+      align-items: center !important;
+    }
+    
+    .article-editor__toolbar-left {
+      flex: 1 !important;
+    }
+    
+    .article-editor__toolbar-right {
+      flex: 0 !important;
+    }
+    
+    @media (max-width: 768px) {
+      .article-creator__global-toolbar {
+        padding: 8px 16px !important;
+      }
+    }
   </style>
 </head>
 <body>
