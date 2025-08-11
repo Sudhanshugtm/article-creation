@@ -90,6 +90,8 @@
         font-size: 18px !important;
       }
     }
+    /* Hide the default page title in editor view */
+    .article-creator.article-creator--editing .article-creator__title { display: none !important; }
     
     
     /* Hide the New topic chip */
@@ -114,7 +116,7 @@
     }
     @media (min-width: 768px) {
       .article-creator__global-toolbar {
-        margin-bottom: 32px !important;
+        margin-bottom: 12px !important;
       }
     }
     /* Ensure toolbar remains usable on narrow screens */
@@ -163,7 +165,7 @@
     }
     
     /* Direct targeting approaches for toolbar spacing */
-    #editingSection { padding-top: 24px !important; }
+    #editingSection { padding-top: 12px !important; }
     
     #articleContent {
       margin-top: 40px !important;
@@ -172,7 +174,11 @@
     .article-editor__content { padding-top: 12px !important; }
     /* Editing view polish */
     .article-editor { max-width: 800px; margin: 0 auto; }
-    .article-editor__title { font-size: 24px; font-weight: 600; margin: 12px 0 16px 0; }
+    .article-editor__title { font-size: 24px; font-weight: 600; margin: 8px 0 8px 0; }
+    .article-editor__title-text[contenteditable="true"][data-placeholder]:empty:before {
+      content: attr(data-placeholder);
+      color: var(--color-disabled, #a2a9b1);
+    }
     #articleContent[contenteditable="true"] {
       min-height: 240px;
       padding: 16px 20px;
@@ -193,6 +199,8 @@
       pointer-events: none;
     }
     .article-lead { margin-bottom: 12px; color: var(--color-base, #202122); }
+    /* Hide body in simplified editor */
+    .article-creator.article-creator--editing #articleContent { display: none !important; }
   </style>
   
   <script>

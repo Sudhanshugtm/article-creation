@@ -464,20 +464,22 @@ class HTMLArticleCreator {
         // Set up link detection for this editing session
         // Link detection will be manual via link button
         
-        // Focus the editable article body to enable typing and place caret at end
-        this.articleContent.focus();
+        // Prepare and focus the editable article title (simple editor view)
+        const titleEl = this.articleTitleText as HTMLElement;
+        titleEl.setAttribute('contenteditable', 'true');
+        titleEl.setAttribute('data-placeholder', 'Title...');
+        titleEl.textContent = '';
+        titleEl.focus();
         try {
             const range = document.createRange();
-            range.selectNodeContents(this.articleContent);
+            range.selectNodeContents(titleEl);
             range.collapse(false);
             const sel = window.getSelection();
             if (sel) {
                 sel.removeAllRanges();
                 sel.addRange(range);
             }
-        } catch (e) {
-            // no-op
-        }
+        } catch {}
     }
 
     private exitArticleEditor(): void {
@@ -503,31 +505,7 @@ class HTMLArticleCreator {
         this.articleContent.innerHTML = '';
         this.articleContent.setAttribute('data-placeholder', 'Start writing your article...');
         
-        // Set the article title
-        const articleTitle = this.searchTerm;
-        this.articleTitleText.textContent = articleTitle;
-        
-        // Generate a brief, focused lead section (not detailed)
-        const leadVariations = this.getManualLeads(this.selectedTopic.label, this.selectedTopic.category as ArticleCategory);
-        const briefLead = leadVariations.formal; // Use formal instead of detailed for conciseness
-        
-        // Create a lead paragraph element
-        const leadParagraph = document.createElement('p');
-        leadParagraph.className = 'article-lead';
-        leadParagraph.innerHTML = briefLead;
-        
-        // Insert the lead into the article content
-        this.articleContent.appendChild(leadParagraph);
-        
-        // Add click handlers to detail chips in the lead
-        const detailChips = leadParagraph.querySelectorAll('.detail-chip');
-        detailChips.forEach(chip => {
-            const detail = chip.getAttribute('data-detail');
-            chip.addEventListener('click', (e) => {
-                e.preventDefault();
-                this.handleDetailChipClick(detail || '', chip as HTMLElement);
-            });
-        });
+        // Do not prefill title or body; title is editable and body is hidden in this simplified view
         // Render editor action chips below the content area
         const editorChipsContainer = document.getElementById('editorChipsContainer') as HTMLElement;
         if (editorChipsContainer) {
