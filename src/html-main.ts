@@ -19,7 +19,8 @@ import {
     cdxIconEllipsis,
     cdxIconClose,
     cdxIconNext,
-    cdxIconPrevious
+    cdxIconPrevious,
+    cdxIconReferenceExisting
 } from '@wikimedia/codex-icons';
 
 enum WorkflowState {
@@ -644,18 +645,25 @@ class HTMLArticleCreator {
         const baseChips = contextualChips && contextualChips.length > 0 ? 
             this.getContextualChips(contextualChips) : 
             this.getCategorySpecificChips(category);
+        
+        // Enhanced reference chip with proper icon
+        const referenceIconPath = (cdxIconReferenceExisting as any).ltr || cdxIconReferenceExisting;
         const referenceChip = `
-            <span class="cdx-info-chip cdx-info-chip--notice cdx-chip--reference" data-detail="reference">
-                <span class="cdx-info-chip__text">📎 Reference</span>
+            <span class="cdx-info-chip cdx-info-chip--notice cdx-chip--reference" data-detail="reference" title="Add reference">
+                <span class="cdx-info-chip__icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 20 20" aria-hidden="true">${referenceIconPath}</svg>
+                </span>
+                <span class="cdx-info-chip__text">Reference</span>
             </span>`;
+        
         const moreChip = `
-            <span class="cdx-info-chip cdx-info-chip--notice cdx-chip--more" data-detail="more">
+            <span class="cdx-info-chip cdx-info-chip--notice cdx-chip--more" data-detail="more" title="More details">
                 <span class="cdx-info-chip__text">… More</span>
             </span>`;
         
-        // Wikipedia-inspired lead generation with + placeholder chips
+        // Enhanced placeholder chips with better styling and accessibility
         const chip = (detail: string, label: string) => `
-            <span class="cdx-info-chip cdx-info-chip--notice cdx-placeholder-chip" data-detail="${detail}">
+            <span class="cdx-info-chip cdx-info-chip--notice cdx-placeholder-chip" data-detail="${detail}" title="Click to add ${label}" role="button" tabindex="0">
                 <span class="cdx-info-chip__text">+ ${label}</span>
             </span>`;
         
@@ -663,62 +671,62 @@ class HTMLArticleCreator {
             case ArticleCategory.LOCATION:
                 // Pattern: India, officially the Republic of India, is a country in South Asia.
                 return {
-                    formal: `${title} is ${article} ${chip('location_type', 'type')} in ${chip('parent_location', 'location')}.`,
-                    concise: `${title}: ${chip('location_type', 'type')} in ${chip('parent_location', 'location')}.`,
-                    detailed: `${title}, officially ${chip('official_name', 'official name')}, is ${article} ${chip('location_type', 'type')} in ${chip('parent_location', 'location')}. It is the ${chip('size_rank', 'rank')} ${chip('location_type', 'type')} by ${chip('area', 'area')} and has a population of ${chip('population', 'population')}. ${chip('notable_feature', 'notable feature')}.`
+                    formal: `${title} is ${article} ${chip('location_type', 'type')} in ${chip('parent_location', 'location')}. ${referenceChip}`,
+                    concise: `${title}: ${chip('location_type', 'type')} in ${chip('parent_location', 'location')}. ${referenceChip}`,
+                    detailed: `${title}, officially ${chip('official_name', 'official name')}, is ${article} ${chip('location_type', 'type')} in ${chip('parent_location', 'location')}. It is the ${chip('size_rank', 'rank')} ${chip('location_type', 'type')} by ${chip('area', 'area')} and has a population of ${chip('population', 'population')}. ${chip('notable_feature', 'notable feature')}. ${referenceChip}`
                 };
             case ArticleCategory.PERSON:
                 // Pattern: Albert Einstein (14 March 1879 – 18 April 1955) was a German-born theoretical physicist
                 return {
-                    formal: `${title} (${chip('birth_death', 'dates')}) was ${article} ${chip('nationality', 'nationality')} ${chip('profession', 'profession')}.`,
-                    concise: `${title}: ${chip('nationality', 'nationality')} ${chip('profession', 'profession')} (${chip('period', 'period')}).`,
-                    detailed: `${title} (${chip('birth_death', 'birth-death dates')}) was ${article} ${chip('nationality', 'nationality')} ${chip('profession', 'profession')} who is best known for ${chip('known_for', 'achievement')}. ${chip('additional_contribution', 'additional contribution')}. ${chip('recognition', 'recognition or award')}.`
+                    formal: `${title} (${chip('birth_death', 'dates')}) was ${article} ${chip('nationality', 'nationality')} ${chip('profession', 'profession')}. ${referenceChip}`,
+                    concise: `${title}: ${chip('nationality', 'nationality')} ${chip('profession', 'profession')} (${chip('period', 'period')}). ${referenceChip}`,
+                    detailed: `${title} (${chip('birth_death', 'birth-death dates')}) was ${article} ${chip('nationality', 'nationality')} ${chip('profession', 'profession')} who is best known for ${chip('known_for', 'achievement')}. ${chip('additional_contribution', 'additional contribution')}. ${chip('recognition', 'recognition or award')}. ${referenceChip}`
                 };
             case ArticleCategory.SPECIES:
                 // Pattern: The tiger (Panthera tigris) is a large cat and a member of the genus Panthera native to Asia
                 return {
-                    formal: `The ${title.toLowerCase()} (${chip('scientific_name', 'scientific name')}) is ${article} ${chip('classification', 'classification')} native to ${chip('native_region', 'region')}.`,
-                    concise: `${title}: ${chip('classification', 'type')} from ${chip('native_region', 'region')}.`,
-                    detailed: `The ${title.toLowerCase()} (${chip('scientific_name', 'scientific name')}) is ${article} ${chip('size_description', 'size')} ${chip('classification', 'classification')} and a member of the genus ${chip('genus', 'genus')} native to ${chip('native_region', 'region')}. It has ${chip('physical_description', 'physical features')} and ${chip('behavior', 'behavior')}. ${chip('habitat', 'habitat')}.`
+                    formal: `The ${title.toLowerCase()} (${chip('scientific_name', 'scientific name')}) is ${article} ${chip('classification', 'classification')} native to ${chip('native_region', 'region')}. ${referenceChip}`,
+                    concise: `${title}: ${chip('classification', 'type')} from ${chip('native_region', 'region')}. ${referenceChip}`,
+                    detailed: `The ${title.toLowerCase()} (${chip('scientific_name', 'scientific name')}) is ${article} ${chip('size_description', 'size')} ${chip('classification', 'classification')} and a member of the genus ${chip('genus', 'genus')} native to ${chip('native_region', 'region')}. It has ${chip('physical_description', 'physical features')} and ${chip('behavior', 'behavior')}. ${chip('habitat', 'habitat')}. ${referenceChip}`
                 };
             case ArticleCategory.ORGANIZATION:
                 // Pattern: Microsoft Corporation is an American multinational corporation and technology company
                 return {
-                    formal: `${title} is ${article} ${chip('nationality', 'nationality')} ${chip('org_type', 'organization type')} founded in ${chip('founding_year', 'year')}.`,
-                    concise: `${title}: ${chip('org_type', 'type')} founded in ${chip('founding_year', 'year')}.`,
-                    detailed: `${title} is ${article} ${chip('nationality', 'nationality')} ${chip('org_type', 'organization type')} and ${chip('industry', 'industry')} headquartered in ${chip('headquarters', 'location')}. Founded in ${chip('founding_year', 'year')}, the company ${chip('primary_business', 'primary business')}. ${chip('current_status', 'current status')}.`
+                    formal: `${title} is ${article} ${chip('nationality', 'nationality')} ${chip('org_type', 'organization type')} founded in ${chip('founding_year', 'year')}. ${referenceChip}`,
+                    concise: `${title}: ${chip('org_type', 'type')} founded in ${chip('founding_year', 'year')}. ${referenceChip}`,
+                    detailed: `${title} is ${article} ${chip('nationality', 'nationality')} ${chip('org_type', 'organization type')} and ${chip('industry', 'industry')} headquartered in ${chip('headquarters', 'location')}. Founded in ${chip('founding_year', 'year')}, the company ${chip('primary_business', 'primary business')}. ${chip('current_status', 'current status')}. ${referenceChip}`
                 };
             case ArticleCategory.EVENT:
                 // Pattern: World War II was a global conflict between two coalitions: the Allies and the Axis powers
                 return {
-                    formal: `${title} was ${article} ${chip('event_type', 'event type')} that occurred ${chip('time_period', 'time period')}.`,
-                    concise: `${title}: ${chip('event_type', 'type')} (${chip('dates', 'dates')}).`,
-                    detailed: `${title} (${chip('dates', 'dates')}) was ${article} ${chip('scope', 'scope')} ${chip('event_type', 'event type')} between ${chip('participants', 'participants')}. ${chip('significance', 'significance')}. ${chip('impact', 'impact')}.`
+                    formal: `${title} was ${article} ${chip('event_type', 'event type')} that occurred ${chip('time_period', 'time period')}. ${referenceChip}`,
+                    concise: `${title}: ${chip('event_type', 'type')} (${chip('dates', 'dates')}). ${referenceChip}`,
+                    detailed: `${title} (${chip('dates', 'dates')}) was ${article} ${chip('scope', 'scope')} ${chip('event_type', 'event type')} between ${chip('participants', 'participants')}. ${chip('significance', 'significance')}. ${chip('impact', 'impact')}. ${referenceChip}`
                 };
             case ArticleCategory.CREATIVE_WORK:
                 return {
-                    formal: `${title} is ${article} ${chip('work_type', 'work type')} by ${chip('creator', 'creator')} published in ${chip('year', 'year')}.`,
-                    concise: `${title}: ${chip('work_type', 'type')} by ${chip('creator', 'creator')} (${chip('year', 'year')}).`,
-                    detailed: `${title} is ${article} ${chip('work_type', 'work type')} created by ${chip('creator', 'creator')} and ${chip('publication_info', 'publication info')} in ${chip('year', 'year')}. ${chip('theme', 'theme')}. ${chip('reception', 'reception')}.`
+                    formal: `${title} is ${article} ${chip('work_type', 'work type')} by ${chip('creator', 'creator')} published in ${chip('year', 'year')}. ${referenceChip}`,
+                    concise: `${title}: ${chip('work_type', 'type')} by ${chip('creator', 'creator')} (${chip('year', 'year')}). ${referenceChip}`,
+                    detailed: `${title} is ${article} ${chip('work_type', 'work type')} created by ${chip('creator', 'creator')} and ${chip('publication_info', 'publication info')} in ${chip('year', 'year')}. ${chip('theme', 'theme')}. ${chip('reception', 'reception')}. ${referenceChip}`
                 };
             case ArticleCategory.CONCEPT:
                 return {
-                    formal: `${title} is ${article} ${chip('concept_type', 'concept type')} in ${chip('field', 'field')}.`,
-                    concise: `${title}: ${chip('concept_type', 'type')} in ${chip('field', 'field')}.`,
-                    detailed: `${title} is ${article} ${chip('concept_type', 'concept type')} in ${chip('field', 'field')} that ${chip('definition', 'definition')}. ${chip('development', 'development')}. ${chip('applications', 'applications')}.`
+                    formal: `${title} is ${article} ${chip('concept_type', 'concept type')} in ${chip('field', 'field')}. ${referenceChip}`,
+                    concise: `${title}: ${chip('concept_type', 'type')} in ${chip('field', 'field')}. ${referenceChip}`,
+                    detailed: `${title} is ${article} ${chip('concept_type', 'concept type')} in ${chip('field', 'field')} that ${chip('definition', 'definition')}. ${chip('development', 'development')}. ${chip('applications', 'applications')}. ${referenceChip}`
                 };
             default:
                 return {
-                    formal: `${title} is ${article} ${chip('type', 'type')} ${chip('description', 'description')}.`,
-                    concise: `${title}: ${chip('type', 'type')} ${chip('context', 'context')}.`,
-                    detailed: `${title} is ${article} ${chip('type', 'type')} ${categoryDescription} ${chip('significance', 'significance')}. ${chip('details', 'additional details')}.`
+                    formal: `${title} is ${article} ${chip('type', 'type')} ${chip('description', 'description')}. ${referenceChip}`,
+                    concise: `${title}: ${chip('type', 'type')} ${chip('context', 'context')}. ${referenceChip}`,
+                    detailed: `${title} is ${article} ${chip('type', 'type')} ${categoryDescription} ${chip('significance', 'significance')}. ${chip('details', 'additional details')}. ${referenceChip}`
                 };
         }
     }
     
     private getContextualChips(contextualChips: string[]): Record<string, string> {
         const chip = (detail: string, label: string) => `
-            <span class="cdx-info-chip cdx-info-chip--notice cdx-placeholder-chip" data-detail="${detail}">
+            <span class="cdx-info-chip cdx-info-chip--notice cdx-placeholder-chip" data-detail="${detail}" title="Click to add ${label}" role="button" tabindex="0">
                 <span class="cdx-info-chip__text">+ ${label}</span>
             </span>`;
         
@@ -743,7 +751,7 @@ class HTMLArticleCreator {
     
     private getCategorySpecificChips(category: ArticleCategory): Record<string, string> {
         const chip = (detail: string, label: string) => `
-            <span class="cdx-info-chip cdx-info-chip--notice cdx-placeholder-chip" data-detail="${detail}">
+            <span class="cdx-info-chip cdx-info-chip--notice cdx-placeholder-chip" data-detail="${detail}" title="Click to add ${label}" role="button" tabindex="0">
                 <span class="cdx-info-chip__text">+ ${label}</span>
             </span>`;
         
@@ -2102,11 +2110,11 @@ class HTMLArticleCreator {
 
     private chipifyPlaceholders(text: string): string {
         try {
-            // Convert occurrences of "+ label" into Codex chips
+            // Convert occurrences of "+ label" into enhanced Codex chips
             return text.replace(/\+\s([A-Za-z][A-Za-z _-]+)/g, (_m, label) => {
                 const key = String(label).toLowerCase().trim().replace(/\s+/g, '_');
                 return `
-                    <span class="cdx-info-chip cdx-info-chip--notice cdx-placeholder-chip" data-detail="${key}">
+                    <span class="cdx-info-chip cdx-info-chip--notice cdx-placeholder-chip" data-detail="${key}" title="Click to add ${label}" role="button" tabindex="0">
                         <span class="cdx-info-chip__text">+ ${label}</span>
                     </span>`;
             });

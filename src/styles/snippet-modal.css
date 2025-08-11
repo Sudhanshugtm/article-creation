@@ -178,6 +178,137 @@
   opacity: 1;
 }
 
+/* Enhanced Codex-style placeholder chips */
+.cdx-placeholder-chip {
+  display: inline-block;
+  background: var(--background-color-interactive-subtle, #f8f9fa);
+  color: var(--color-progressive, #3366cc);
+  border: 1px dashed var(--border-color-interactive, #c8ccd1);
+  border-radius: var(--border-radius-base, 2px);
+  font-size: 0.875rem;
+  font-weight: 500;
+  padding: 4px 8px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  margin: 0 2px;
+  white-space: nowrap;
+  user-select: none;
+  outline: none;
+}
+
+.cdx-placeholder-chip:hover {
+  background: var(--background-color-progressive-subtle, #eef3ff);
+  border-color: var(--color-progressive, #3366cc);
+  border-style: solid;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.cdx-placeholder-chip:focus {
+  border-color: var(--color-progressive, #3366cc);
+  border-style: solid;
+  box-shadow: 0 0 0 2px var(--color-progressive-subtle, #eef3ff);
+}
+
+.cdx-placeholder-chip:active {
+  background: var(--background-color-progressive, #3366cc);
+  color: var(--color-base, #ffffff);
+  border-color: var(--color-progressive, #3366cc);
+  transform: translateY(1px);
+}
+
+/* Enhanced reference chip with proper Codex styling */
+.cdx-chip--reference {
+  background: var(--background-color-notice-subtle, #fef6e7);
+  color: var(--color-notice, #ac6600);
+  border-color: var(--border-color-notice, #fc3);
+  border-style: solid;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.cdx-chip--reference:hover {
+  background: var(--background-color-notice, #fc3);
+  color: var(--color-base, #000000);
+  border-color: var(--color-notice, #ac6600);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.cdx-chip--reference .cdx-info-chip__icon {
+  display: inline-flex;
+  align-items: center;
+  margin-right: 4px;
+  vertical-align: middle;
+}
+
+.cdx-chip--reference .cdx-info-chip__icon svg {
+  fill: currentColor;
+}
+
+/* Enhanced more chip */
+.cdx-chip--more {
+  background: var(--background-color-base90, #f8f9fa);
+  color: var(--color-base20, #72777d);
+  border-color: var(--border-color-base, #c8ccd1);
+  border-style: solid;
+  font-style: italic;
+}
+
+.cdx-chip--more:hover {
+  background: var(--background-color-base80, #eaecf0);
+  color: var(--color-base10, #54595d);
+  border-color: var(--border-color-interactive, #a2a9b1);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+
+/* Keyboard navigation and accessibility improvements */
+.cdx-placeholder-chip:focus-visible,
+.cdx-chip--reference:focus-visible,
+.cdx-chip--more:focus-visible {
+  outline: 2px solid var(--color-progressive, #3366cc);
+  outline-offset: 1px;
+}
+
+/* Animation for smooth transitions */
+@keyframes chipPress {
+  0% { transform: scale(1); }
+  50% { transform: scale(0.95); }
+  100% { transform: scale(1); }
+}
+
+.cdx-placeholder-chip:active,
+.cdx-chip--reference:active,
+.cdx-chip--more:active {
+  animation: chipPress 0.1s ease-in-out;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .cdx-placeholder-chip {
+    border-width: 2px;
+    border-style: solid;
+  }
+  
+  .cdx-chip--reference,
+  .cdx-chip--more {
+    border-width: 2px;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .cdx-placeholder-chip,
+  .cdx-chip--reference,
+  .cdx-chip--more {
+    transition: none;
+  }
+  
+  .cdx-placeholder-chip:active,
+  .cdx-chip--reference:active,
+  .cdx-chip--more:active {
+    animation: none;
+    transform: none;
+  }
+}
+
 .detail-chip--filled {
   background: #36c;
   color: #fff;
