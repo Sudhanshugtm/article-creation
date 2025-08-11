@@ -41,9 +41,13 @@ class SectionExpansionManager {
     }
 
     private getExistingArticleContent(): string {
-        // Get the actual content from the page
-        const contentElement = document.getElementById('researchCareerContent');
-        return contentElement?.textContent || '';
+        // Get content from all current article sections
+        const sections = document.querySelectorAll('.article-section .article-section__content');
+        let content = '';
+        sections.forEach(section => {
+            content += section.textContent + ' ';
+        });
+        return content.trim();
     }
 
     private checkForAppliedSuggestions(): void {
@@ -226,7 +230,9 @@ class SectionExpansionManager {
     }
 
     private updateSuggestionCount(): void {
-        const totalSuggestions = 6; // 2 facts + 4 sections
+        // With the complete article, we now have more comprehensive content
+        // The suggestions will be more targeted to specific improvements
+        const totalSuggestions = 8; // Updated for enhanced suggestions
         const addedCount = this.addedContent.size;
         const remainingCount = totalSuggestions - addedCount;
         
