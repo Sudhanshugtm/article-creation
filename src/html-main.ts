@@ -20,7 +20,7 @@ import {
     cdxIconClose,
     cdxIconNext,
     cdxIconPrevious,
-    cdxIconReferenceExisting
+    cdxIconReference
 } from '@wikimedia/codex-icons';
 
 enum WorkflowState {
@@ -646,8 +646,8 @@ class HTMLArticleCreator {
             this.getContextualChips(contextualChips) : 
             this.getCategorySpecificChips(category);
         
-        // Enhanced reference chip with proper icon
-        const referenceIconPath = (cdxIconReferenceExisting as any).ltr || cdxIconReferenceExisting;
+        // Enhanced reference chip with improved icon
+        const referenceIconPath = (cdxIconReference as any).ltr || cdxIconReference;
         const referenceChip = `
             <span class="cdx-info-chip cdx-info-chip--notice cdx-chip--reference" data-detail="reference" title="Add reference">
                 <span class="cdx-info-chip__icon">
