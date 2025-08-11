@@ -97,7 +97,7 @@
     
     /* Responsive toolbar design */
     .article-creator__global-toolbar {
-      display: flex !important;
+      display: none; /* hidden by default */
       align-items: center !important;
       justify-content: flex-start !important;
       padding: 8px 20px !important;
@@ -105,6 +105,10 @@
       max-width: 800px !important;
       margin: 0 auto 24px !important;
       overflow: visible !important;
+    }
+    /* Only show toolbar during editing */
+    .article-creator.article-creator--editing .article-creator__global-toolbar {
+      display: flex !important;
     }
     @media (min-width: 768px) {
       .article-creator__global-toolbar {
