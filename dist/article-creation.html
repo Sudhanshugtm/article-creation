@@ -219,6 +219,57 @@
     })();
   </script>
   <script type="module" crossorigin src="/article-creation/assets/prototype-BKE4pTt0.js"></script>
+  <script>
+    (function() {
+      function cleanupLeadAndPrepare() {
+        try {
+          var app = document.getElementById('app');
+          var content = document.getElementById('articleContent');
+          var titleEl = document.querySelector('.article-editor__title-text');
+          if (!app || !content || !titleEl) return;
+          if (!app.classList.contains('article-creator--editing')) return;
+
+          // Remove any auto-generated lead paragraph if present
+          content.querySelectorAll('.article-lead').forEach(function(n){ n.remove(); });
+
+          // Set contextual placeholder based on title text
+          var topic = (titleEl.textContent || '').trim();
+          if (topic) {
+            content.setAttribute('data-placeholder', topic + ' is ...');
+          }
+
+          // If content is now empty, place caret at beginning so placeholder remains visible
+          if (!content.textContent || content.textContent.trim() === '') {
+            content.focus();
+            try {
+              var range = document.createRange();
+              range.selectNodeContents(content);
+              range.collapse(true);
+              var sel = window.getSelection();
+              if (sel) { sel.removeAllRanges(); sel.addRange(range); }
+            } catch (e) {}
+          }
+        } catch (e) {}
+      }
+
+      // Observe when editing mode is entered to clean up the auto lead
+      window.addEventListener('DOMContentLoaded', function() {
+        var app = document.getElementById('app');
+        if (!app) return;
+        var obs = new MutationObserver(function(muts){
+          muts.forEach(function(m){
+            if (m.attributeName === 'class') {
+              cleanupLeadAndPrepare();
+            }
+          });
+        });
+        obs.observe(app, { attributes: true });
+      });
+
+      // Also run after navigation restores state
+      window.addEventListener('pageshow', function(){ setTimeout(cleanupLeadAndPrepare, 0); });
+    })();
+  </script>
   <link rel="modulepreload" crossorigin href="/article-creation/assets/modulepreload-polyfill-B5Qt9EMX.js">
 </head>
 <body>
