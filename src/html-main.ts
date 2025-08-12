@@ -1479,6 +1479,39 @@ class HTMLArticleCreator {
                 'climate_adaptations': ['temperature tolerance', 'drought resistance', 'flood adaptations', 'seasonal adjustments', 'Custom...'],
                 'alternative_habitats': ['human-modified landscapes', 'protected reserves', 'restoration areas', 'corridor habitats', 'Custom...'],
                 'elevation_changes': ['higher altitudes', 'lower elevations', 'sea level areas', 'mountain peaks', 'Custom...']
+            },
+            [ArticleCategory.ORGANIZATION]: {
+                'nationality': ['American', 'British', 'German', 'Japanese', 'Chinese', 'Indian', 'French', 'Custom...'],
+                'org_type': ['corporation', 'company', 'non-profit organization', 'government agency', 'startup', 'institution', 'foundation', 'Custom...'],
+                'founding_year': ['2020', '2015', '2010', '2005', '2000', '1995', '1990', 'Custom...'],
+                'industry': ['technology', 'healthcare', 'finance', 'education', 'manufacturing', 'retail', 'entertainment', 'Custom...'],
+                'headquarters': ['San Francisco', 'New York', 'London', 'Tokyo', 'Berlin', 'Bangalore', 'Toronto', 'Custom...'],
+                'primary_business': ['develops software products', 'provides healthcare services', 'offers financial solutions', 'manufactures consumer goods', 'operates retail stores', 'produces entertainment content', 'Custom...'],
+                'current_status': ['It is publicly traded', 'It remains privately held', 'It was acquired', 'It is a subsidiary', 'It operates globally', 'Custom...']
+            },
+            [ArticleCategory.EVENT]: {
+                'event_type': ['war', 'conference', 'festival', 'competition', 'disaster', 'revolution', 'ceremony', 'Custom...'],
+                'time_period': ['from 1939 to 1945', 'in the 1960s', 'during the 21st century', 'in medieval times', 'in ancient history', 'in recent years', 'Custom...'],
+                'dates': ['1939-1945', 'July 16, 1969', 'September 11, 2001', '1776-1783', 'December 7, 1941', 'Custom...'],
+                'scope': ['global', 'international', 'national', 'regional', 'local', 'continental', 'worldwide', 'Custom...'],
+                'participants': ['Allied and Axis powers', 'multiple nations', 'thousands of participants', 'international delegates', 'competing teams', 'Custom...'],
+                'significance': ['It changed the course of history', 'It marked a turning point', 'It established new precedents', 'It had lasting impact', 'It transformed society', 'Custom...'],
+                'impact': ['The event reshaped global politics', 'It led to significant social changes', 'It advanced scientific understanding', 'It influenced cultural development', 'Custom...']
+            },
+            [ArticleCategory.CREATIVE_WORK]: {
+                'work_type': ['novel', 'film', 'painting', 'album', 'play', 'sculpture', 'documentary', 'Custom...'],
+                'creator': ['Stephen King', 'Steven Spielberg', 'Pablo Picasso', 'The Beatles', 'Shakespeare', 'Leonardo da Vinci', 'Custom...'],
+                'year': ['2023', '2020', '2015', '2010', '2000', '1990', '1980', 'Custom...'],
+                'publication_info': ['published by Random House', 'released by Universal Studios', 'exhibited at MoMA', 'recorded by Abbey Road Studios', 'Custom...'],
+                'theme': ['explores themes of love and loss', 'examines social justice', 'depicts historical events', 'celebrates human resilience', 'questions modern society', 'Custom...'],
+                'reception': ['It received critical acclaim', 'It became a bestseller', 'It won multiple awards', 'It was commercially successful', 'It influenced the genre', 'Custom...']
+            },
+            [ArticleCategory.CONCEPT]: {
+                'concept_type': ['theory', 'principle', 'method', 'framework', 'philosophy', 'law', 'hypothesis', 'Custom...'],
+                'field': ['physics', 'psychology', 'economics', 'mathematics', 'philosophy', 'computer science', 'biology', 'Custom...'],
+                'definition': ['describes the relationship between matter and energy', 'explains human behavioral patterns', 'provides a framework for understanding', 'establishes fundamental principles', 'Custom...'],
+                'development': ['It was first proposed in the early 1900s', 'It evolved over several decades', 'It was refined through extensive research', 'It emerged from practical applications', 'Custom...'],
+                'applications': ['modern physics', 'clinical psychology', 'economic policy', 'software engineering', 'medical research', 'educational systems', 'Custom...']
             }
         };
         
