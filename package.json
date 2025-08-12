@@ -6,7 +6,8 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "verify": "bash tools/verify-build.sh"
+    "verify": "bash tools/verify-build.sh",
+    "deploy": "npm run build && bash tools/deploy-gh-pages.sh"
   },
   "devDependencies": {
     "@types/node": "^20.11.0",
