@@ -24,6 +24,11 @@ class SuggestionsPageManager {
         
         // No API calls needed - suggestions are static and handled by HTML
         console.log('Suggestions manager initialized - using static article-specific suggestions');
+
+        // Prefetch Wikidata suggestions for the selected article to avoid delays on apply
+        this.prefetchWikidataSuggestions().catch(() => {
+            // Non-fatal for prototype
+        });
     }
 
     // Removed API loading methods - using static article-specific suggestions from HTML
@@ -53,6 +58,27 @@ class SuggestionsPageManager {
         if (this.clearButton) {
             this.clearButton.removeEventListener('click', this.handleClearClick);
             this.clearButton.addEventListener('click', this.handleClearClick);
+        }
+    }
+
+    private async prefetchWikidataSuggestions(): Promise<void> {
+        try {
+            const stored = sessionStorage.getItem('selectedArticle');
+            if (!stored) return;
+            const article = JSON.parse(stored);
+            const title = article?.wikipediaTitle || article?.title;
+            if (!title) return;
+            // Try to resolve entity by enwiki title
+            const resolved = await this.wikidataService.fetchEntityByWikipediaTitle(title);
+            const entityId = resolved?.id;
+            if (!entityId) return;
+            // Use empty existingContent for prefetch; expansion page performs its own filtering
+            const suggestions = await this.wikidataService.getEnhancementSuggestions('', entityId);
+            // Cache under a generic key the expansion page already reads
+            sessionStorage.setItem('wikidataSuggestions', JSON.stringify(suggestions));
+            console.log('Prefetched Wikidata suggestions for', title, '→', suggestions.length);
+        } catch (e) {
+            console.warn('Prefetch Wikidata failed:', e);
         }
     }
 
@@ -232,6 +258,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // Single, unified manager instance
     const suggestionsManager = new SuggestionsPageManager();
     
+    // Expose globally so inline renderer can rebind after dynamic DOM updates
+    try { (window as any).suggestionsManager = suggestionsManager; } catch {}
+
     // Initialize event listeners through the manager
     suggestionsManager.initializeEventListeners();
 });

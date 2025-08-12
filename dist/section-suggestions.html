@@ -4,13 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title id="pageTitle">What to improve?</title>
-  <link rel="modulepreload" crossorigin href="/article-creation/assets/codex-BYAibwde.js">
-  <link rel="modulepreload" crossorigin href="/article-creation/assets/WikidataEnhancementService-2MvXLlqh.js">
-  <link rel="stylesheet" crossorigin href="/article-creation/assets/codex-BGgWxIno.css">
-  <link rel="stylesheet" crossorigin href="/article-creation/assets/section-suggestions-Cp8aRV_-.css">
-  <script type="module" crossorigin src="/article-creation/assets/section-suggestions-DZdWYaYi.js"></script>
+  <!-- Dev-friendly: load source entry and CSS; Vite will bundle for prod -->
+  <script type="module" crossorigin src="/article-creation/assets/section-suggestions-7c3bhD11.js"></script>
   <link rel="modulepreload" crossorigin href="/article-creation/assets/modulepreload-polyfill-B5Qt9EMX.js">
-  <link rel="modulepreload" crossorigin href="/article-creation/assets/WikidataEnhancementService-2MvXLlqh-edISr3u7.js">
+  <link rel="modulepreload" crossorigin href="/article-creation/assets/WikidataEnhancementService-DbWP4Spv.js">
+  <link rel="stylesheet" crossorigin href="/article-creation/assets/section-suggestions-B4IHV9yj.css">
+  <link rel="stylesheet" crossorigin href="/article-creation/assets/codex-BxE_R6kp.css">
 </head>
 <body>
     <div class="suggestions-page">
@@ -35,10 +34,77 @@
 
         <main class="suggestions-page__main">
             <div class="suggestions-page__content">
-                <!-- Add a fact section -->
+                <!-- Add a new section (moved first) -->
+                <section class="suggestion-section">
+                    <h2 class="suggestion-section__title">Add a new section</h2>
+                    <div class="suggestion-list" id="sectionList">
+                        <div class="suggestion-item suggestion-item--section" data-section="awards-section">
+                            <button class="suggestion-item__add-btn">+</button>
+                            <div class="suggestion-item__content">
+                                <div class="suggestion-item__text">Awards</div>
+                                <div class="suggestion-item__hint">Mention all awards received</div>
+                                <div class="suggestion-item__placement">
+                                    <span class="cdx-icon cdx-icon--x-small suggestion-item__placement-icon">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+                                            <path d="M2 3v2h12V3H2zm0 4v2h12V7H2zm0 4v2h12v-2H2z"/>
+                                        </svg>
+                                    </span>
+                                    <span class="suggestion-item__placement-text">Will be positioned after "Recognition" section</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="suggestion-item suggestion-item--section" data-section="works-section">
+                            <button class="suggestion-item__add-btn">+</button>
+                            <div class="suggestion-item__content">
+                                <div class="suggestion-item__text">Notable Works</div>
+                                <div class="suggestion-item__hint">Highlight significant works listed on Wikidata</div>
+                                <div class="suggestion-item__placement">
+                                    <span class="cdx-icon cdx-icon--x-small suggestion-item__placement-icon">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+                                            <path d="M2 3v2h12V3H2zm0 4v2h12V7H2zm0 4v2h12v-2H2z"/>
+                                        </svg>
+                                    </span>
+                                    <span class="suggestion-item__placement-text">Will be positioned after "Research and career" section</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="suggestion-item suggestion-item--section" data-section="education-section">
+                            <button class="suggestion-item__add-btn">+</button>
+                            <div class="suggestion-item__content">
+                                <div class="suggestion-item__text">Education</div>
+                                <div class="suggestion-item__hint">Academic background and degrees</div>
+                                <div class="suggestion-item__placement">
+                                    <span class="cdx-icon cdx-icon--x-small suggestion-item__placement-icon">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+                                            <path d="M2 3v2h12V3H2zm0 4v2h12V7H2zm0 4v2h12v-2H2z"/>
+                                        </svg>
+                                    </span>
+                                    <span class="suggestion-item__placement-text">Will enhance "Early life and education" section</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="suggestion-item suggestion-item--section" data-section="personal-section">
+                            <button class="suggestion-item__add-btn">+</button>
+                            <div class="suggestion-item__content">
+                                <div class="suggestion-item__text">Personal life</div>
+                                <div class="suggestion-item__hint">Background and personal information</div>
+                                <div class="suggestion-item__placement">
+                                    <span class="cdx-icon cdx-icon--x-small suggestion-item__placement-icon">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+                                            <path d="M2 3v2h12V3H2zm0 4v2h12V7H2zm0 4v2h12v-2H2z"/>
+                                        </svg>
+                                    </span>
+                                    <span class="suggestion-item__placement-text">Will be positioned after "Early life and education" section</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Add a fact (moved second) -->
                 <section class="suggestion-section">
                     <h2 class="suggestion-section__title">Add a fact</h2>
-                    <div class="suggestion-list">
+                    <div class="suggestion-list" id="factList">
                         <label class="suggestion-item">
                             <input type="checkbox" class="suggestion-item__checkbox" data-fact="harvard">
                             <div class="suggestion-item__content">
@@ -70,71 +136,6 @@
                     </div>
                 </section>
 
-                <!-- Add a new section -->
-                <section class="suggestion-section">
-                    <h2 class="suggestion-section__title">Add a new section</h2>
-                    <div class="suggestion-list">
-                        <div class="suggestion-item suggestion-item--section" data-section="awards">
-                            <button class="suggestion-item__add-btn">+</button>
-                            <div class="suggestion-item__content">
-                                <div class="suggestion-item__text">Awards</div>
-                                <div class="suggestion-item__hint">Mention all awards received</div>
-                                <div class="suggestion-item__placement">
-                                    <span class="cdx-icon cdx-icon--x-small suggestion-item__placement-icon">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
-                                            <path d="M2 3v2h12V3H2zm0 4v2h12V7H2zm0 4v2h12v-2H2z"/>
-                                        </svg>
-                                    </span>
-                                    <span class="suggestion-item__placement-text">Will be positioned after "Recognition" section</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="suggestion-item suggestion-item--section" data-section="works">
-                            <button class="suggestion-item__add-btn">+</button>
-                            <div class="suggestion-item__content">
-                                <div class="suggestion-item__text">Notable Works</div>
-                                <div class="suggestion-item__hint">Highlight significant works listed on Wikidata</div>
-                                <div class="suggestion-item__placement">
-                                    <span class="cdx-icon cdx-icon--x-small suggestion-item__placement-icon">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
-                                            <path d="M2 3v2h12V3H2zm0 4v2h12V7H2zm0 4v2h12v-2H2z"/>
-                                        </svg>
-                                    </span>
-                                    <span class="suggestion-item__placement-text">Will be positioned after "Research and career" section</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="suggestion-item suggestion-item--section" data-section="education">
-                            <button class="suggestion-item__add-btn">+</button>
-                            <div class="suggestion-item__content">
-                                <div class="suggestion-item__text">Education</div>
-                                <div class="suggestion-item__hint">Academic background and degrees</div>
-                                <div class="suggestion-item__placement">
-                                    <span class="cdx-icon cdx-icon--x-small suggestion-item__placement-icon">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
-                                            <path d="M2 3v2h12V3H2zm0 4v2h12V7H2zm0 4v2h12v-2H2z"/>
-                                        </svg>
-                                    </span>
-                                    <span class="suggestion-item__placement-text">Will enhance "Early life and education" section</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="suggestion-item suggestion-item--section" data-section="personal">
-                            <button class="suggestion-item__add-btn">+</button>
-                            <div class="suggestion-item__content">
-                                <div class="suggestion-item__text">Personal life</div>
-                                <div class="suggestion-item__hint">Background and personal information</div>
-                                <div class="suggestion-item__placement">
-                                    <span class="cdx-icon cdx-icon--x-small suggestion-item__placement-icon">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
-                                            <path d="M2 3v2h12V3H2zm0 4v2h12V7H2zm0 4v2h12v-2H2z"/>
-                                        </svg>
-                                    </span>
-                                    <span class="suggestion-item__placement-text">Will be positioned after "Early life and education" section</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                 </section>
             </div>
         </main>
@@ -172,11 +173,40 @@
             document.getElementById('pageTitle').textContent = `What to improve? - ${article.title}`;
             document.getElementById('articleSubtitle').innerHTML = `${article.title} article • <span id="suggestionCount">8 ideas</span>`;
             
-            // Load article-specific suggestions
-            loadArticleSpecificSuggestions(article.id || 'katie-bouman');
+            // Load suggestions dynamically from cached Wikidata or fall back to presets
+            loadSuggestionsFromCacheOrFallback(article.id || 'katie-bouman');
         }
 
-        function loadArticleSpecificSuggestions(articleId) {
+        function loadSuggestionsFromCacheOrFallback(articleId) {
+            // Prefer suggestions prefetched from Wikidata and stored in sessionStorage
+            try {
+                const raw = sessionStorage.getItem('wikidataSuggestions');
+                if (raw) {
+                    const arr = JSON.parse(raw) || [];
+                    const facts = arr.filter(s => s.type === 'fact').map(s => ({
+                        id: s.id,
+                        text: s.content,
+                        placement: s.hint || 'Will be added where relevant'
+                    }));
+                    const sections = arr.filter(s => s.type === 'section').map(s => ({
+                        id: s.id,
+                        title: s.title,
+                        hint: s.hint || 'Suggested based on Wikidata',
+                        placement: 'Positioned based on article structure'
+                    }));
+                    if (facts.length + sections.length > 0) {
+                        updateSuggestionContent({ facts, sections });
+                        if (window.suggestionsManager && window.suggestionsManager.initializeEventListeners) {
+                            window.suggestionsManager.initializeEventListeners();
+                        }
+                        return; // Done
+                    }
+                }
+            } catch (e) {
+                console.warn('Failed to load cached Wikidata suggestions:', e);
+            }
+
+            // Fallback: static presets per article
             const suggestionSets = {
                 'katie-bouman': {
                     facts: [
@@ -193,13 +223,13 @@
                     ],
                     sections: [
                         {
-                            id: 'awards',
+                            id: 'awards-section',
                             title: 'Awards',
                             hint: 'Mention all awards received',
                             placement: 'Will be positioned after "Recognition" section'
                         },
                         {
-                            id: 'works',
+                            id: 'works-section',
                             title: 'Notable Works',
                             hint: 'Highlight significant works listed on Wikidata',
                             placement: 'Will be positioned after "Research and career" section'
@@ -226,19 +256,19 @@
                     ],
                     sections: [
                         {
-                            id: 'education',
+                            id: 'education-section',
                             title: 'Education',
                             hint: 'Academic background and degrees',
                             placement: 'Will be positioned after introduction'
                         },
                         {
-                            id: 'career',
+                            id: 'career-section',
                             title: 'Career',
                             hint: 'Professional positions and roles',
                             placement: 'Will be positioned after "Education" section'
                         },
                         {
-                            id: 'research',
+                            id: 'research-section',
                             title: 'Research',
                             hint: 'Detailed research contributions',
                             placement: 'Will be positioned after "Career" section'
@@ -265,13 +295,13 @@
                     ],
                     sections: [
                         {
-                            id: 'early-life',
+                            id: 'early-life-section',
                             title: 'Early life',
                             hint: 'Birth and family background',
                             placement: 'Will be positioned after introduction'
                         },
                         {
-                            id: 'legacy',
+                            id: 'legacy-section',
                             title: 'Legacy and impact',
                             hint: 'Influence on computer graphics field',
                             placement: 'Will be positioned after "Original publications" section'
@@ -298,19 +328,19 @@
                     ],
                     sections: [
                         {
-                            id: 'career',
+                            id: 'career-section',
                             title: 'Career',
                             hint: 'Academic positions and institutes founded',
                             placement: 'Will be positioned after introduction'
                         },
                         {
-                            id: 'research',
+                            id: 'research-section',
                             title: 'Research contributions',
                             hint: 'Key scientific contributions and theories',
                             placement: 'Will be positioned after "Career" section'
                         },
                         {
-                            id: 'legacy',
+                            id: 'legacy-section',
                             title: 'Legacy',
                             hint: 'Impact on physics and cybernetics',
                             placement: 'Will be positioned after "Research contributions" section'
@@ -337,7 +367,7 @@
                     ],
                     sections: [
                         {
-                            id: 'awards',
+                            id: 'awards-section',
                             title: 'Awards and recognition',
                             hint: 'Emmy, Reuben award, and other accolades',
                             placement: 'Will be positioned after existing content'
@@ -348,11 +378,14 @@
 
             const suggestions = suggestionSets[articleId] || suggestionSets['katie-bouman'];
             updateSuggestionContent(suggestions);
+            if (window.suggestionsManager && window.suggestionsManager.initializeEventListeners) {
+                window.suggestionsManager.initializeEventListeners();
+            }
         }
 
         function updateSuggestionContent(suggestions) {
             // Update fact suggestions
-            const factList = document.querySelector('.suggestion-section .suggestion-list');
+            const factList = document.getElementById('factList');
             if (factList && suggestions.facts) {
                 factList.innerHTML = '';
                 suggestions.facts.forEach(fact => {
@@ -377,8 +410,7 @@
             }
 
             // Update section suggestions
-            const sectionLists = document.querySelectorAll('.suggestion-section .suggestion-list');
-            const sectionList = sectionLists[1]; // Second list is for sections
+            const sectionList = document.getElementById('sectionList');
             if (sectionList && suggestions.sections) {
                 sectionList.innerHTML = '';
                 suggestions.sections.forEach(section => {

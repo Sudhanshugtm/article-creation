@@ -21,9 +21,26 @@ class SectionExpansionManager {
     }
 
     private async initialize(): Promise<void> {
-        await this.loadWikidataSuggestions();
+        // Apply any user-selected suggestions immediately without blocking on network
         this.checkForAppliedSuggestions();
         this.updateSuggestionCount();
+
+        // Load Wikidata suggestions in background with a short timeout so UI stays responsive
+        this.loadWikidataSuggestionsWithTimeout(3000).catch(() => {
+            // Silently ignore background load failures/timeouts for prototype smoothness
+        });
+    }
+
+    private async loadWikidataSuggestionsWithTimeout(timeoutMs: number): Promise<void> {
+        const timeoutPromise = new Promise<void>((resolve) => setTimeout(resolve, timeoutMs));
+        try {
+            await Promise.race([
+                this.loadWikidataSuggestions(),
+                timeoutPromise
+            ]);
+        } catch (e) {
+            // Ignore background load failures for prototype
+        }
     }
 
     private async loadWikidataSuggestions(): Promise<void> {
@@ -83,7 +100,12 @@ class SectionExpansionManager {
         const sectionsToAdd: string[] = [];
 
         suggestions.forEach(suggestionId => {
-            const [type, id] = suggestionId.split('-');
+            // Preserve the full ID after the first hyphen so IDs like
+            // 'section-awards-section' are handled correctly.
+            const hyphenIndex = suggestionId.indexOf('-');
+            if (hyphenIndex === -1) return;
+            const type = suggestionId.slice(0, hyphenIndex);
+            const id = suggestionId.slice(hyphenIndex + 1);
             if (type === 'fact') {
                 factsToAdd.push(id);
             } else if (type === 'section') {
@@ -106,7 +128,7 @@ class SectionExpansionManager {
             this.addedContent.add(id);
         });
         
-        // Update count
+        // Counter removed from UI; keep method as no-op
         this.updateSuggestionCount();
 
         // Show success feedback
@@ -156,7 +178,26 @@ class SectionExpansionManager {
         console.log('Available Wikidata suggestions:', Array.from(this.wikidataSuggestions.keys()));
         
         // Check if this is a Wikidata-based suggestion
-        const wikidataSuggestion = this.wikidataSuggestions.get(sectionId);
+        let wikidataSuggestion = this.wikidataSuggestions.get(sectionId);
+        // If not found, try normalizing '-section' suffix
+        if (!wikidataSuggestion && sectionId.endsWith('-section')) {
+            const baseId = sectionId.replace(/-section$/, '');
+            wikidataSuggestion = this.wikidataSuggestions.get(baseId) || this.wikidataSuggestions.get(`${baseId}-section`);
+        }
+        // Fuzzy match by title if still not found (e.g., Education vs education-section)
+        if (!wikidataSuggestion) {
+            const fallbackKey = sectionId.endsWith('-section') ? sectionId.replace(/-section$/, '') : sectionId;
+            const wantedTitle = fallbackKey.replace(/-/g, ' ').toLowerCase();
+            for (const s of this.wikidataSuggestions.values() as any) {
+                if (s?.type === 'section') {
+                    const title = (s.title || '').toLowerCase();
+                    if (title === wantedTitle || title.includes(wantedTitle) || wantedTitle.includes(title)) {
+                        wikidataSuggestion = s;
+                        break;
+                    }
+                }
+            }
+        }
         if (wikidataSuggestion) {
             console.log(`Found Wikidata suggestion for ${sectionId}:`, wikidataSuggestion);
             const section = document.createElement('section');
@@ -172,78 +213,94 @@ class SectionExpansionManager {
             return;
         }
         
-        // Fallback to hardcoded content for backward compatibility
+        // Fallback to generic content for prototype fidelity (personalized by selected title)
+        const subject = this.getSelectedArticleTitle();
         const sectionContent: Record<string, { title: string; content: string }> = {
             awards: {
                 title: 'Awards',
-                content: `<p>Bouman has received numerous awards and honors for her contributions to computational imaging and the Event Horizon Telescope project:</p>
+                content: `<p>${subject} has received recognition for contributions in their field:</p>
                 <ul>
-                    <li>2019 - Breakthrough Prize in Fundamental Physics (shared with EHT collaboration)</li>
-                    <li>2020 - Diamond Achievement Award from Purdue University</li>
-                    <li>2021 - Royal Photographic Society Progress Medal</li>
-                    <li>2022 - Named to MIT Technology Review's Innovators Under 35</li>
+                    <li>Year – Award or honor</li>
+                    <li>Year – Award or honor</li>
+                    <li>Year – Award or honor</li>
                 </ul>`
             },
             works: {
-                title: 'Notable Works',
-                content: `<p>Bouman has published extensively in the fields of computational imaging and black hole visualization:</p>
+                title: 'Notable works',
+                content: `<p>Selected works and publications by ${subject}:</p>
                 <ul>
-                    <li>"Computational Imaging for VLBI Image Reconstruction" (2016) - PhD thesis</li>
-                    <li>"CHIRP: Continuous High-resolution Image Reconstruction using Patch priors" (2016)</li>
-                    <li>"First M87 Event Horizon Telescope Results" (2019) - series of papers with EHT collaboration</li>
-                    <li>"Reconstructing Video from Interferometric Measurements of Time-Varying Sources" (2019)</li>
+                    <li>Year – Work title</li>
+                    <li>Year – Work title</li>
+                    <li>Year – Work title</li>
                 </ul>`
             },
             education: {
                 title: 'Education',
-                content: `<p>Bouman completed her education at prestigious institutions:</p>
+                content: `<p>Educational background for ${subject}:</p>
                 <ul>
-                    <li>B.S. in Electrical Engineering - University of Michigan (2011)</li>
-                    <li>M.S. in Electrical Engineering - Massachusetts Institute of Technology (2013)</li>
-                    <li>Ph.D. in Electrical Engineering and Computer Science - Massachusetts Institute of Technology (2017)</li>
-                </ul>
-                <p>Her doctoral advisor was William T. Freeman, and her thesis focused on "Computational Imaging for VLBI Image Reconstruction".</p>`
+                    <li>Degree or program – Institution (Year)</li>
+                    <li>Degree or program – Institution (Year)</li>
+                </ul>`
             },
             personal: {
                 title: 'Personal life',
-                content: `<p>Katie Bouman was born in 1989 in West Lafayette, Indiana. She grew up in an academic environment, with her father being a professor of electrical and computer engineering at Purdue University.</p>
-                <p>Bouman has spoken about the importance of interdisciplinary collaboration in science and has been an advocate for encouraging young women to pursue careers in STEM fields. She frequently gives talks at universities and conferences about computational imaging and the process behind capturing the first image of a black hole.</p>`
+                content: `<p>Personal background and notable life details for ${subject}.</p>`
+            },
+            career: {
+                title: 'Career',
+                content: `<p>Notable roles, appointments, and positions held by ${subject} across academia and industry.</p>`
+            },
+            research: {
+                title: 'Research contributions',
+                content: `<p>Key areas of research focus and significant contributions by ${subject}.</p>`
+            },
+            legacy: {
+                title: 'Legacy',
+                content: `<p>Long-term impact, influence, and recognition of ${subject} within their field.</p>`
+            },
+            'early-life': {
+                title: 'Early life',
+                content: `<p>Background, upbringing, and formative experiences of ${subject} leading to later career and research interests.</p>`
             }
         };
 
-        if (sectionContent[sectionId]) {
-            console.log(`Found hardcoded content for ${sectionId}: ${sectionContent[sectionId].title}`);
+        // Normalize to fallback keys if needed
+        const fallbackKey = sectionId.endsWith('-section') ? sectionId.replace(/-section$/, '') : sectionId;
+
+        if (sectionContent[fallbackKey]) {
+            console.log(`Found hardcoded content for ${fallbackKey}: ${sectionContent[fallbackKey].title}`);
             const section = document.createElement('section');
             section.className = 'article-section article-section--new';
             section.innerHTML = `
-                <h2 class="article-section__title">${sectionContent[sectionId].title}</h2>
+                <h2 class="article-section__title">${sectionContent[fallbackKey].title}</h2>
                 <div class="article-section__content">
-                    ${sectionContent[sectionId].content}
+                    ${sectionContent[fallbackKey].content}
                 </div>
             `;
             container.appendChild(section);
-            console.log(`Added hardcoded section: ${sectionContent[sectionId].title}`);
+            console.log(`Added hardcoded section: ${sectionContent[fallbackKey].title}`);
         } else {
             console.warn(`No content found for section ID: ${sectionId}`);
             console.log('Available hardcoded sections:', Object.keys(sectionContent));
         }
     }
 
+    private getSelectedArticleTitle(): string {
+        try {
+            const stored = sessionStorage.getItem('selectedArticle');
+            if (!stored) return 'This topic';
+            const parsed = JSON.parse(stored);
+            return parsed?.title || 'This topic';
+        } catch {
+            return 'This topic';
+        }
+    }
+
     private updateSuggestionCount(): void {
-        // With the complete article, we now have more comprehensive content
-        // The suggestions will be more targeted to specific improvements
-        const totalSuggestions = 8; // Updated for enhanced suggestions
-        const addedCount = this.addedContent.size;
-        const remainingCount = totalSuggestions - addedCount;
-        
-        const badge = document.getElementById('suggestionCount')!;
-        
-        if (remainingCount > 0) {
-            badge.textContent = `${remainingCount} ideas`;
-        } else {
-            badge.textContent = 'All done!';
-            const smartWidgetTrigger = document.getElementById('smartWidgetTrigger')!;
-            smartWidgetTrigger.style.opacity = '0.6';
+        // No counter UI anymore; if legacy badge exists in DOM, remove it
+        const badge = document.getElementById('suggestionCount');
+        if (badge && badge.parentElement) {
+            badge.parentElement.removeChild(badge);
         }
     }
 

@@ -42,9 +42,10 @@ export class WikidataEnhancementService {
     private readonly WIKIDATA_API = 'https://www.wikidata.org/w/api.php';
     private readonly KATIE_BOUMAN_ID = 'Q63080922'; // Katie Bouman's Wikidata ID
 
-    async getEnhancementSuggestions(existingContent: string): Promise<EnhancementSuggestion[]> {
+    async getEnhancementSuggestions(existingContent: string, entityIdOverride?: string): Promise<EnhancementSuggestion[]> {
         try {
-            const entity = await this.fetchEntity(this.KATIE_BOUMAN_ID);
+            const targetId = entityIdOverride || this.KATIE_BOUMAN_ID;
+            const entity = await this.fetchEntity(targetId);
             if (!entity) return [];
 
             const suggestions: EnhancementSuggestion[] = [];
@@ -75,6 +76,21 @@ export class WikidataEnhancementService {
         const data = await response.json();
         
         return data.entities?.[entityId] || null;
+    }
+
+    async fetchEntityByWikipediaTitle(enwikiTitle: string): Promise<{ id: string, entity: WikidataEntity } | null> {
+        const url = new URL(this.WIKIDATA_API);
+        url.searchParams.set('action', 'wbgetentities');
+        url.searchParams.set('sites', 'enwiki');
+        url.searchParams.set('titles', enwikiTitle);
+        url.searchParams.set('format', 'json');
+        url.searchParams.set('origin', '*');
+        const response = await fetch(url.toString());
+        const data = await response.json();
+        const entities = data.entities || {};
+        const firstKey = Object.keys(entities)[0];
+        if (!firstKey) return null;
+        return { id: firstKey, entity: entities[firstKey] };
     }
 
     private async generateFactSuggestions(entity: WikidataEntity, existingContent: string): Promise<EnhancementSuggestion[]> {
