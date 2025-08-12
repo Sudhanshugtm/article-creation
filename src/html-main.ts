@@ -292,7 +292,7 @@ class HTMLArticleCreator {
 
     private showCategorySelection(): void {
         this.setState(WorkflowState.CATEGORY_SELECTION);
-        this.categoryTitle.textContent = `What is ${this.searchTerm}?`;
+        this.categoryTitle.textContent = `What is "${this.searchTerm}"?`;
         this.displayCategories();
         this.renderChips(this.chipsContainer, null);
     }
@@ -666,9 +666,11 @@ class HTMLArticleCreator {
         // Enhanced reference chip with improved icon
         const referenceIconPath = (cdxIconReference as any).ltr || cdxIconReference;
         const referenceChip = `
-            <span class="cdx-info-chip cdx-info-chip--notice cdx-chip--reference" data-detail="reference" title="Add reference">
+            <span class="cdx-info-chip cdx-chip--reference" data-detail="reference" title="Add reference">
                 <span class="cdx-info-chip__icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 20 20" aria-hidden="true">${referenceIconPath}</svg>
+                    <span class="cdx-icon cdx-icon--medium" aria-hidden="true">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">${referenceIconPath}</svg>
+                    </span>
                 </span>
                 <span class="cdx-info-chip__text">Reference</span>
             </span>`;

@@ -26,7 +26,7 @@
   }
   
   .article-creator__category-list {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
     gap: var(--spacing-md);
   }
 }

@@ -235,11 +235,16 @@
 .cdx-chip--reference .cdx-info-chip__icon {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
   margin-right: 4px;
   vertical-align: middle;
 }
 
 .cdx-chip--reference .cdx-info-chip__icon svg {
+  width: 100%;
+  height: 100%;
   fill: currentColor;
 }
 

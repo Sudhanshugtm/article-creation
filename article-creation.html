@@ -56,7 +56,7 @@
     }
     
     .category-item__title {
-      margin-bottom: 4px !important;
+      margin-bottom: 2px !important;
       line-height: 1.3 !important;
     }
     
@@ -92,6 +92,8 @@
     }
     /* Hide the default page title in editor view */
     .article-creator.article-creator--editing .article-creator__title { display: none !important; }
+    /* Hide the in-editor H1 title entirely */
+    .article-editor__title { display: none !important; }
     
     
     /* Hide the New topic chip */
@@ -114,6 +116,23 @@
     .article-creator.article-creator--editing .article-creator__global-toolbar {
       display: flex !important;
     }
+    /* Editing mode spacing: ensure content clears toolbar */
+    .article-creator.article-creator--editing .article-creator__header {
+      margin-top: 24px !important;
+      margin-bottom: 0 !important;
+      padding-top: 0 !important;
+      padding-bottom: 0 !important;
+    }
+    .article-creator.article-creator--editing #globalToolbar {
+      margin-top: 0 !important;
+      padding: 8px 20px !important;
+      margin-bottom: 8px !important;
+    }
+    /* Add top padding while editing so content doesn't sit under toolbar */
+    .article-creator.article-creator--editing { padding-top: 64px !important; }
+
+    /* Push Next button to the far right within the toolbar */
+    #nextBtn { margin-left: auto !important; }
     @media (min-width: 768px) {
       .article-creator__global-toolbar { margin-bottom: 8px !important; }
     }
@@ -133,9 +152,7 @@
     .article-creator__global-toolbar { gap: 8px !important; }
 
     /* Ensure the header (with "New article") has space from anything above */
-    .article-creator__header {
-      margin-top: 24px !important;
-    }
+    .article-creator__header { margin-top: 24px !important; }
     @media (min-width: 768px) {
       .article-creator__header {
         margin-top: 32px !important;
@@ -175,7 +192,9 @@
     .article-editor__title { font-size: 24px; font-weight: 600; margin: 2px 0 2px 0; }
     .article-editor__title-text[contenteditable="true"][data-placeholder]:empty:before {
       content: attr(data-placeholder);
-      color: var(--color-disabled, #a2a9b1);
+      color: var(--color-base30, #72777d);
+      font-style: italic;
+      opacity: 0.95;
     }
     #articleContent[contenteditable="true"] {
       min-height: 1.4em;
@@ -185,16 +204,25 @@
       background: transparent;
       line-height: 1.6;
       font-size: 16px;
+      caret-color: #36c;
     }
     #articleContent[contenteditable="true"]:focus { outline: none; border: none; }
-    /* Placeholder for empty contenteditable */
+    /* Placeholder for empty contenteditable (simple "Topic is …" style) */
     #articleContent[contenteditable="true"][data-placeholder]:empty:before {
       content: attr(data-placeholder);
-      color: var(--color-disabled, #a2a9b1);
+      color: var(--color-base30, #72777d);
+      font-style: italic;
+      opacity: 0.95;
+      font-size: 18px;
       pointer-events: none;
     }
     .article-lead { margin-bottom: 8px; color: var(--color-base, #202122); }
     .article-editor__chips { margin-top: 4px; display: flex; gap: 8px; }
+    /* Toolbar layout improvements */
+    .article-creator__global-toolbar { flex-wrap: nowrap !important; }
+    .article-editor__tool { flex: 0 0 auto !important; min-width: 0 !important; }
+    #nextBtn { margin-left: auto !important; flex: 0 0 auto !important; }
+    .article-creator__global-toolbar .toolbar-spacer { display: none !important; }
 
     /* "...More" section styling */
     .editor-more-section {
@@ -314,7 +342,25 @@
       border-style: solid;
       background: #fff;
     }
-    .cdx-chip--reference { background: #eef6ff; border-color: #36c; }
+    .cdx-chip--reference { background: #eaf3ff; border-color: #36c; color: #36c; }
+    .cdx-chip--reference .cdx-info-chip__icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 18px;
+      height: 18px;
+      margin-right: 4px;
+      vertical-align: middle;
+    }
+    /* Hide any default pseudo-icon to ensure our SVG shows */
+    .cdx-chip--reference .cdx-info-chip__icon::before { content: none !important; }
+    .cdx-info-chip--notice.cdx-chip--reference .cdx-info-chip__icon::before { content: none !important; }
+    .cdx-chip--reference .cdx-info-chip__icon { background: none !important; }
+    .cdx-chip--reference .cdx-info-chip__icon svg {
+      width: 100%;
+      height: 100%;
+      fill: currentColor;
+    }
     .cdx-chip--more { background: #fff8e6; border-color: #f3cc6b; }
     .cdx-info-chip__input {
       border: none;
@@ -360,7 +406,9 @@
           // Set contextual placeholder based on title text
           var topic = (titleEl.textContent || '').trim();
           if (topic) {
-            content.setAttribute('data-placeholder', topic + ' is ...');
+            content.setAttribute('data-placeholder', topic + ' is …');
+          } else {
+            content.setAttribute('data-placeholder', 'Topic is …');
           }
 
           // If content is now empty, place caret at beginning so placeholder remains visible
@@ -395,11 +443,10 @@
       window.addEventListener('pageshow', function(){ setTimeout(cleanupLeadAndPrepare, 0); });
     })();
   </script>
-  <!-- Use source entry in dev; Vite rewrites for prod build -->
-  <script type="module" crossorigin src="/article-creation/assets/prototype-BwLlhEe-.js"></script>
-  <link rel="modulepreload" crossorigin href="/article-creation/assets/modulepreload-polyfill-B5Qt9EMX.js">
-  <link rel="stylesheet" crossorigin href="/article-creation/assets/codex-BxE_R6kp.css">
-  <link rel="stylesheet" crossorigin href="/article-creation/assets/section-expansion-Qg1vSYNK.css">
+  <!-- Dev-friendly sources for local; Vite will rewrite on build -->
+  <script type="module" src="./src/html-main.ts"></script>
+  <link rel="stylesheet" href="./src/styles/codex.css">
+  <link rel="stylesheet" href="./src/styles/section-expansion.css">
 </head>
 <body>
     <!-- Canvas version (to be phased out) -->
@@ -484,8 +531,8 @@
                     <!-- Chips will be populated here -->
                 </div>
                 
-                <h2 class="article-creator__section-title" id="categoryTitle">Help us categorize ""</h2>
-                <p class="article-creator__section-description">Select the category that best fits your new article:</p>
+                <h2 class="article-creator__section-title" id="categoryTitle">What is ""?</h2>
+                <p class="article-creator__section-description">Select the category that best describes your topic:</p>
                 
                 <div class="article-creator__category-list" id="categoryList">
                     <!-- Category options will be populated here -->
