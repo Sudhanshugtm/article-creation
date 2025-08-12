@@ -96,9 +96,7 @@
 }
 
 .article-card__meta {
-    display: flex;
-    gap: 20px;
-    flex-wrap: wrap;
+    display: none !important;
 }
 
 .article-card__meta-item {
