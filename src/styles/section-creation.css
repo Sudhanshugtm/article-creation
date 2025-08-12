@@ -110,11 +110,7 @@
 }
 
 .article-card__stats {
-    display: flex;
-    gap: 32px;
-    padding: 16px 0;
-    border-top: 1px solid #eaecf0;
-    border-bottom: 1px solid #eaecf0;
+    display: none !important;
 }
 
 .article-card__stat {
@@ -166,9 +162,7 @@
         height: 80px;
     }
     
-    .article-card__stats {
-        gap: 20px;
-    }
+    .article-card__stats { display: none !important; }
     
     .article-card__button {
         width: 100%;
