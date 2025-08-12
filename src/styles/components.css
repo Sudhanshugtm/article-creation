@@ -180,11 +180,67 @@
     background: var(--background-color-progressive--hover, #2a4b8d);
 }
 
-/* Hide mobile modal on desktop */
-@media (min-width: 769px) {
-    .mobile-chip-overlay {
-        display: none;
-    }
+/* Desktop inline dropdown for chips */
+.chip-dropdown-container {
+    background: #fff;
+    border: 1px solid var(--border-color-base, #a2a9b1);
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    padding: 8px;
+    min-width: 250px;
+    max-width: 350px;
+}
+
+.chip-dropdown-input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid var(--border-color-base, #a2a9b1);
+    border-radius: 4px;
+    font-size: 14px;
+    margin-bottom: 8px;
+}
+
+.chip-dropdown-input:focus {
+    outline: none;
+    border-color: var(--border-color-progressive, #36c);
+}
+
+.chip-dropdown-suggestions {
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.chip-dropdown-suggestion {
+    padding: 8px;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 14px;
+    transition: background-color 0.2s;
+}
+
+.chip-dropdown-suggestion:hover {
+    background: var(--background-color-interactive-subtle, #f8f9fa);
+}
+
+.chip-dropdown-suggestion--custom {
+    color: var(--color-base--subtle, #72777d);
+    font-style: italic;
+    border-top: 1px solid var(--border-color-subtle, #eaecf0);
+    margin-top: 4px;
+    padding-top: 12px;
+}
+
+.detail-chip--active {
+    background: var(--background-color-progressive--subtle, #eaf3ff) !important;
+    border-color: var(--border-color-progressive, #36c) !important;
+}
+
+.detail-chip--filled {
+    border-style: solid !important;
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+    cursor: text !important;
 }
 
 

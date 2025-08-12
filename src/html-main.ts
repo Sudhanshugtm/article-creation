@@ -1051,12 +1051,11 @@ class HTMLArticleCreator {
         // Check if this chip type has intelligent suggestions (async)
         this.getIntelligentSuggestions(detailType).then(suggestions => {
             if (suggestions.length > 0) {
-                // Check if mobile device
+                // Use modal for mobile, inline dropdown for desktop
                 if (this.isMobileDevice()) {
-                    this.createMobileModal(chipElement, detailType, currentText, originalText, suggestions);
+                    this.createChipModal(chipElement, detailType, currentText, originalText, suggestions);
                 } else {
-                    // Create dropdown with suggestions for desktop
-                    this.createIntelligentDropdown(chipElement, detailType, currentText, originalText, suggestions);
+                    this.createInlineDropdown(chipElement, detailType, currentText, originalText, suggestions);
                 }
             } else {
                 // Create inline input (existing behavior)
@@ -1189,7 +1188,32 @@ class HTMLArticleCreator {
                     return this.extractLabels(geoResult);
                     
                 case 'official_name':
-                    return ['the Republic of India', 'the State of California', 'the Kingdom of Thailand', 'the United States of America', 'the People\'s Republic of China'];
+                    // Generate contextual suggestions based on the current topic
+                    const topicName = this.searchTerm || '';
+                    const contextualSuggestions = [];
+                    
+                    // Check if it's a known country and provide accurate suggestions
+                    if (topicName.toLowerCase() === 'japan') {
+                        contextualSuggestions.push('日本国 (Nippon-koku)');
+                        contextualSuggestions.push('State of Japan');
+                    } else if (topicName.toLowerCase() === 'india') {
+                        contextualSuggestions.push('the Republic of India');
+                        contextualSuggestions.push('भारत गणराज्य (Bhārat Gaṇarājya)');
+                    } else if (topicName.toLowerCase() === 'china') {
+                        contextualSuggestions.push('the People\'s Republic of China');
+                        contextualSuggestions.push('中华人民共和国');
+                    } else if (topicName) {
+                        // Generic suggestions for other topics
+                        contextualSuggestions.push(`the State of ${topicName}`);
+                        contextualSuggestions.push(`the Republic of ${topicName}`);
+                        contextualSuggestions.push(`the Kingdom of ${topicName}`);
+                        contextualSuggestions.push(`the Commonwealth of ${topicName}`);
+                    }
+                    
+                    // Always add Custom option
+                    contextualSuggestions.push('Custom...');
+                    
+                    return contextualSuggestions.length > 0 ? contextualSuggestions : ['Custom...'];
                 
                 case 'location_type':
                     return ['country', 'city', 'state', 'province', 'region', 'territory', 'municipality', 'district'];
@@ -1465,7 +1489,7 @@ class HTMLArticleCreator {
         return window.innerWidth <= 768 || 'ontouchstart' in window;
     }
 
-    private createMobileModal(
+    private createChipModal(
         chipElement: HTMLElement,
         detailType: string,
         currentText: string,
@@ -1513,7 +1537,23 @@ class HTMLArticleCreator {
             suggestionBtn.className = 'mobile-chip-suggestion';
             suggestionBtn.textContent = suggestion;
             suggestionBtn.addEventListener('click', () => {
-                input.value = suggestion;
+                if (suggestion === 'Custom...') {
+                    // For Custom, just clear the input and focus
+                    input.value = '';
+                    input.placeholder = `Enter custom ${detailType.replace(/_/g, ' ')}`;
+                    input.focus();
+                } else {
+                    // For other suggestions, apply immediately and close
+                    chipElement.textContent = suggestion;
+                    // Remove all chip styling to make it look like normal text
+                    chipElement.classList.remove('detail-chip', 'detail-chip--placeholder', 'detail-chip--editing');
+                    chipElement.classList.add('detail-chip--filled');
+                    chipElement.style.background = 'transparent';
+                    chipElement.style.border = 'none';
+                    chipElement.style.padding = '0';
+                    chipElement.style.cursor = 'text';
+                    closeModal();
+                }
             });
             suggestionsSection.appendChild(suggestionBtn);
         });
@@ -1550,7 +1590,13 @@ class HTMLArticleCreator {
             const value = input.value.trim();
             if (value) {
                 chipElement.textContent = value;
-                chipElement.classList.remove('detail-chip--placeholder');
+                // Remove all chip styling to make it look like normal text
+                chipElement.classList.remove('detail-chip', 'detail-chip--placeholder', 'detail-chip--editing');
+                chipElement.classList.add('detail-chip--filled');
+                chipElement.style.background = 'transparent';
+                chipElement.style.border = 'none';
+                chipElement.style.padding = '0';
+                chipElement.style.cursor = 'text';
             }
             closeModal();
         };
@@ -1569,33 +1615,36 @@ class HTMLArticleCreator {
         input.select();
     }
     
-    private createIntelligentDropdown(
+    private createInlineDropdown(
         chipElement: HTMLElement, 
         detailType: string, 
         currentText: string, 
         originalText: string, 
         suggestions: string[]
     ): void {
-        // Create dropdown container
-        const dropdown = document.createElement('div');
-        dropdown.className = 'detail-chip__dropdown';
+        // Remove any existing dropdowns
+        document.querySelectorAll('.chip-dropdown-container').forEach(el => el.remove());
         
-        // Create input with autocomplete
+        // Create dropdown container that appears below the chip
+        const dropdownContainer = document.createElement('div');
+        dropdownContainer.className = 'chip-dropdown-container';
+        
+        // Create input field
         const input = document.createElement('input');
         input.type = 'text';
         input.value = currentText;
-        input.className = 'detail-chip__input detail-chip__input--dropdown';
-        input.placeholder = `Enter ${detailType} or select below`;
+        input.className = 'chip-dropdown-input';
+        input.placeholder = `Enter ${detailType.replace(/_/g, ' ')}`;
         
         // Create suggestions list
         const suggestionsList = document.createElement('div');
-        suggestionsList.className = 'detail-chip__suggestions';
+        suggestionsList.className = 'chip-dropdown-suggestions';
         
         suggestions.forEach(suggestion => {
             const suggestionItem = document.createElement('div');
-            suggestionItem.className = 'detail-chip__suggestion';
+            suggestionItem.className = 'chip-dropdown-suggestion';
             if (suggestion === 'Custom...') {
-                suggestionItem.className += ' detail-chip__suggestion--custom';
+                suggestionItem.className += ' chip-dropdown-suggestion--custom';
             }
             suggestionItem.textContent = suggestion;
             
@@ -1603,30 +1652,70 @@ class HTMLArticleCreator {
                 if (suggestion === 'Custom...') {
                     input.focus();
                     input.value = '';
-                    input.placeholder = `Enter custom ${detailType}...`;
+                    input.placeholder = `Enter custom ${detailType.replace(/_/g, ' ')}`;
                 } else {
-                    this.applySuggestion(chipElement, suggestion, originalText);
+                    // Apply the suggestion and remove dropdown
+                    chipElement.textContent = suggestion;
+                    chipElement.classList.remove('detail-chip');
+                    chipElement.classList.add('detail-chip--filled');
+                    dropdownContainer.remove();
                 }
             });
             
             suggestionsList.appendChild(suggestionItem);
         });
         
-        // Add input and suggestions to dropdown
-        dropdown.appendChild(input);
-        dropdown.appendChild(suggestionsList);
+        // Add elements to dropdown
+        dropdownContainer.appendChild(input);
+        dropdownContainer.appendChild(suggestionsList);
         
-        // Replace chip content with dropdown
-        chipElement.innerHTML = '';
-        chipElement.appendChild(dropdown);
-        chipElement.classList.add('detail-chip--editing', 'detail-chip--dropdown');
+        // Position dropdown below the chip
+        const chipRect = chipElement.getBoundingClientRect();
+        dropdownContainer.style.position = 'absolute';
+        dropdownContainer.style.top = `${chipRect.bottom + window.scrollY + 5}px`;
+        dropdownContainer.style.left = `${chipRect.left + window.scrollX}px`;
+        dropdownContainer.style.zIndex = '1000';
+        
+        // Add to body
+        document.body.appendChild(dropdownContainer);
+        
+        // Mark chip as active
+        chipElement.classList.add('detail-chip--active');
         
         // Focus input
         input.focus();
         input.select();
         
-        // Setup input handlers
-        this.setupDropdownHandlers(input, chipElement, originalText);
+        // Handle input events
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                const value = input.value.trim();
+                if (value) {
+                    chipElement.textContent = value;
+                    chipElement.classList.remove('detail-chip', 'detail-chip--active');
+                    chipElement.classList.add('detail-chip--filled');
+                    dropdownContainer.remove();
+                }
+            } else if (e.key === 'Escape') {
+                e.preventDefault();
+                chipElement.classList.remove('detail-chip--active');
+                dropdownContainer.remove();
+            }
+        });
+        
+        // Close dropdown when clicking outside
+        const closeDropdown = (e: MouseEvent) => {
+            if (!dropdownContainer.contains(e.target as Node) && e.target !== chipElement) {
+                chipElement.classList.remove('detail-chip--active');
+                dropdownContainer.remove();
+                document.removeEventListener('click', closeDropdown);
+            }
+        };
+        
+        setTimeout(() => {
+            document.addEventListener('click', closeDropdown);
+        }, 0);
     }
     
     private applySuggestion(chipElement: HTMLElement, suggestion: string, _originalText: string): void {
