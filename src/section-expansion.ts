@@ -136,36 +136,54 @@ class SectionExpansionManager {
     }
 
     private addFact(factId: string): void {
-        const content = document.getElementById('researchCareerContent')!;
-        const firstParagraph = content.querySelector('p')!;
-        
         console.log(`Adding fact: ${factId}`);
-        
+
+        // Prefer a specific section if present; otherwise target the article body first paragraph
+        const fallbackContainer = document.getElementById('articleBody');
+        const content = document.getElementById('researchCareerContent') || fallbackContainer;
+        if (!content) {
+            console.warn('No suitable container found to insert fact');
+            return;
+        }
+
+        let firstParagraph = content.querySelector('p');
+        if (!firstParagraph) {
+            firstParagraph = document.createElement('p');
+            content.appendChild(firstParagraph);
+        }
+
         // Check if this is a Wikidata-based suggestion
         const wikidataSuggestion = this.wikidataSuggestions.get(factId);
         if (wikidataSuggestion) {
-            // Add Wikidata fact to the content
-            const newFactHTML = `<span class="fact-highlight"> ${wikidataSuggestion.content}</span>`;
-            firstParagraph.innerHTML += newFactHTML;
+            const span = document.createElement('span');
+            span.className = 'fact-highlight';
+            span.textContent = ' ' + wikidataSuggestion.content;
+            firstParagraph.appendChild(span);
             console.log(`Added Wikidata fact: ${wikidataSuggestion.content}`);
             return;
         }
-        
+
         // Fallback to hardcoded logic for backward compatibility
         if (factId === 'harvard') {
             const harvardText = firstParagraph.innerHTML;
-            firstParagraph.innerHTML = harvardText.replace(
+            const replaced = harvardText.replace(
                 'on the Event Horizon Telescope Imaging team',
                 'on the Event Horizon Telescope Imaging team <span class="fact-highlight">(2018)</span>'
             );
+            if (replaced !== harvardText) {
+                firstParagraph.innerHTML = replaced;
+            } else {
+                const span = document.createElement('span');
+                span.className = 'fact-highlight';
+                span.textContent = ' (2018)';
+                firstParagraph.appendChild(span);
+            }
             console.log('Added Harvard fact');
         } else if (factId === 'caltech') {
-            const newText = ' She then joined the California Institute of Technology (Caltech) as an assistant professor in June 2019, where she was later promoted to associate professor of computing and mathematical sciences, electrical engineering, and astronomy, as well as a Rosenberg Scholar in 2024.<sup class="reference">[21]</sup>';
-            
-            // Add the fact to the end of the first paragraph
+            const newText = ' She then joined the California Institute of Technology (Caltech) as an assistant professor in June 2019, later promoted to associate professor.';
             const span = document.createElement('span');
             span.className = 'fact-highlight';
-            span.innerHTML = newText;
+            span.textContent = newText;
             firstParagraph.appendChild(span);
             console.log('Added Caltech fact');
         }
