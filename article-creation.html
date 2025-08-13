@@ -439,10 +439,6 @@
       margin: 0 auto 24px !important;
       overflow: visible !important;
     }
-    /* Only show toolbar during editing */
-    .article-creator.article-creator--editing .article-creator__global-toolbar {
-      display: flex !important;
-    }
     /* Editing mode spacing: ensure content clears toolbar */
     .article-creator.article-creator--editing .article-creator__header {
       margin-top: 24px !important;
@@ -455,14 +451,11 @@
       padding: 8px 20px !important;
       margin-bottom: 8px !important;
     }
-    /* Add top padding while editing so content doesn't sit under toolbar */
+    /* Default mobile padding for mobile toolbar */
     .article-creator.article-creator--editing { padding-top: 64px !important; }
 
     /* Push Next button to the far right within the toolbar */
     #nextBtn { margin-left: auto !important; }
-    @media (min-width: 768px) {
-      .article-creator__global-toolbar { margin-bottom: 8px !important; }
-    }
     /* Ensure toolbar remains usable on narrow screens */
     .article-creator__global-toolbar {
       overflow-x: auto !important;
@@ -516,7 +509,14 @@
     .article-editor__content { padding-top: 2px !important; }
     /* Editing view polish */
     .article-editor { max-width: 800px; margin: 0 auto; }
-    .article-editor__title { font-size: 24px; font-weight: 600; margin: 2px 0 2px 0; }
+    .article-editor__title { 
+      font-size: 24px; 
+      font-weight: 600; 
+      margin: 2px 0 8px 0;
+      text-align: left;
+      padding-left: 0;
+      line-height: 1.3;
+    }
     .article-editor__title-text[contenteditable="true"][data-placeholder]:empty:before {
       content: attr(data-placeholder);
       color: var(--color-base30, #72777d);
@@ -526,14 +526,37 @@
     #articleContent[contenteditable="true"] {
       min-height: 1.4em;
       padding: 0;
+      margin: 0;
       border: none;
       border-radius: 0;
       background: transparent;
       line-height: 1.6;
       font-size: 16px;
       caret-color: #36c;
+      text-align: left;
+      position: relative;
+      box-sizing: border-box;
+      width: 100%;
     }
-    #articleContent[contenteditable="true"]:focus { outline: none; border: none; }
+    #articleContent[contenteditable="true"]:focus { 
+      outline: none; 
+      border: none;
+    }
+    
+    /* Ensure cursor starts at the correct position */
+    #articleContent[contenteditable="true"]:empty:focus {
+      cursor: text;
+    }
+    
+    /* Hide placeholder when focused to show cursor properly */
+    #articleContent[contenteditable="true"]:focus:before {
+      opacity: 0.7;
+    }
+    
+    /* Ensure proper text alignment for all content */
+    #articleContent[contenteditable="true"] * {
+      text-align: left;
+    }
     /* Placeholder for empty contenteditable (simple "Topic is …" style) */
     #articleContent[contenteditable="true"][data-placeholder]:empty:before {
       content: attr(data-placeholder);
@@ -542,6 +565,12 @@
       opacity: 0.95;
       font-size: 18px;
       pointer-events: none;
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: auto;
+      z-index: 1;
     }
     .article-lead { margin-bottom: 8px; color: var(--color-base, #202122); }
     .article-editor__chips { margin-top: 4px; display: flex; gap: 8px; }
@@ -697,6 +726,212 @@
       padding: 2px 0;
       min-width: 140px;
     }
+
+    /* Fix for toolbar button SVG icons - ensure they inherit text color */
+    .cdx-button__icon svg {
+      fill: currentColor !important;
+    }
+    
+    /* Remove background color from button icons when they contain SVG */
+    .cdx-button__icon:has(svg) {
+      background-color: transparent !important;
+    }
+
+    /* Wikipedia-style Desktop Toolbar */
+    .wikipedia-toolbar {
+      display: none;
+      background: transparent;
+      border-bottom: none;
+      padding: 8px 24px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+      width: 100%;
+      overflow-x: hidden;
+    }
+
+    .wikipedia-toolbar__inner {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+      max-width: none;
+      margin: 0;
+    }
+
+    .toolbar-group {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding-right: 8px;
+      border-right: 1px solid #c8ccd1;
+    }
+
+    .toolbar-group:last-child {
+      border-right: none;
+    }
+
+    .toolbar-group--save {
+      border-right: none;
+    }
+
+    .toolbar-tool {
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .toolbar-tool .cdx-button__text {
+      font-size: 13px;
+    }
+
+    .toolbar-spacer {
+      flex: 1;
+    }
+
+    /* Format and Insert dropdowns */
+    .toolbar-group .cdx-select {
+      min-width: 120px;
+    }
+
+    /* Bring dropdown arrow closer to text */
+    .toolbar-group .cdx-select__indicator {
+      padding-left: 4px;
+    }
+
+    .toolbar-group .cdx-select__input {
+      font-size: 13px;
+      padding: 6px 8px;
+      border: none;
+      border-radius: 2px;
+      background: transparent;
+      outline: none;
+      box-shadow: none;
+    }
+
+    .toolbar-group .cdx-select__input:focus {
+      border: none;
+      box-shadow: none;
+      outline: none;
+    }
+
+    /* Remove any additional borders from select wrapper */
+    .toolbar-group .cdx-select__handle {
+      border: none;
+      background: transparent;
+    }
+
+    /* Ensure no borders on any select element states */
+    .toolbar-group .cdx-select,
+    .toolbar-group .cdx-select:hover,
+    .toolbar-group .cdx-select:focus,
+    .toolbar-group .cdx-select:active {
+      border: none !important;
+      outline: none !important;
+      box-shadow: none !important;
+    }
+
+    .toolbar-group select {
+      border: none !important;
+      outline: none !important;
+      box-shadow: none !important;
+    }
+
+    /* Desktop Title Section - Wikipedia Visual Editor style */
+    .desktop-title-section {
+      display: none;
+      background: #fff;
+      border-bottom: 1px solid #c8ccd1;
+      padding: 12px 0;
+    }
+
+    .desktop-title-section__inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 16px;
+    }
+
+    .desktop-title-section__title {
+      font-family: 'Linux Libertine', Georgia, Times, serif;
+      font-size: 28px;
+      font-weight: normal;
+      color: #000;
+      margin: 0;
+      line-height: 1.3;
+    }
+
+
+
+    /* Responsive Layout: Desktop vs Mobile */
+    @media (max-width: 768px) {
+      /* Mobile: Show mobile toolbar when editing, hide Wikipedia toolbar */
+      .wikipedia-toolbar {
+        display: none !important;
+      }
+      
+      .article-creator--editing .article-creator__global-toolbar {
+        display: flex !important;
+      }
+    }
+
+    @media (min-width: 769px) {
+      /* Desktop: Show all desktop editing components when editing */
+      .article-creator--editing .desktop-title-section {
+        display: block !important;
+      }
+
+      
+      .article-creator--editing .wikipedia-toolbar {
+        display: block !important;
+      }
+      
+      .article-creator__global-toolbar {
+        display: none !important;
+      }
+
+      /* Full-width editing area for desktop */
+      .article-creator {
+        max-width: 100%;
+      }
+
+      .article-creator__main {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 40px 20px;
+      }
+
+      /* Desktop article editor adjustments */
+      .article-creator--editing {
+        padding-top: 0 !important;
+      }
+
+      .article-creator--editing .article-creator__header {
+        display: none;
+      }
+
+      /* Proper spacing for editing section */
+      .article-creator--editing .article-creator__editing-section {
+        padding-top: 20px;
+        margin-top: 0;
+      }
+
+      /* Adjust article editor for desktop */
+      .article-creator--editing .article-editor {
+        max-width: 800px;
+        margin: 0 auto;
+      }
+
+      /* Position chips correctly below content */
+      .article-creator--editing .article-editor__chips {
+        margin-top: 24px;
+        padding-top: 16px;
+        border-top: 1px solid #eaecf0;
+        justify-content: center;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+    }
   </style>
   
   <script>
@@ -746,7 +981,23 @@
               range.selectNodeContents(content);
               range.collapse(true);
               var sel = window.getSelection();
-              if (sel) { sel.removeAllRanges(); sel.addRange(range); }
+              if (sel) { 
+                sel.removeAllRanges(); 
+                sel.addRange(range); 
+              }
+              // Ensure cursor is visible and positioned correctly
+              setTimeout(function() {
+                if (content === document.activeElement && (!content.textContent || content.textContent.trim() === '')) {
+                  var newRange = document.createRange();
+                  newRange.setStart(content, 0);
+                  newRange.collapse(true);
+                  var newSel = window.getSelection();
+                  if (newSel) {
+                    newSel.removeAllRanges();
+                    newSel.addRange(newRange);
+                  }
+                }
+              }, 10);
             } catch (e) {}
           }
         } catch (e) {}
@@ -771,7 +1022,7 @@
     })();
   </script>
   <!-- Dev-friendly sources for local; Vite will rewrite on build -->
-  <script type="module" crossorigin src="/article-creation/assets/prototype-D0PHS0vb.js"></script>
+  <script type="module" crossorigin src="/article-creation/assets/prototype-BK2m0qQS.js"></script>
   <link rel="modulepreload" crossorigin href="/article-creation/assets/modulepreload-polyfill-B5Qt9EMX.js">
   <link rel="stylesheet" crossorigin href="/article-creation/assets/codex-B5m2OaX5.css">
   <link rel="stylesheet" crossorigin href="/article-creation/assets/section-expansion-Qg1vSYNK.css">
@@ -779,7 +1030,7 @@
 <body>
     <!-- Canvas version (to be phased out) -->
     <canvas id="articleCanvas" style="display: none;"></canvas>
-    <input type="text" id="hiddenInput" aria-label="Type article title" style="display: none;" />
+    <input type="text" id="hiddenInput" aria-label="What would you like to write about?" style="display: none;" />
     
     <!-- New HTML version -->
     <div id="app" class="article-creator">
@@ -808,6 +1059,89 @@
                 <span class="cdx-button__icon"></span>
             </button>
         </div>
+
+        <!-- Desktop Title Section (shown only on desktop when editing) -->
+        <div class="desktop-title-section" id="desktopTitleSection" style="display: none;">
+            <div class="desktop-title-section__inner">
+                <h1 class="desktop-title-section__title" id="desktopTitle">Article Title</h1>
+            </div>
+        </div>
+
+
+        <!-- Wikipedia-style Desktop Toolbar (shown only on desktop) -->
+        <div class="wikipedia-toolbar" id="wikipediaToolbar" style="display: none;">
+            <div class="wikipedia-toolbar__inner">
+                <!-- History Group -->
+                <div class="toolbar-group toolbar-group--history">
+                    <button class="cdx-button cdx-button--action-default cdx-button--weight-quiet cdx-button--size-medium toolbar-tool" id="undoBtn2" title="Undo ⌘Z">
+                        <span class="cdx-button__icon"></span>
+                    </button>
+                    <button class="cdx-button cdx-button--action-default cdx-button--weight-quiet cdx-button--size-medium toolbar-tool" id="redoBtn" title="Redo ⌘⇧Z">
+                        <span class="cdx-button__icon"></span>
+                    </button>
+                </div>
+
+                <!-- Format Group -->
+                <div class="toolbar-group toolbar-group--format">
+                    <div class="cdx-select">
+                        <select class="cdx-select__input" id="formatSelect">
+                            <option value="paragraph">Paragraph</option>
+                            <option value="heading">Heading</option>
+                            <option value="subheading1">Sub-heading 1</option>
+                            <option value="subheading2">Sub-heading 2</option>
+                            <option value="subheading3">Sub-heading 3</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Style Group -->
+                <div class="toolbar-group toolbar-group--style">
+                    <button class="cdx-button cdx-button--action-default cdx-button--weight-quiet cdx-button--size-medium toolbar-tool" id="boldBtn2" title="Bold ⌘B">
+                        <span class="cdx-button__icon"></span>
+                    </button>
+                    <button class="cdx-button cdx-button--action-default cdx-button--weight-quiet cdx-button--size-medium toolbar-tool" id="italicBtn2" title="Italic ⌘I">
+                        <span class="cdx-button__icon"></span>
+                    </button>
+                </div>
+
+                <!-- Link Group -->
+                <div class="toolbar-group toolbar-group--link">
+                    <button class="cdx-button cdx-button--action-default cdx-button--weight-quiet cdx-button--size-medium toolbar-tool" id="linkBtn2" title="Link ⌘K">
+                        <span class="cdx-button__icon"></span>
+                    </button>
+                </div>
+
+                <!-- Citations Group -->
+                <div class="toolbar-group toolbar-group--citations">
+                    <button class="cdx-button cdx-button--action-default cdx-button--weight-quiet cdx-button--size-medium toolbar-tool" id="citeBtn" title="Cite ⌘⇧K">
+                        <span class="cdx-button__icon"></span>
+                    </button>
+                </div>
+
+                <!-- Insert Group -->
+                <div class="toolbar-group toolbar-group--insert">
+                    <div class="cdx-select">
+                        <select class="cdx-select__input" id="insertSelect">
+                            <option value="">Insert</option>
+                            <option value="image">Images and media</option>
+                            <option value="template">Template</option>
+                            <option value="table">Table</option>
+                            <option value="reference">References list</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Spacer -->
+                <div class="toolbar-spacer"></div>
+
+                <!-- Save Group -->
+                <div class="toolbar-group toolbar-group--save">
+                    <button class="cdx-button cdx-button--action-progressive cdx-button--weight-primary cdx-button--size-medium toolbar-tool" id="publishBtn" title="Publish page... ⌘S">
+                        <span class="cdx-button__text">Publish page...</span>
+                    </button>
+                </div>
+            </div>
+        </div>
         
         <header class="article-creator__header">
             <div class="article-creator__header-nav">
@@ -827,7 +1161,7 @@
                             type="text" 
                             id="articleTitleInput"
                             class="cdx-text-input__input"
-                            placeholder="Type article title"
+                            placeholder="What would you like to write about?"
                             aria-label="Article title"
                             autocomplete="off"
                             spellcheck="false"
