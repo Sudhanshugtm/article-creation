@@ -6,10 +6,337 @@
     <title>Article Creator</title>
   <!-- Dev-friendly styles; Vite will bundle these for production -->
   <style>
-    /* Only hide the unwanted dialogs - minimal CSS to not break existing styles */
-    .reference-dialog,
+    /* Only hide the add-link-dialog - we'll show reference-dialog when needed */
     .add-link-dialog {
       display: none !important;
+    }
+    
+    /* Reference dialog styling - now inline context */
+    .reference-dialog {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      margin-top: 8px;
+      max-width: 500px;
+      min-width: 350px;
+    }
+    
+    /* Responsive positioning for smaller screens */
+    @media (max-width: 600px) {
+      .reference-dialog {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        right: auto;
+        transform: translate(-50%, -50%);
+        max-width: 90vw;
+        min-width: 300px;
+        margin-top: 0;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+      }
+    }
+    
+    .reference-dialog.active {
+      display: block !important;
+    }
+    
+    .reference-dialog__content {
+      background: #fff;
+      border: 1px solid var(--border-color-base, #a2a9b1);
+      border-radius: 8px;
+      padding: 16px;
+      max-width: 500px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    }
+    
+    /* Position relative container for reference chip */
+    .reference-chip-container {
+      position: relative;
+      display: inline-block;
+    }
+    
+    .reference-dialog__title {
+      font-size: 18px;
+      font-weight: 600;
+      margin: 0 0 16px;
+    }
+    
+    .reference-dialog__field {
+      margin-bottom: 16px;
+    }
+    
+    .reference-dialog__label {
+      display: block;
+      font-weight: 500;
+      margin-bottom: 8px;
+      color: var(--color-base, #202122);
+    }
+    
+    .reference-dialog__input {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid var(--border-color-base, #a2a9b1);
+      border-radius: 4px;
+      font-size: 14px;
+    }
+    
+    .reference-dialog__input:focus {
+      outline: none;
+      border-color: var(--border-color-progressive, #36c);
+    }
+    
+    .reference-dialog__actions {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+      margin-top: 24px;
+    }
+    
+    .reference-dialog__button {
+      padding: 8px 16px;
+      border: 1px solid var(--border-color-base, #a2a9b1);
+      border-radius: 4px;
+      background: #fff;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    
+    .reference-dialog__button--primary {
+      background: var(--background-color-progressive, #36c);
+      color: #fff;
+      border-color: var(--border-color-progressive, #36c);
+    }
+    
+    .reference-dialog__button:hover {
+      background: var(--background-color-interactive-subtle, #f8f9fa);
+    }
+    
+    .reference-dialog__button--primary:hover {
+      background: var(--background-color-progressive--hover, #2a56a6);
+    }
+    
+    .reference-dialog__error {
+      color: #d73333;
+      font-size: 12px;
+      margin-top: 4px;
+    }
+    
+    .reference-dialog__loading {
+      text-align: center;
+      padding: 16px;
+    }
+    
+    .reference-dialog__spinner {
+      width: 20px;
+      height: 20px;
+      border: 2px solid #f3f3f3;
+      border-top: 2px solid #36c;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      display: inline-block;
+      margin-right: 8px;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    .reference-dialog__validation {
+      padding: 8px 12px;
+      border-radius: 4px;
+      font-size: 13px;
+      font-weight: 500;
+    }
+    
+    .reference-dialog__validation.reliable {
+      background: #eaf3ff;
+      color: #36c;
+      border: 1px solid #36c;
+    }
+    
+    .reference-dialog__validation.unknown {
+      background: #fff3cd;
+      color: #856404;
+      border: 1px solid #ffeaa7;
+    }
+    
+    .reference-dialog__suggestions {
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border-color-subtle, #eaecf0);
+    }
+    
+    .reference-dialog__suggestions-title {
+      font-weight: 500;
+      margin-bottom: 12px;
+      color: var(--color-base, #202122);
+    }
+    
+    .reference-suggestion-item {
+      display: flex;
+      align-items: center;
+      padding: 8px 12px;
+      margin-bottom: 8px;
+      background: var(--background-color-interactive-subtle, #f8f9fa);
+      border: 1px solid var(--border-color-subtle, #eaecf0);
+      border-radius: 4px;
+    }
+    
+    .reference-suggestion-item input[type="checkbox"] {
+      margin-right: 12px;
+      accent-color: var(--background-color-progressive, #36c);
+    }
+    
+    .reference-suggestion-content {
+      flex: 1;
+    }
+    
+    .reference-suggestion-field {
+      font-weight: 500;
+      color: var(--color-base, #202122);
+    }
+    
+    .reference-suggestion-value {
+      color: var(--color-base30, #72777d);
+      margin-left: 8px;
+    }
+    
+    .reference-suggestion-confidence {
+      font-size: 11px;
+      color: var(--color-base30, #72777d);
+      margin-left: auto;
+    }
+    
+    /* Visual indicator for chips populated from reference */
+    .cdx-chip--reference-populated {
+      background: #eef3ff !important;
+      border-color: #36c !important;
+      position: relative;
+    }
+    
+    .cdx-chip--reference-populated::after {
+      content: "📎";
+      font-size: 10px;
+      position: absolute;
+      top: -2px;
+      right: -2px;
+      background: #36c;
+      color: white;
+      border-radius: 50%;
+      width: 14px;
+      height: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 8px;
+    }
+    
+    /* Verification awareness styling */
+    .article-content-unverified {
+      background: #fffbf0 !important;
+      border-left: 3px solid #f3cc6b !important;
+      padding: 12px !important;
+      margin: 8px 0 !important;
+      border-radius: 4px !important;
+      position: relative;
+    }
+    
+    .article-content-verified {
+      background: transparent !important;
+      border: none !important;
+      padding: 0 !important;
+      margin: 0 !important;
+    }
+    
+    .verification-prompt {
+      display: none;
+      font-size: 12px;
+      color: #856404;
+      margin-top: 8px;
+      padding: 6px 12px;
+      background: #fff3cd;
+      border: 1px solid #ffeaa7;
+      border-radius: 4px;
+      position: relative;
+    }
+    
+    .verification-prompt.show {
+      display: block;
+    }
+    
+    .verification-prompt::before {
+      content: "💡";
+      margin-right: 6px;
+    }
+    
+    /* Reference chip state indicators */
+    .cdx-chip--reference.empty {
+      background: #f5f5f5 !important;
+      border-color: #a2a9b1 !important;
+      color: #72777d !important;
+    }
+    
+    .cdx-chip--reference.verified {
+      background: #eef3ff !important;
+      border-color: #36c !important;
+      color: #36c !important;
+    }
+    
+    /* Remove text cursor from reference chip completely */
+    .cdx-chip--reference {
+      cursor: pointer !important;
+      user-select: none !important;
+      pointer-events: all !important;
+    }
+    
+    .cdx-chip--reference * {
+      cursor: pointer !important;
+      user-select: none !important;
+      pointer-events: none !important;
+    }
+    
+    /* Ensure reference chip cannot be edited */
+    .cdx-chip--reference,
+    .cdx-chip--reference .cdx-info-chip__text,
+    .cdx-chip--reference .cdx-info-chip__icon {
+      -webkit-user-select: none !important;
+      -moz-user-select: none !important;
+      -ms-user-select: none !important;
+      user-select: none !important;
+      cursor: pointer !important;
+    }
+    
+    /* Wikipedia-style section dividers */
+    .article-section-divider {
+      border: none;
+      border-top: 1px solid var(--border-color-subtle, #eaecf0);
+      margin: 24px 0 16px 0;
+      background: none;
+    }
+    
+    .article-section {
+      margin-bottom: 16px;
+    }
+    
+    .article-section__heading {
+      font-family: Linux Libertine, Georgia, Times, serif;
+      font-size: 1.5rem;
+      font-weight: normal;
+      color: var(--color-base, #202122);
+      margin: 16px 0 12px 0;
+      padding-bottom: 4px;
+      border-bottom: 1px solid var(--border-color-subtle, #eaecf0);
+    }
+    
+    .article-section__content {
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--color-base, #202122);
+      margin-bottom: 12px;
     }
     
     /* Simple list layout for categories */
@@ -451,7 +778,7 @@
 <body>
     <!-- Canvas version (to be phased out) -->
     <canvas id="articleCanvas" style="display: none;"></canvas>
-    <input type="text" id="hiddenInput" aria-label="Type article title" style="display: none;" />
+    <input type="text" id="hiddenInput" aria-label="What would you like to write about?" style="display: none;" />
     
     <!-- New HTML version -->
     <div id="app" class="article-creator">
@@ -499,7 +826,7 @@
                             type="text" 
                             id="articleTitleInput"
                             class="cdx-text-input__input"
-                            placeholder="Type article title"
+                            placeholder="What would you like to write about?"
                             aria-label="Article title"
                             autocomplete="off"
                             spellcheck="false"
@@ -561,6 +888,10 @@
                         <span class="article-editor__title-text" id="articleTitleText"></span>
                     </h1>
                     <div id="articleContent" class="article-editor__content" contenteditable="true" tabindex="0" data-placeholder=""></div>
+                    <!-- Verification awareness prompt -->
+                    <div class="verification-prompt" id="verificationPrompt">
+                        Consider adding verification to improve article reliability
+                    </div>
                     <!-- Editor chips below the editable content area -->
                     <div class="article-editor__chips" id="editorChipsContainer"></div>
                 </div>
@@ -574,21 +905,22 @@
     <div class="reference-dialog" id="referenceDialog">
         <div class="reference-dialog__content">
             <h2 class="reference-dialog__title">
-                📎 Add Reference
+                📎 Add Reference to Verify Statement
             </h2>
             <form class="reference-dialog__form" id="referenceForm">
                 <div class="reference-dialog__field">
                     <label class="reference-dialog__label" for="referenceUrl">
-                        Article URL or Title
+                        Paste a reliable source URL to help verify this statement:
                     </label>
                     <input 
                         type="text" 
                         id="referenceUrl" 
                         class="reference-dialog__input"
-                        placeholder="https://example.com/article or Article Title"
+                        placeholder="https://britannica.com/biography/Albert-Einstein"
                         required
                     />
                     <div class="reference-dialog__error" id="referenceError" style="display: none;"></div>
+                    <div class="reference-dialog__validation" id="referenceValidation" style="display: none; margin-top: 8px;"></div>
                 </div>
                 
                 <div class="reference-dialog__field" id="referenceAccessField" style="display: none;">
@@ -609,7 +941,14 @@
                 
                 <div class="reference-dialog__loading" id="referenceLoading" style="display: none;">
                     <div class="reference-dialog__spinner"></div>
-                    Validating reference...
+                    Analyzing content...
+                </div>
+                
+                <div class="reference-dialog__suggestions" id="referenceSuggestions" style="display: none;">
+                    <div class="reference-dialog__suggestions-title">Found these details from the source:</div>
+                    <div class="reference-dialog__suggestion-items" id="suggestionItems">
+                        <!-- Suggestions will be populated here -->
+                    </div>
                 </div>
             </form>
             
@@ -617,8 +956,11 @@
                 <button type="button" class="reference-dialog__button" id="referenceCancelBtn">
                     Cancel
                 </button>
-                <button type="button" class="reference-dialog__button reference-dialog__button--primary" id="referenceInsertBtn" disabled>
-                    Insert Reference
+                <button type="button" class="reference-dialog__button reference-dialog__button--primary" id="referenceAnalyzeBtn" disabled style="display: none;">
+                    Analyze Content
+                </button>
+                <button type="button" class="reference-dialog__button reference-dialog__button--primary" id="referenceApplyBtn" disabled style="display: none;">
+                    Apply Suggestions
                 </button>
             </div>
         </div>

@@ -78,8 +78,16 @@ class HTMLArticleCreator {
     private referenceError!: HTMLElement;
     private referenceCancelBtn!: HTMLButtonElement;
     private referenceInsertBtn!: HTMLButtonElement;
+    private referenceAnalyzeBtn!: HTMLButtonElement;
+    private referenceApplyBtn!: HTMLButtonElement;
+    private referenceValidation!: HTMLElement;
+    private referenceSuggestions!: HTMLElement;
+    private suggestionItems!: HTMLElement;
     private referenceAccessField!: HTMLElement;
+    private verificationPrompt!: HTMLElement;
     private referenceCount: number = 0;
+    private verificationPromptShown: boolean = false;
+    private lastVerificationPromptTime: number = 0;
     // Add from Link dialog elements
     private addLinkDialog!: HTMLElement;
     private addLinkStep1!: HTMLElement;
@@ -158,7 +166,13 @@ class HTMLArticleCreator {
         this.referenceError = document.getElementById('referenceError') as HTMLElement;
         this.referenceCancelBtn = document.getElementById('referenceCancelBtn') as HTMLButtonElement;
         this.referenceInsertBtn = document.getElementById('referenceInsertBtn') as HTMLButtonElement;
+        this.referenceAnalyzeBtn = document.getElementById('referenceAnalyzeBtn') as HTMLButtonElement;
+        this.referenceApplyBtn = document.getElementById('referenceApplyBtn') as HTMLButtonElement;
+        this.referenceValidation = document.getElementById('referenceValidation') as HTMLElement;
+        this.referenceSuggestions = document.getElementById('referenceSuggestions') as HTMLElement;
+        this.suggestionItems = document.getElementById('suggestionItems') as HTMLElement;
         this.referenceAccessField = document.getElementById('referenceAccessField') as HTMLElement;
+        this.verificationPrompt = document.getElementById('verificationPrompt') as HTMLElement;
         
         // Add from Link dialog elements
         this.addLinkDialog = document.getElementById('addLinkDialog') as HTMLElement;
@@ -221,6 +235,11 @@ class HTMLArticleCreator {
         // Close button to return to article creation
         this.closeBtn.addEventListener('click', () => {
             this.exitArticleEditor();
+        });
+
+        // Next button - strategic verification awareness
+        this.nextBtn.addEventListener('click', () => {
+            this.handleNextButtonClick();
         });
 
         // Formatting buttons
@@ -384,18 +403,18 @@ class HTMLArticleCreator {
     }
 
     private getFriendlyCreationTitle(category: string, searchTerm: string): string {
-        // Map internal categories to user-friendly messages
+        // Map internal categories to user-friendly messages that empower the user
         const categoryMessages: Record<string, string> = {
-            'Person/Biography': `Ready to write about ${searchTerm}`,
-            'Geographic Location': `Let's create an article about ${searchTerm}`,
-            'Species/Biology': `Creating information about ${searchTerm}`,
-            'Organization': `Getting ready to document ${searchTerm}`,
-            'Event/History': `Preparing to chronicle ${searchTerm}`,
-            'Creative Work': `Ready to describe ${searchTerm}`,
-            'Concept/Abstract': `Let's define ${searchTerm}`
+            'Person/Biography': `You're writing the Wikipedia article for ${searchTerm}`,
+            'Geographic Location': `You're writing the Wikipedia article for ${searchTerm}`,
+            'Species/Biology': `You're writing the Wikipedia article for ${searchTerm}`,
+            'Organization': `You're writing the Wikipedia article for ${searchTerm}`,
+            'Event/History': `You're writing the Wikipedia article for ${searchTerm}`,
+            'Creative Work': `You're writing the Wikipedia article for ${searchTerm}`,
+            'Concept/Abstract': `You're writing the Wikipedia article for ${searchTerm}`
         };
         
-        return categoryMessages[category] || `Creating article about ${searchTerm}`;
+        return categoryMessages[category] || `You're writing the Wikipedia article for ${searchTerm}`;
     }
 
     private renderChips(container: HTMLElement, selectedTopic: TopicSelection | null): void {
@@ -666,13 +685,15 @@ class HTMLArticleCreator {
         // Enhanced reference chip with improved icon
         const referenceIconPath = (cdxIconReference as any).ltr || cdxIconReference;
         const referenceChip = `
-            <span class="cdx-info-chip cdx-chip--reference" data-detail="reference" title="Add reference">
-                <span class="cdx-info-chip__icon">
-                    <span class="cdx-icon cdx-icon--medium" aria-hidden="true">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">${referenceIconPath}</svg>
+            <span class="reference-chip-container">
+                <span class="cdx-info-chip cdx-chip--reference" data-detail="reference" title="Add reference" contenteditable="false">
+                    <span class="cdx-info-chip__icon" contenteditable="false">
+                        <span class="cdx-icon cdx-icon--medium" aria-hidden="true" contenteditable="false">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" contenteditable="false">${referenceIconPath}</svg>
+                        </span>
                     </span>
+                    <span class="cdx-info-chip__text" contenteditable="false">Reference</span>
                 </span>
-                <span class="cdx-info-chip__text">Reference</span>
             </span>`;
         
         const moreChip = `
@@ -1013,6 +1034,9 @@ class HTMLArticleCreator {
             });
         });
         
+        // Set initial verification awareness
+        this.updateVerificationStatus();
+        
         // Place caret at end
         const range = document.createRange();
         const sel = window.getSelection();
@@ -1031,7 +1055,7 @@ class HTMLArticleCreator {
         // Handle "reference" chip specially - show reference dialog
         if (detailType === 'reference') {
             console.log('Opening reference dialog');
-            this.openReferenceDialog();
+            this.openReferenceDialog(chipElement);
             return;
         }
         
@@ -1099,6 +1123,9 @@ class HTMLArticleCreator {
                 chipElement.innerHTML = `<span class="cdx-info-chip__text">${originalText}</span>`;
             }
             chipElement.classList.remove('cdx-info-chip--editing');
+            
+            // Update verification status after chip is filled
+            this.updateVerificationStatus();
         };
         
         const cancelEdit = () => {
@@ -1580,12 +1607,14 @@ class HTMLArticleCreator {
                     chipElement.textContent = suggestion;
                     // Remove all chip styling to make it look like normal text
                     chipElement.classList.remove('detail-chip', 'detail-chip--placeholder', 'detail-chip--editing');
-                    chipElement.classList.add('detail-chip--filled');
+                    chipElement.classList.add('detail-chip--filled', 'cdx-info-chip--filled');
                     chipElement.style.background = 'transparent';
                     chipElement.style.border = 'none';
                     chipElement.style.padding = '0';
                     chipElement.style.cursor = 'text';
                     closeModal();
+                    // Update verification status after chip is filled
+                    this.updateVerificationStatus();
                 }
             });
             suggestionsSection.appendChild(suggestionBtn);
@@ -1625,11 +1654,13 @@ class HTMLArticleCreator {
                 chipElement.textContent = value;
                 // Remove all chip styling to make it look like normal text
                 chipElement.classList.remove('detail-chip', 'detail-chip--placeholder', 'detail-chip--editing');
-                chipElement.classList.add('detail-chip--filled');
+                chipElement.classList.add('detail-chip--filled', 'cdx-info-chip--filled');
                 chipElement.style.background = 'transparent';
                 chipElement.style.border = 'none';
                 chipElement.style.padding = '0';
                 chipElement.style.cursor = 'text';
+                // Update verification status after chip is filled
+                this.updateVerificationStatus();
             }
             closeModal();
         };
@@ -1690,8 +1721,10 @@ class HTMLArticleCreator {
                     // Apply the suggestion and remove dropdown
                     chipElement.textContent = suggestion;
                     chipElement.classList.remove('detail-chip');
-                    chipElement.classList.add('detail-chip--filled');
+                    chipElement.classList.add('detail-chip--filled', 'cdx-info-chip--filled');
                     dropdownContainer.remove();
+                    // Update verification status after chip is filled
+                    this.updateVerificationStatus();
                 }
             });
             
@@ -1727,8 +1760,10 @@ class HTMLArticleCreator {
                 if (value) {
                     chipElement.textContent = value;
                     chipElement.classList.remove('detail-chip', 'detail-chip--active');
-                    chipElement.classList.add('detail-chip--filled');
+                    chipElement.classList.add('detail-chip--filled', 'cdx-info-chip--filled');
                     dropdownContainer.remove();
+                    // Update verification status after chip is filled
+                    this.updateVerificationStatus();
                 }
             } else if (e.key === 'Escape') {
                 e.preventDefault();
@@ -1767,11 +1802,14 @@ class HTMLArticleCreator {
             if (newValue) {
                 chipElement.textContent = newValue;
                 // Remove all chip styling to make it look like normal text
-                chipElement.classList.remove('detail-chip', 'detail-chip--editing', 'detail-chip--dropdown', 'detail-chip--filled');
+                chipElement.classList.remove('detail-chip', 'detail-chip--editing', 'detail-chip--dropdown');
+                chipElement.classList.add('detail-chip--filled', 'cdx-info-chip--filled');
                 chipElement.style.background = 'transparent';
                 chipElement.style.border = 'none';
                 chipElement.style.padding = '0';
                 chipElement.style.cursor = 'text';
+                // Update verification status after chip is filled
+                this.updateVerificationStatus();
             } else {
                 chipElement.textContent = originalText;
                 chipElement.classList.remove('detail-chip--editing', 'detail-chip--dropdown');
@@ -2192,6 +2230,11 @@ The lasting importance of ${entityName} can be measured by <span class="detail-c
     }
     
     private insertSectionWithFormatting(sectionTitle: string, sectionContent: string): void {
+        // Add Wikipedia-style horizontal divider before new section
+        const divider = document.createElement('hr');
+        divider.className = 'article-section-divider';
+        this.articleContent.appendChild(divider);
+        
         // Create proper HTML structure for section like Wikipedia
         const sectionElement = document.createElement('div');
         sectionElement.className = 'article-section';
@@ -2227,6 +2270,12 @@ The lasting importance of ${entityName} can be measured by <span class="detail-c
                 this.handleDetailChipClick(detail || '', chip as HTMLElement);
             });
         });
+        
+        // Update verification awareness after adding new section
+        setTimeout(() => this.updateVerificationStatus(), 500);
+        
+        // Show strategic verification prompt after section is added
+        setTimeout(() => this.showStrategicVerificationPrompt('section-added'), 800);
         
         // Scroll section into view
         sectionElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -2386,18 +2435,67 @@ The lasting importance of ${entityName} can be measured by <span class="detail-c
     }
     
     // Reference Dialog Methods
-    private openReferenceDialog(): void {
-        this.referenceDialog.style.display = 'flex';
+    private openReferenceDialog(chipElement?: HTMLElement): void {
+        // Close any existing dialogs first
+        document.querySelectorAll('.reference-dialog.active').forEach(dialog => {
+            dialog.classList.remove('active');
+        });
+
+        // Position dialog in context if chip element provided
+        if (chipElement) {
+            const container = chipElement.closest('.reference-chip-container') as HTMLElement;
+            if (container) {
+                // Append dialog to the container for proper positioning
+                container.appendChild(this.referenceDialog);
+                
+                // Check if dialog would go outside viewport and adjust if needed
+                setTimeout(() => {
+                    const dialogRect = this.referenceDialog.getBoundingClientRect();
+                    const viewportWidth = window.innerWidth;
+                    const viewportHeight = window.innerHeight;
+                    
+                    // Adjust horizontal positioning if dialog goes outside viewport
+                    if (dialogRect.right > viewportWidth - 20) {
+                        this.referenceDialog.style.left = 'auto';
+                        this.referenceDialog.style.right = '0';
+                    }
+                    
+                    // On mobile, use fixed positioning if dialog is too constrained
+                    if (viewportWidth <= 600) {
+                        this.referenceDialog.style.position = 'fixed';
+                        this.referenceDialog.style.top = '50%';
+                        this.referenceDialog.style.left = '50%';
+                        this.referenceDialog.style.transform = 'translate(-50%, -50%)';
+                        this.referenceDialog.style.right = 'auto';
+                    }
+                }, 10);
+            } else {
+                // Fallback: append to article content if no container found
+                this.articleContent.appendChild(this.referenceDialog);
+            }
+        } else {
+            // Fallback positioning if no chip element provided
+            document.body.appendChild(this.referenceDialog);
+        }
+        
+        this.referenceDialog.classList.add('active');
         this.referenceUrlInput.focus();
         this.setupReferenceDialogEventListeners();
         
-        // Set today's date as default access date
-        const today = new Date().toISOString().split('T')[0];
-        this.referenceAccessInput.value = today;
+        // Reset dialog to initial state
+        this.resetReferenceDialog();
     }
     
     private closeReferenceDialog(): void {
-        this.referenceDialog.style.display = 'none';
+        this.referenceDialog.classList.remove('active');
+        
+        // Reset positioning styles that may have been applied
+        this.referenceDialog.style.position = '';
+        this.referenceDialog.style.top = '';
+        this.referenceDialog.style.left = '';
+        this.referenceDialog.style.right = '';
+        this.referenceDialog.style.transform = '';
+        
         this.resetReferenceDialog();
     }
     
@@ -2406,68 +2504,70 @@ The lasting importance of ${entityName} can be measured by <span class="detail-c
         this.referencePreview.style.display = 'none';
         this.referenceLoading.style.display = 'none';
         this.referenceError.style.display = 'none';
+        this.referenceValidation.style.display = 'none';
+        this.referenceSuggestions.style.display = 'none';
         this.referenceAccessField.style.display = 'none';
+        
+        // Reset button states
+        this.referenceAnalyzeBtn.style.display = 'none';
+        this.referenceAnalyzeBtn.disabled = true;
+        this.referenceApplyBtn.style.display = 'none';
+        this.referenceApplyBtn.disabled = true;
         this.referenceInsertBtn.disabled = true;
+        
+        // Clear suggestions
+        this.suggestionItems.innerHTML = '';
     }
     
     private setupReferenceDialogEventListeners(): void {
         // Remove existing listeners to prevent duplicates
         this.referenceCancelBtn.removeEventListener('click', this.closeReferenceDialog);
-        this.referenceInsertBtn.removeEventListener('click', this.insertReference);
-        this.referenceUrlInput.removeEventListener('input', this.validateReference);
+        this.referenceAnalyzeBtn.removeEventListener('click', this.analyzeReferenceContent);
+        this.referenceApplyBtn.removeEventListener('click', this.applyReferenceSuggestions);
+        this.referenceUrlInput.removeEventListener('input', this.validateReferenceUrl);
         
         // Add listeners
         this.referenceCancelBtn.addEventListener('click', () => this.closeReferenceDialog());
-        this.referenceInsertBtn.addEventListener('click', () => this.insertReference());
-        this.referenceUrlInput.addEventListener('input', () => this.validateReference());
+        this.referenceAnalyzeBtn.addEventListener('click', () => this.analyzeReferenceContent());
+        this.referenceApplyBtn.addEventListener('click', () => this.applyReferenceSuggestions());
+        this.referenceUrlInput.addEventListener('input', () => this.validateReferenceUrl());
         
-        // Close dialog when clicking outside
-        this.referenceDialog.addEventListener('click', (e) => {
-            if (e.target === this.referenceDialog) {
+        // Close dialog when clicking outside (for in-context dialog)
+        document.addEventListener('click', (e) => {
+            const target = e.target as HTMLElement;
+            if (!this.referenceDialog.contains(target) && 
+                !target.closest('.reference-chip-container') &&
+                this.referenceDialog.classList.contains('active')) {
                 this.closeReferenceDialog();
             }
         });
     }
     
-    private async validateReference(): Promise<void> {
+    private async validateReferenceUrl(): Promise<void> {
         const url = this.referenceUrlInput.value.trim();
         
         if (!url) {
-            this.referencePreview.style.display = 'none';
-            this.referenceInsertBtn.disabled = true;
+            this.referenceValidation.style.display = 'none';
+            this.referenceAnalyzeBtn.style.display = 'none';
+            this.referenceAnalyzeBtn.disabled = true;
             this.referenceError.style.display = 'none';
             return;
         }
         
-        this.referenceLoading.style.display = 'flex';
-        this.referenceError.style.display = 'none';
-        this.referencePreview.style.display = 'none';
-        
-        try {
-            // Simulate validation delay (replace with actual validation)
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            
-            let referenceData;
-            
-            if (this.isValidUrl(url)) {
-                // Handle URL reference
-                referenceData = await this.fetchUrlMetadata(url);
-                this.referenceAccessField.style.display = 'block';
-            } else {
-                // Handle article title reference
-                referenceData = this.createTitleReference(url);
-                this.referenceAccessField.style.display = 'none';
-            }
-            
-            this.showReferencePreview(referenceData);
-            this.referenceInsertBtn.disabled = false;
-            
-        } catch (error) {
-            this.showReferenceError('Unable to validate reference. Please check the URL or article title.');
-            this.referenceInsertBtn.disabled = true;
-        } finally {
-            this.referenceLoading.style.display = 'none';
+        // Check if it's a valid URL
+        if (!this.isValidUrl(url)) {
+            this.showReferenceError('Please enter a valid URL');
+            return;
         }
+        
+        // Show source reliability validation
+        const reliability = this.validateSourceReliability(url);
+        this.showSourceValidation(reliability);
+        
+        // Enable analyze button
+        this.referenceAnalyzeBtn.style.display = 'inline-block';
+        this.referenceAnalyzeBtn.disabled = false;
+        this.referenceError.style.display = 'none';
     }
     
     private isValidUrl(string: string): boolean {
@@ -2520,11 +2620,6 @@ The lasting importance of ${entityName} can be measured by <span class="detail-c
         this.referencePreview.style.display = 'block';
     }
     
-    private showReferenceError(message: string): void {
-        this.referenceError.textContent = message;
-        this.referenceError.style.display = 'block';
-        this.referencePreview.style.display = 'none';
-    }
     
     private insertReference(): void {
         const url = this.referenceUrlInput.value.trim();
@@ -2588,6 +2683,385 @@ The lasting importance of ${entityName} can be measured by <span class="detail-c
         this.addLinkSuggestions.innerHTML = '';
         this.addLinkPreview.innerHTML = '';
         this.currentExtractedContent = null;
+    }
+    
+    private validateSourceReliability(url: string): 'reliable' | 'unknown' {
+        try {
+            const domain = new URL(url).hostname.toLowerCase();
+            
+            // Mock reliable sources based on Wikipedia's standards
+            const reliableDomains = [
+                'britannica.com',
+                'bbc.com', 'bbc.co.uk',
+                'reuters.com',
+                'nature.com',
+                'science.org',
+                'scholarly.com',
+                'jstor.org',
+                'pubmed.ncbi.nlm.nih.gov',
+                'stanford.edu',
+                'harvard.edu',
+                'mit.edu',
+                'nytimes.com',
+                'theguardian.com',
+                'washingtonpost.com'
+            ];
+            
+            const isReliable = reliableDomains.some(reliable => domain.includes(reliable));
+            return isReliable ? 'reliable' : 'unknown';
+        } catch {
+            return 'unknown';
+        }
+    }
+    
+    private showSourceValidation(reliability: 'reliable' | 'unknown'): void {
+        this.referenceValidation.style.display = 'block';
+        
+        if (reliability === 'reliable') {
+            this.referenceValidation.className = 'reference-dialog__validation reliable';
+            this.referenceValidation.textContent = '✅ Generally Reliable Source';
+        } else {
+            this.referenceValidation.className = 'reference-dialog__validation unknown';
+            this.referenceValidation.textContent = '⚠️ Source reliability unknown - verify quality';
+        }
+    }
+    
+    private async analyzeReferenceContent(): Promise<void> {
+        const url = this.referenceUrlInput.value.trim();
+        
+        // Show loading
+        this.referenceLoading.style.display = 'block';
+        this.referenceAnalyzeBtn.disabled = true;
+        
+        try {
+            // Simulate content extraction (2-3 seconds)
+            await new Promise(resolve => setTimeout(resolve, 2500));
+            
+            // Generate mock suggestions based on current topic and category
+            const suggestions = this.generateMockSuggestions(url);
+            this.showReferenceSuggestions(suggestions);
+            
+            // Hide loading, show suggestions and apply button
+            this.referenceLoading.style.display = 'none';
+            this.referenceSuggestions.style.display = 'block';
+            this.referenceApplyBtn.style.display = 'inline-block';
+            this.referenceApplyBtn.disabled = false;
+            
+        } catch (error) {
+            this.showReferenceError('Failed to analyze content. Please try again.');
+            this.referenceLoading.style.display = 'none';
+            this.referenceAnalyzeBtn.disabled = false;
+        }
+    }
+    
+    private generateMockSuggestions(url: string): Array<{field: string, value: string, confidence: number}> {
+        const domain = new URL(url).hostname.toLowerCase();
+        const topicName = this.searchTerm?.toLowerCase() || '';
+        const category = this.selectedTopic?.category as ArticleCategory || ArticleCategory.PERSON;
+        
+        // Generate contextual suggestions based on topic and category
+        const suggestions: Array<{field: string, value: string, confidence: number}> = [];
+        
+        if (category === ArticleCategory.PERSON) {
+            if (topicName.includes('einstein')) {
+                suggestions.push(
+                    {field: 'nationality', value: 'German-born', confidence: 92},
+                    {field: 'profession', value: 'theoretical physicist', confidence: 88},
+                    {field: 'birth_death', value: '1879-1955', confidence: 95}
+                );
+            } else {
+                suggestions.push(
+                    {field: 'nationality', value: 'nationality from source', confidence: 85},
+                    {field: 'profession', value: 'profession from source', confidence: 82},
+                    {field: 'period', value: 'active period', confidence: 78}
+                );
+            }
+        } else if (category === ArticleCategory.LOCATION) {
+            if (topicName.includes('tokyo') || topicName.includes('japan')) {
+                suggestions.push(
+                    {field: 'location_type', value: 'capital city', confidence: 94},
+                    {field: 'population', value: '37 million metro area', confidence: 89},
+                    {field: 'parent_location', value: 'Japan', confidence: 98}
+                );
+            } else {
+                suggestions.push(
+                    {field: 'location_type', value: 'type from source', confidence: 85},
+                    {field: 'parent_location', value: 'location from source', confidence: 87}
+                );
+            }
+        } else {
+            // Generic suggestions for other categories
+            suggestions.push(
+                {field: 'type', value: 'type from source', confidence: 85},
+                {field: 'description', value: 'description from source', confidence: 82}
+            );
+        }
+        
+        return suggestions;
+    }
+    
+    private showReferenceSuggestions(suggestions: Array<{field: string, value: string, confidence: number}>): void {
+        this.suggestionItems.innerHTML = '';
+        
+        suggestions.forEach((suggestion, index) => {
+            const item = document.createElement('div');
+            item.className = 'reference-suggestion-item';
+            item.innerHTML = `
+                <input type="checkbox" id="suggestion_${index}" checked>
+                <div class="reference-suggestion-content">
+                    <span class="reference-suggestion-field">${this.formatFieldName(suggestion.field)}</span>
+                    <span class="reference-suggestion-value">"${suggestion.value}"</span>
+                </div>
+                <span class="reference-suggestion-confidence">${suggestion.confidence}%</span>
+            `;
+            this.suggestionItems.appendChild(item);
+        });
+    }
+    
+    private formatFieldName(field: string): string {
+        return field.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+    }
+    
+    private async applyReferenceSuggestions(): Promise<void> {
+        const checkboxes = this.suggestionItems.querySelectorAll('input[type="checkbox"]:checked');
+        const selectedSuggestions: Array<{field: string, value: string}> = [];
+        
+        checkboxes.forEach((checkbox, index) => {
+            const suggestionItem = checkbox.closest('.reference-suggestion-item');
+            if (suggestionItem) {
+                const field = suggestionItem.querySelector('.reference-suggestion-field')?.textContent?.toLowerCase().replace(/\s+/g, '_') || '';
+                const value = suggestionItem.querySelector('.reference-suggestion-value')?.textContent?.replace(/"/g, '') || '';
+                selectedSuggestions.push({field, value});
+            }
+        });
+        
+        // Apply suggestions to chips in the article content
+        this.populateChipsFromSuggestions(selectedSuggestions);
+        
+        // Update verification status
+        this.updateVerificationStatus();
+        
+        // Close dialog
+        this.closeReferenceDialog();
+        
+        // Show success feedback
+        // TODO: Add visual feedback that chips were populated from reference
+    }
+    
+    private populateChipsFromSuggestions(suggestions: Array<{field: string, value: string}>): void {
+        suggestions.forEach(suggestion => {
+            const chip = this.articleContent.querySelector(`[data-detail="${suggestion.field}"]`) as HTMLElement;
+            if (chip) {
+                // Replace chip with the suggestion value
+                chip.textContent = suggestion.value;
+                chip.classList.remove('cdx-placeholder-chip');
+                chip.classList.add('cdx-info-chip--filled');
+                
+                // Add visual indicator that this came from a reference
+                chip.classList.add('cdx-chip--reference-populated');
+                chip.title = 'Populated from reference source';
+                
+                // Mark reference chip as verified if it exists
+                const referenceChip = this.articleContent.querySelector('[data-detail="reference"]');
+                if (referenceChip) {
+                    referenceChip.classList.remove('empty');
+                    referenceChip.classList.add('verified');
+                }
+            }
+        });
+    }
+    
+    private showReferenceError(message: string): void {
+        this.referenceError.textContent = message;
+        this.referenceError.style.display = 'block';
+        this.referenceValidation.style.display = 'none';
+    }
+    
+    private updateVerificationStatus(): void {
+        // Count filled chips vs total chips
+        const totalChips = this.articleContent.querySelectorAll('.cdx-info-chip[data-detail]:not([data-detail="reference"]):not([data-detail="more"])').length;
+        const filledChips = this.articleContent.querySelectorAll('.cdx-info-chip--filled:not([data-detail="reference"]):not([data-detail="more"])').length;
+        const referenceChip = this.articleContent.querySelector('[data-detail="reference"]');
+        const hasReference = referenceChip && referenceChip.classList.contains('verified');
+        
+        
+        // Determine verification status - but don't auto-trigger notifications
+        const isVerified = hasReference;
+        
+        // Apply visual states (background color changes only)
+        if (isVerified) {
+            this.articleContent.classList.remove('article-content-unverified');
+            this.articleContent.classList.add('article-content-verified');
+            this.verificationPrompt.classList.remove('show');
+            this.verificationPromptShown = false; // Reset so it can show again if reference is removed
+        } else if (filledChips >= 1) {
+            // Add subtle visual indicator but don't show prompt immediately
+            this.articleContent.classList.add('article-content-unverified');
+            this.articleContent.classList.remove('article-content-verified');
+            // Note: Prompt will be shown strategically via showStrategicVerificationPrompt()
+        }
+        
+        // Update reference chip visual state
+        if (referenceChip) {
+            if (hasReference) {
+                referenceChip.classList.remove('empty');
+                referenceChip.classList.add('verified');
+            } else {
+                referenceChip.classList.add('empty');
+                referenceChip.classList.remove('verified');
+            }
+        }
+    }
+    
+    private showStrategicVerificationPrompt(context: 'section-added' | 'next-clicked'): void {
+        console.log(`=== Strategic Verification Debug: ${context} ===`);
+        
+        // Check if we have a reference
+        const referenceChip = this.articleContent.querySelector('[data-detail="reference"]');
+        const hasReference = referenceChip && referenceChip.classList.contains('verified');
+        
+        // Context-aware throttling
+        const now = Date.now();
+        let shouldShowPrompt = false;
+        let hasRecentlyShown = false;
+        
+        if (context === 'section-added') {
+            // For section additions, use minimal throttling (5 seconds) to allow contextual prompts for each section
+            const throttleWindow = 5000;
+            hasRecentlyShown = (now - this.lastVerificationPromptTime) < throttleWindow;
+            shouldShowPrompt = !hasReference && !hasRecentlyShown;
+            console.log(`Debug - section-added: hasReference: ${hasReference}, hasRecentlyShown: ${hasRecentlyShown} (${Math.round((now - this.lastVerificationPromptTime) / 1000)}s ago)`);
+        } else if (context === 'next-clicked') {
+            // For Next button, use longer throttling (30 seconds) since it's less contextual
+            const throttleWindow = 30000;
+            hasRecentlyShown = (now - this.lastVerificationPromptTime) < throttleWindow;
+            shouldShowPrompt = !hasReference && !hasRecentlyShown;
+            console.log(`Debug - next-clicked: hasReference: ${hasReference}, hasRecentlyShown: ${hasRecentlyShown} (${Math.round((now - this.lastVerificationPromptTime) / 1000)}s ago)`);
+        }
+        
+        console.log(`Debug - shouldShowPrompt: ${shouldShowPrompt}`);
+        
+        if (shouldShowPrompt) {
+            console.log(`✅ Showing strategic verification prompt: ${context}`);
+            
+            // Create contextual prompt positioned near unreferenced content
+            this.showContextualVerificationPrompt(context);
+            
+            this.verificationPromptShown = true;
+            this.lastVerificationPromptTime = now;
+        } else if (hasRecentlyShown) {
+            console.log(`🚫 Throttled verification prompt (${context}) - shown ${Math.round((now - this.lastVerificationPromptTime) / 1000)}s ago`);
+        } else if (hasReference) {
+            console.log(`ℹ️ Reference already exists - no prompt needed`);
+        }
+    }
+    
+    private showContextualVerificationPrompt(context: 'section-added' | 'next-clicked'): void {
+        // Find the best position for the prompt based on content structure
+        const articleContent = document.getElementById('articleContent');
+        if (!articleContent) return;
+
+        // Remove prompt from its current fixed position
+        this.verificationPrompt.classList.remove('show');
+        
+        // Create a new contextual prompt element
+        const contextualPrompt = this.verificationPrompt.cloneNode(true) as HTMLElement;
+        const timestamp = Date.now();
+        contextualPrompt.id = `contextualVerificationPrompt_${timestamp}`;
+        contextualPrompt.classList.add('contextual-verification-prompt');
+        
+        // Find insertion point based on context
+        let insertionPoint: Element | null = null;
+        
+        if (context === 'section-added') {
+            // Position before the most recently added section header
+            const sections = articleContent.querySelectorAll('h2, h3');
+            if (sections.length > 0) {
+                // Find the last section and insert before it
+                const lastSection = sections[sections.length - 1];
+                insertionPoint = lastSection;
+                // Special flag to insert before instead of after
+                insertionPoint.setAttribute('data-insert-before', 'true');
+            } else {
+                // No sections yet, position after the first paragraph (introduction)
+                const firstParagraph = articleContent.querySelector('p');
+                if (firstParagraph) {
+                    insertionPoint = firstParagraph;
+                }
+            }
+        } else if (context === 'next-clicked') {
+            // Position after the introduction paragraph
+            const firstParagraph = articleContent.querySelector('p');
+            if (firstParagraph) {
+                insertionPoint = firstParagraph;
+            }
+        }
+        
+        // If we couldn't find a good insertion point, fall back to after first paragraph or article start
+        if (!insertionPoint) {
+            const firstParagraph = articleContent.querySelector('p');
+            insertionPoint = firstParagraph || articleContent.firstElementChild;
+        }
+        
+        // For section-added context, allow multiple prompts to exist
+        // For next-clicked context, remove existing prompts to avoid clutter
+        if (context === 'next-clicked') {
+            const existingPrompts = articleContent.querySelectorAll('#contextualVerificationPrompt, .contextual-verification-prompt');
+            existingPrompts.forEach(prompt => prompt.remove());
+        }
+        
+        // Insert the contextual prompt
+        if (insertionPoint) {
+            // Check if a prompt already exists near this section to avoid duplicates
+            const shouldInsertBefore = insertionPoint.hasAttribute('data-insert-before');
+            let existingNearbyPrompt: Element | null = null;
+            
+            if (shouldInsertBefore) {
+                // Check for existing prompt before this section
+                existingNearbyPrompt = insertionPoint.previousElementSibling?.classList.contains('contextual-verification-prompt') 
+                    ? insertionPoint.previousElementSibling : null;
+            } else {
+                // Check for existing prompt after this element
+                existingNearbyPrompt = insertionPoint.nextElementSibling?.classList.contains('contextual-verification-prompt') 
+                    ? insertionPoint.nextElementSibling : null;
+            }
+            
+            if (existingNearbyPrompt) {
+                console.log('📍 Prompt already exists near this location, skipping duplicate');
+                return;
+            }
+            
+            // Add some contextual styling
+            contextualPrompt.style.margin = '16px 0';
+            contextualPrompt.style.position = 'static';
+            contextualPrompt.classList.add('show');
+            
+            if (shouldInsertBefore) {
+                // Insert before the target element (e.g., before section header)
+                insertionPoint.parentNode?.insertBefore(contextualPrompt, insertionPoint);
+                insertionPoint.removeAttribute('data-insert-before'); // Clean up
+                console.log(`📍 Contextual verification prompt positioned before:`, insertionPoint.tagName, insertionPoint.textContent?.slice(0, 50) + '...');
+            } else {
+                // Insert after the target element (e.g., after paragraph)
+                insertionPoint.parentNode?.insertBefore(contextualPrompt, insertionPoint.nextSibling);
+                console.log(`📍 Contextual verification prompt positioned after:`, insertionPoint.tagName, insertionPoint.textContent?.slice(0, 50) + '...');
+            }
+        } else {
+            // Fallback to original positioning
+            this.verificationPrompt.classList.add('show');
+            console.log('📍 Using fallback verification prompt positioning');
+        }
+    }
+    
+    private handleNextButtonClick(): void {
+        console.log('Next button clicked - checking verification status');
+        
+        // Show strategic verification prompt before proceeding
+        this.showStrategicVerificationPrompt('next-clicked');
+        
+        // Add actual Next button functionality here
+        // For now, just log the action since the button doesn't have workflow implementation yet
+        console.log('Next button functionality would continue here');
     }
     
     private setupAddLinkEventListeners(): void {
