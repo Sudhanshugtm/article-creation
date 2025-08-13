@@ -203,8 +203,10 @@ class HTMLArticleCreator {
             iconSpan.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" aria-hidden="true">${cdxIconAdd}</svg>`;
         }
         
-        // Initialize toolbar icons
-        this.initializeToolbarIcons();
+        // Initialize toolbar icons with a small delay to ensure DOM is ready
+        setTimeout(() => {
+            this.initializeToolbarIcons();
+        }, 0);
     }
 
     private setupEventListeners(): void {
@@ -2385,126 +2387,97 @@ The lasting importance of ${entityName} can be measured by <span class="detail-c
 
 
     private initializeToolbarIcons(): void {
-        // Inject inline SVG icons into toolbar button icon spans
-        const iconSize = 20;
+        console.log('🔧 DEBUG: Starting initializeToolbarIcons');
         
-        // Close button (string)
-        const closeIconSpan = this.closeBtn.querySelector('.cdx-button__icon');
-        if (closeIconSpan) {
-            closeIconSpan.innerHTML =
-                `<svg xmlns="http://www.w3.org/2000/svg" width="${iconSize}" height="${iconSize}" viewBox="0 0 20 20" aria-hidden="true">${cdxIconClose}</svg>`;
-        }
+        // Debug: Log all imported icon data
+        console.log('📝 DEBUG: Imported icon data:', {
+            cdxIconUndo,
+            cdxIconRedo, 
+            cdxIconBold,
+            cdxIconItalic,
+            cdxIconLink,
+            cdxIconReference,
+            cdxIconClose,
+            cdxIconEllipsis,
+            cdxIconNext
+        });
         
-        // Bold button (object with langCodeMap)
-        const boldIconSpan = this.boldBtn.querySelector('.cdx-button__icon');
-        if (boldIconSpan) {
-            const boldPath = (cdxIconBold as any).langCodeMap?.en || (cdxIconBold as any).default;
-            boldIconSpan.innerHTML =
-                `<svg xmlns="http://www.w3.org/2000/svg" width="${iconSize}" height="${iconSize}" viewBox="0 0 20 20" aria-hidden="true">${boldPath}</svg>`;
-        }
-        
-        // Italic button (object with langCodeMap)
-        const italicIconSpan = this.italicBtn.querySelector('.cdx-button__icon');
-        if (italicIconSpan) {
-            const italicPath = (cdxIconItalic as any).langCodeMap?.en || (cdxIconItalic as any).default;
-            italicIconSpan.innerHTML =
-                `<svg xmlns="http://www.w3.org/2000/svg" width="${iconSize}" height="${iconSize}" viewBox="0 0 20 20" aria-hidden="true">${italicPath}</svg>`;
-        }
-        
-        // Link button (string)
-        const linkIconSpan = this.linkBtn.querySelector('.cdx-button__icon');
-        if (linkIconSpan) {
-            linkIconSpan.innerHTML =
-                `<svg xmlns="http://www.w3.org/2000/svg" width="${iconSize}" height="${iconSize}" viewBox="0 0 20 20" aria-hidden="true">${cdxIconLink}</svg>`;
-        }
-        
-        // Undo button (object with ltr property)
-        const undoIconSpan = this.undoBtn.querySelector('.cdx-button__icon');
-        if (undoIconSpan) {
-            const undoPath = (cdxIconUndo as any).ltr;
-            undoIconSpan.innerHTML =
-                `<svg xmlns="http://www.w3.org/2000/svg" width="${iconSize}" height="${iconSize}" viewBox="0 0 20 20" aria-hidden="true">${undoPath}</svg>`;
-        }
-        
-        // More (ellipsis) button (string)
-        const moreIconSpan = this.moreBtn.querySelector('.cdx-button__icon');
-        if (moreIconSpan) {
-            moreIconSpan.innerHTML =
-                `<svg xmlns="http://www.w3.org/2000/svg" width="${iconSize}" height="${iconSize}" viewBox="0 0 20 20" aria-hidden="true">${cdxIconEllipsis}</svg>`;
-        }
-        
-        // Next button (object with ltr property)
-        const nextIconSpan = this.nextBtn.querySelector('.cdx-button__icon');
-        if (nextIconSpan) {
-            const nextPath = (cdxIconNext as any).ltr;
-            nextIconSpan.innerHTML =
-                `<svg xmlns="http://www.w3.org/2000/svg" width="${iconSize}" height="${iconSize}" viewBox="0 0 20 20" aria-hidden="true">${nextPath}</svg>`;
-        }
-
-        // Wikipedia desktop toolbar icons (using querySelector since these are static HTML elements)
-        // Undo button (desktop toolbar)
-        const undoBtn2 = document.querySelector('#undoBtn2');
-        if (undoBtn2) {
-            const undoIconSpan2 = undoBtn2.querySelector('.cdx-button__icon');
-            if (undoIconSpan2) {
-                const undoPath = (cdxIconUndo as any).ltr;
-                undoIconSpan2.innerHTML =
-                    `<svg xmlns="http://www.w3.org/2000/svg" width="${iconSize}" height="${iconSize}" viewBox="0 0 20 20" aria-hidden="true">${undoPath}</svg>`;
+        // Helper function to extract icon path from different Codex icon formats
+        const getIconPath = (icon: any): string => {
+            console.log('🔍 DEBUG: Processing icon:', icon);
+            
+            if (typeof icon === 'string') {
+                console.log('✅ DEBUG: Icon is string:', icon.substring(0, 50) + '...');
+                return icon;
             }
-        }
-
-        // Redo button (desktop toolbar)
-        const redoBtn = document.querySelector('#redoBtn');
-        if (redoBtn) {
-            const redoIconSpan = redoBtn.querySelector('.cdx-button__icon');
-            if (redoIconSpan) {
-                const redoPath = (cdxIconRedo as any).ltr;
-                redoIconSpan.innerHTML =
-                    `<svg xmlns="http://www.w3.org/2000/svg" width="${iconSize}" height="${iconSize}" viewBox="0 0 20 20" aria-hidden="true">${redoPath}</svg>`;
+            if (icon?.langCodeMap?.en) {
+                console.log('✅ DEBUG: Using langCodeMap.en:', icon.langCodeMap.en.substring(0, 50) + '...');
+                return icon.langCodeMap.en;
             }
-        }
-
-        // Bold button (desktop toolbar)
-        const boldBtn2 = document.querySelector('#boldBtn2');
-        if (boldBtn2) {
-            const boldIconSpan2 = boldBtn2.querySelector('.cdx-button__icon');
-            if (boldIconSpan2) {
-                const boldPath = (cdxIconBold as any).langCodeMap?.en || (cdxIconBold as any).default;
-                boldIconSpan2.innerHTML =
-                    `<svg xmlns="http://www.w3.org/2000/svg" width="${iconSize}" height="${iconSize}" viewBox="0 0 20 20" aria-hidden="true">${boldPath}</svg>`;
+            if (icon?.ltr) {
+                console.log('✅ DEBUG: Using ltr:', icon.ltr.substring(0, 50) + '...');
+                return icon.ltr;
             }
-        }
-
-        // Italic button (desktop toolbar)
-        const italicBtn2 = document.querySelector('#italicBtn2');
-        if (italicBtn2) {
-            const italicIconSpan2 = italicBtn2.querySelector('.cdx-button__icon');
-            if (italicIconSpan2) {
-                const italicPath = (cdxIconItalic as any).langCodeMap?.en || (cdxIconItalic as any).default;
-                italicIconSpan2.innerHTML =
-                    `<svg xmlns="http://www.w3.org/2000/svg" width="${iconSize}" height="${iconSize}" viewBox="0 0 20 20" aria-hidden="true">${italicPath}</svg>`;
+            if (icon?.default) {
+                console.log('✅ DEBUG: Using default:', icon.default.substring(0, 50) + '...');
+                return icon.default;
             }
-        }
+            console.log('❌ DEBUG: No valid icon path found for:', icon);
+            return '';
+        };
 
-        // Link button (desktop toolbar)
-        const linkBtn2 = document.querySelector('#linkBtn2');
-        if (linkBtn2) {
-            const linkIconSpan2 = linkBtn2.querySelector('.cdx-button__icon');
-            if (linkIconSpan2) {
-                linkIconSpan2.innerHTML =
-                    `<svg xmlns="http://www.w3.org/2000/svg" width="${iconSize}" height="${iconSize}" viewBox="0 0 20 20" aria-hidden="true">${cdxIconLink}</svg>`;
+        // Helper function to inject icon into a button
+        const injectIcon = (button: HTMLElement | null, iconData: any, buttonName: string): void => {
+            console.log(`🎯 DEBUG: Injecting icon for ${buttonName}`, { button, iconData });
+            
+            if (!button) {
+                console.log(`❌ DEBUG: Button ${buttonName} not found`);
+                return;
             }
-        }
+            
+            const iconSpan = button.querySelector('.cdx-button__icon');
+            if (!iconSpan) {
+                console.log(`❌ DEBUG: Icon span not found in button ${buttonName}`);
+                return;
+            }
+            
+            console.log(`📍 DEBUG: Found icon span for ${buttonName}:`, iconSpan);
 
-        // Cite button (desktop toolbar)
-        const citeBtn = document.querySelector('#citeBtn');
-        if (citeBtn) {
-            const citeIconSpan = citeBtn.querySelector('.cdx-button__icon');
-            if (citeIconSpan) {
-                citeIconSpan.innerHTML =
-                    `<svg xmlns="http://www.w3.org/2000/svg" width="${iconSize}" height="${iconSize}" viewBox="0 0 20 20" aria-hidden="true">${cdxIconReference}</svg>`;
+            const iconPath = getIconPath(iconData);
+            if (!iconPath) {
+                console.log(`❌ DEBUG: No icon path for ${buttonName}`);
+                return;
             }
-        }
+            
+            const svgContent = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" aria-hidden="true">${iconPath}</svg>`;
+            console.log(`🎨 DEBUG: Injecting SVG for ${buttonName}:`, svgContent.substring(0, 100) + '...');
+            
+            iconSpan.innerHTML = svgContent;
+            
+            // Verify injection
+            console.log(`✅ DEBUG: Final content of ${buttonName} icon span:`, iconSpan.innerHTML.substring(0, 100) + '...');
+        };
+
+        // Mobile toolbar icons
+        console.log('📱 DEBUG: Processing mobile toolbar icons');
+        injectIcon(this.closeBtn, cdxIconClose, 'closeBtn');
+        injectIcon(this.boldBtn, cdxIconBold, 'boldBtn');
+        injectIcon(this.italicBtn, cdxIconItalic, 'italicBtn');
+        injectIcon(this.linkBtn, cdxIconLink, 'linkBtn');
+        injectIcon(this.undoBtn, cdxIconUndo, 'undoBtn');
+        injectIcon(this.moreBtn, cdxIconEllipsis, 'moreBtn');
+        injectIcon(this.nextBtn, cdxIconNext, 'nextBtn');
+
+        // Desktop toolbar icons (using querySelector since these are static HTML elements)
+        console.log('🖥️ DEBUG: Processing desktop toolbar icons');
+        injectIcon(document.querySelector('#undoBtn2'), cdxIconUndo, 'undoBtn2');
+        injectIcon(document.querySelector('#redoBtn'), cdxIconRedo, 'redoBtn');
+        injectIcon(document.querySelector('#boldBtn2'), cdxIconBold, 'boldBtn2');
+        injectIcon(document.querySelector('#italicBtn2'), cdxIconItalic, 'italicBtn2');
+        injectIcon(document.querySelector('#linkBtn2'), cdxIconLink, 'linkBtn2');
+        injectIcon(document.querySelector('#citeBtn'), cdxIconReference, 'citeBtn');
+        
+        console.log('🏁 DEBUG: Finished initializeToolbarIcons');
     }
     
     // Reference Dialog Methods
@@ -3617,5 +3590,15 @@ The lasting importance of ${entityName} can be measured by <span class="detail-c
     
 }
 
-// Initialize the application
-new HTMLArticleCreator();
+// Initialize the application when DOM is ready
+function initializeApp() {
+    new HTMLArticleCreator();
+}
+
+// Ensure DOM is fully loaded before initializing
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeApp);
+} else {
+    // DOM is already loaded
+    initializeApp();
+}

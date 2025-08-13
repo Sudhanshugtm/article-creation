@@ -509,7 +509,14 @@
     .article-editor__content { padding-top: 2px !important; }
     /* Editing view polish */
     .article-editor { max-width: 800px; margin: 0 auto; }
-    .article-editor__title { font-size: 24px; font-weight: 600; margin: 2px 0 2px 0; }
+    .article-editor__title { 
+      font-size: 24px; 
+      font-weight: 600; 
+      margin: 2px 0 8px 0;
+      text-align: left;
+      padding-left: 0;
+      line-height: 1.3;
+    }
     .article-editor__title-text[contenteditable="true"][data-placeholder]:empty:before {
       content: attr(data-placeholder);
       color: var(--color-base30, #72777d);
@@ -519,14 +526,37 @@
     #articleContent[contenteditable="true"] {
       min-height: 1.4em;
       padding: 0;
+      margin: 0;
       border: none;
       border-radius: 0;
       background: transparent;
       line-height: 1.6;
       font-size: 16px;
       caret-color: #36c;
+      text-align: left;
+      position: relative;
+      box-sizing: border-box;
+      width: 100%;
     }
-    #articleContent[contenteditable="true"]:focus { outline: none; border: none; }
+    #articleContent[contenteditable="true"]:focus { 
+      outline: none; 
+      border: none;
+    }
+    
+    /* Ensure cursor starts at the correct position */
+    #articleContent[contenteditable="true"]:empty:focus {
+      cursor: text;
+    }
+    
+    /* Hide placeholder when focused to show cursor properly */
+    #articleContent[contenteditable="true"]:focus:before {
+      opacity: 0.7;
+    }
+    
+    /* Ensure proper text alignment for all content */
+    #articleContent[contenteditable="true"] * {
+      text-align: left;
+    }
     /* Placeholder for empty contenteditable (simple "Topic is …" style) */
     #articleContent[contenteditable="true"][data-placeholder]:empty:before {
       content: attr(data-placeholder);
@@ -535,6 +565,12 @@
       opacity: 0.95;
       font-size: 18px;
       pointer-events: none;
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: auto;
+      z-index: 1;
     }
     .article-lead { margin-bottom: 8px; color: var(--color-base, #202122); }
     .article-editor__chips { margin-top: 4px; display: flex; gap: 8px; }
@@ -691,23 +727,37 @@
       min-width: 140px;
     }
 
+    /* Fix for toolbar button SVG icons - ensure they inherit text color */
+    .cdx-button__icon svg {
+      fill: currentColor !important;
+    }
+    
+    /* Remove background color from button icons when they contain SVG */
+    .cdx-button__icon:has(svg) {
+      background-color: transparent !important;
+    }
+
     /* Wikipedia-style Desktop Toolbar */
     .wikipedia-toolbar {
       display: none;
-      background: #f8f9fa;
-      border-bottom: 1px solid #a2a9b1;
-      padding: 8px 16px;
+      background: transparent;
+      border-bottom: none;
+      padding: 8px 24px;
       position: sticky;
       top: 0;
       z-index: 100;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+      width: 100%;
+      overflow-x: hidden;
     }
 
     .wikipedia-toolbar__inner {
       display: flex;
       align-items: center;
       gap: 8px;
-      max-width: 1200px;
-      margin: 0 auto;
+      width: 100%;
+      max-width: none;
+      margin: 0;
     }
 
     .toolbar-group {
@@ -744,12 +794,47 @@
       min-width: 120px;
     }
 
+    /* Bring dropdown arrow closer to text */
+    .toolbar-group .cdx-select__indicator {
+      padding-left: 4px;
+    }
+
     .toolbar-group .cdx-select__input {
       font-size: 13px;
       padding: 6px 8px;
-      border: 1px solid #a2a9b1;
+      border: none;
       border-radius: 2px;
-      background: #fff;
+      background: transparent;
+      outline: none;
+      box-shadow: none;
+    }
+
+    .toolbar-group .cdx-select__input:focus {
+      border: none;
+      box-shadow: none;
+      outline: none;
+    }
+
+    /* Remove any additional borders from select wrapper */
+    .toolbar-group .cdx-select__handle {
+      border: none;
+      background: transparent;
+    }
+
+    /* Ensure no borders on any select element states */
+    .toolbar-group .cdx-select,
+    .toolbar-group .cdx-select:hover,
+    .toolbar-group .cdx-select:focus,
+    .toolbar-group .cdx-select:active {
+      border: none !important;
+      outline: none !important;
+      box-shadow: none !important;
+    }
+
+    .toolbar-group select {
+      border: none !important;
+      outline: none !important;
+      box-shadow: none !important;
     }
 
     /* Desktop Title Section - Wikipedia Visual Editor style */
@@ -775,19 +860,7 @@
       line-height: 1.3;
     }
 
-    .desktop-title-section__subtitle {
-      font-size: 13px;
-      color: #72777d;
-      margin-top: 4px;
-    }
 
-    /* Separator between title and toolbar */
-    .desktop-separator {
-      display: none;
-      height: 1px;
-      background: #eaecf0;
-      border: none;
-    }
 
     /* Responsive Layout: Desktop vs Mobile */
     @media (max-width: 768px) {
@@ -807,9 +880,6 @@
         display: block !important;
       }
 
-      .article-creator--editing .desktop-separator {
-        display: block !important;
-      }
       
       .article-creator--editing .wikipedia-toolbar {
         display: block !important;
@@ -911,7 +981,23 @@
               range.selectNodeContents(content);
               range.collapse(true);
               var sel = window.getSelection();
-              if (sel) { sel.removeAllRanges(); sel.addRange(range); }
+              if (sel) { 
+                sel.removeAllRanges(); 
+                sel.addRange(range); 
+              }
+              // Ensure cursor is visible and positioned correctly
+              setTimeout(function() {
+                if (content === document.activeElement && (!content.textContent || content.textContent.trim() === '')) {
+                  var newRange = document.createRange();
+                  newRange.setStart(content, 0);
+                  newRange.collapse(true);
+                  var newSel = window.getSelection();
+                  if (newSel) {
+                    newSel.removeAllRanges();
+                    newSel.addRange(newRange);
+                  }
+                }
+              }, 10);
             } catch (e) {}
           }
         } catch (e) {}
@@ -977,12 +1063,9 @@
         <div class="desktop-title-section" id="desktopTitleSection" style="display: none;">
             <div class="desktop-title-section__inner">
                 <h1 class="desktop-title-section__title" id="desktopTitle">Article Title</h1>
-                <div class="desktop-title-section__subtitle">From Wikipedia, the free encyclopedia</div>
             </div>
         </div>
 
-        <!-- Separator between title and toolbar -->
-        <hr class="desktop-separator" id="desktopSeparator" style="display: none;">
 
         <!-- Wikipedia-style Desktop Toolbar (shown only on desktop) -->
         <div class="wikipedia-toolbar" id="wikipediaToolbar" style="display: none;">
@@ -991,11 +1074,9 @@
                 <div class="toolbar-group toolbar-group--history">
                     <button class="cdx-button cdx-button--action-default cdx-button--weight-quiet cdx-button--size-medium toolbar-tool" id="undoBtn2" title="Undo ⌘Z">
                         <span class="cdx-button__icon"></span>
-                        <span class="cdx-button__text">Undo</span>
                     </button>
                     <button class="cdx-button cdx-button--action-default cdx-button--weight-quiet cdx-button--size-medium toolbar-tool" id="redoBtn" title="Redo ⌘⇧Z">
                         <span class="cdx-button__icon"></span>
-                        <span class="cdx-button__text">Redo</span>
                     </button>
                 </div>
 
@@ -1016,11 +1097,9 @@
                 <div class="toolbar-group toolbar-group--style">
                     <button class="cdx-button cdx-button--action-default cdx-button--weight-quiet cdx-button--size-medium toolbar-tool" id="boldBtn2" title="Bold ⌘B">
                         <span class="cdx-button__icon"></span>
-                        <span class="cdx-button__text">Bold</span>
                     </button>
                     <button class="cdx-button cdx-button--action-default cdx-button--weight-quiet cdx-button--size-medium toolbar-tool" id="italicBtn2" title="Italic ⌘I">
                         <span class="cdx-button__icon"></span>
-                        <span class="cdx-button__text">Italic</span>
                     </button>
                 </div>
 
@@ -1028,7 +1107,6 @@
                 <div class="toolbar-group toolbar-group--link">
                     <button class="cdx-button cdx-button--action-default cdx-button--weight-quiet cdx-button--size-medium toolbar-tool" id="linkBtn2" title="Link ⌘K">
                         <span class="cdx-button__icon"></span>
-                        <span class="cdx-button__text">Link</span>
                     </button>
                 </div>
 
@@ -1036,7 +1114,6 @@
                 <div class="toolbar-group toolbar-group--citations">
                     <button class="cdx-button cdx-button--action-default cdx-button--weight-quiet cdx-button--size-medium toolbar-tool" id="citeBtn" title="Cite ⌘⇧K">
                         <span class="cdx-button__icon"></span>
-                        <span class="cdx-button__text">Cite</span>
                     </button>
                 </div>
 
