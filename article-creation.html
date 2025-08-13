@@ -439,10 +439,6 @@
       margin: 0 auto 24px !important;
       overflow: visible !important;
     }
-    /* Only show toolbar during editing */
-    .article-creator.article-creator--editing .article-creator__global-toolbar {
-      display: flex !important;
-    }
     /* Editing mode spacing: ensure content clears toolbar */
     .article-creator.article-creator--editing .article-creator__header {
       margin-top: 24px !important;
@@ -455,14 +451,11 @@
       padding: 8px 20px !important;
       margin-bottom: 8px !important;
     }
-    /* Add top padding while editing so content doesn't sit under toolbar */
+    /* Default mobile padding for mobile toolbar */
     .article-creator.article-creator--editing { padding-top: 64px !important; }
 
     /* Push Next button to the far right within the toolbar */
     #nextBtn { margin-left: auto !important; }
-    @media (min-width: 768px) {
-      .article-creator__global-toolbar { margin-bottom: 8px !important; }
-    }
     /* Ensure toolbar remains usable on narrow screens */
     .article-creator__global-toolbar {
       overflow-x: auto !important;
@@ -761,19 +754,19 @@
 
     /* Responsive Layout: Desktop vs Mobile */
     @media (max-width: 768px) {
-      /* Mobile: Keep current layout, hide Wikipedia toolbar */
+      /* Mobile: Show mobile toolbar when editing, hide Wikipedia toolbar */
       .wikipedia-toolbar {
         display: none !important;
       }
       
-      .article-creator__global-toolbar {
-        /* Keep existing mobile toolbar styles */
+      .article-creator--editing .article-creator__global-toolbar {
+        display: flex !important;
       }
     }
 
     @media (min-width: 769px) {
-      /* Desktop: Show Wikipedia toolbar, hide mobile toolbar */
-      .wikipedia-toolbar {
+      /* Desktop: Show Wikipedia toolbar when editing, hide mobile toolbar */
+      .article-creator--editing .wikipedia-toolbar {
         display: block !important;
       }
       
@@ -792,18 +785,13 @@
         padding: 20px 40px;
       }
 
-      /* Desktop article editor adjustments */
+      /* Desktop article editor adjustments - Wikipedia toolbar is sticky */
       .article-creator--editing {
         padding-top: 0 !important;
       }
 
       .article-creator--editing .article-creator__header {
         display: none;
-      }
-
-      /* Show Wikipedia toolbar in editing mode */
-      .article-creator--editing .wikipedia-toolbar {
-        display: block !important;
       }
     }
   </style>

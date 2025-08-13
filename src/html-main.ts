@@ -554,15 +554,11 @@ class HTMLArticleCreator {
         this.setState(WorkflowState.ARTICLE_EDITING);
         this.setupArticleEditor();
         
-        // Show the global toolbar and add editing class
-        this.globalToolbar.style.display = 'flex';
+        // Add editing class - CSS media queries will handle which toolbar to show
         document.querySelector('.article-creator')?.classList.add('article-creator--editing');
         
-        // Show Wikipedia toolbar on desktop
-        const wikipediaToolbar = document.getElementById('wikipediaToolbar');
-        if (wikipediaToolbar) {
-            wikipediaToolbar.style.display = 'block';
-        }
+        // Let CSS media queries handle toolbar visibility based on screen size
+        // No need to manually show/hide toolbars here
         
         // Set up link detection for this editing session
         // Link detection will be manual via link button
@@ -596,15 +592,8 @@ class HTMLArticleCreator {
     }
 
     private exitArticleEditor(): void {
-        // Hide the global toolbar and remove editing class
-        this.globalToolbar.style.display = 'none';
+        // Remove editing class - CSS media queries will handle hiding toolbars
         document.querySelector('.article-creator')?.classList.remove('article-creator--editing');
-        
-        // Hide Wikipedia toolbar
-        const wikipediaToolbar = document.getElementById('wikipediaToolbar');
-        if (wikipediaToolbar) {
-            wikipediaToolbar.style.display = 'none';
-        }
         // Reset all state so user sees a clean title-entry screen
         this.searchTerm = '';
         this.selectedTopic = null;
