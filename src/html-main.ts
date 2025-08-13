@@ -16,6 +16,7 @@ import {
     cdxIconItalic,
     cdxIconLink,
     cdxIconUndo,
+    cdxIconRedo,
     cdxIconEllipsis,
     cdxIconClose,
     cdxIconNext,
@@ -567,6 +568,12 @@ class HTMLArticleCreator {
         const titleEl = this.articleTitleText as HTMLElement;
         titleEl.setAttribute('contenteditable', 'true');
         titleEl.textContent = this.searchTerm;
+        
+        // Also update the desktop title section
+        const desktopTitleEl = document.getElementById('desktopTitle') as HTMLElement;
+        if (desktopTitleEl) {
+            desktopTitleEl.textContent = this.searchTerm;
+        }
         // Set contextual placeholder for the body
         const topic = this.searchTerm || (this.selectedTopic?.label ?? '');
         this.articleContent.setAttribute('data-placeholder', `${topic} is ...`);
@@ -2432,6 +2439,71 @@ The lasting importance of ${entityName} can be measured by <span class="detail-c
             const nextPath = (cdxIconNext as any).ltr;
             nextIconSpan.innerHTML =
                 `<svg xmlns="http://www.w3.org/2000/svg" width="${iconSize}" height="${iconSize}" viewBox="0 0 20 20" aria-hidden="true">${nextPath}</svg>`;
+        }
+
+        // Wikipedia desktop toolbar icons (using querySelector since these are static HTML elements)
+        // Undo button (desktop toolbar)
+        const undoBtn2 = document.querySelector('#undoBtn2');
+        if (undoBtn2) {
+            const undoIconSpan2 = undoBtn2.querySelector('.cdx-button__icon');
+            if (undoIconSpan2) {
+                const undoPath = (cdxIconUndo as any).ltr;
+                undoIconSpan2.innerHTML =
+                    `<svg xmlns="http://www.w3.org/2000/svg" width="${iconSize}" height="${iconSize}" viewBox="0 0 20 20" aria-hidden="true">${undoPath}</svg>`;
+            }
+        }
+
+        // Redo button (desktop toolbar)
+        const redoBtn = document.querySelector('#redoBtn');
+        if (redoBtn) {
+            const redoIconSpan = redoBtn.querySelector('.cdx-button__icon');
+            if (redoIconSpan) {
+                const redoPath = (cdxIconRedo as any).ltr;
+                redoIconSpan.innerHTML =
+                    `<svg xmlns="http://www.w3.org/2000/svg" width="${iconSize}" height="${iconSize}" viewBox="0 0 20 20" aria-hidden="true">${redoPath}</svg>`;
+            }
+        }
+
+        // Bold button (desktop toolbar)
+        const boldBtn2 = document.querySelector('#boldBtn2');
+        if (boldBtn2) {
+            const boldIconSpan2 = boldBtn2.querySelector('.cdx-button__icon');
+            if (boldIconSpan2) {
+                const boldPath = (cdxIconBold as any).langCodeMap?.en || (cdxIconBold as any).default;
+                boldIconSpan2.innerHTML =
+                    `<svg xmlns="http://www.w3.org/2000/svg" width="${iconSize}" height="${iconSize}" viewBox="0 0 20 20" aria-hidden="true">${boldPath}</svg>`;
+            }
+        }
+
+        // Italic button (desktop toolbar)
+        const italicBtn2 = document.querySelector('#italicBtn2');
+        if (italicBtn2) {
+            const italicIconSpan2 = italicBtn2.querySelector('.cdx-button__icon');
+            if (italicIconSpan2) {
+                const italicPath = (cdxIconItalic as any).langCodeMap?.en || (cdxIconItalic as any).default;
+                italicIconSpan2.innerHTML =
+                    `<svg xmlns="http://www.w3.org/2000/svg" width="${iconSize}" height="${iconSize}" viewBox="0 0 20 20" aria-hidden="true">${italicPath}</svg>`;
+            }
+        }
+
+        // Link button (desktop toolbar)
+        const linkBtn2 = document.querySelector('#linkBtn2');
+        if (linkBtn2) {
+            const linkIconSpan2 = linkBtn2.querySelector('.cdx-button__icon');
+            if (linkIconSpan2) {
+                linkIconSpan2.innerHTML =
+                    `<svg xmlns="http://www.w3.org/2000/svg" width="${iconSize}" height="${iconSize}" viewBox="0 0 20 20" aria-hidden="true">${cdxIconLink}</svg>`;
+            }
+        }
+
+        // Cite button (desktop toolbar)
+        const citeBtn = document.querySelector('#citeBtn');
+        if (citeBtn) {
+            const citeIconSpan = citeBtn.querySelector('.cdx-button__icon');
+            if (citeIconSpan) {
+                citeIconSpan.innerHTML =
+                    `<svg xmlns="http://www.w3.org/2000/svg" width="${iconSize}" height="${iconSize}" viewBox="0 0 20 20" aria-hidden="true">${cdxIconReference}</svg>`;
+            }
         }
     }
     

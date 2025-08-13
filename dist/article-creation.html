@@ -439,10 +439,6 @@
       margin: 0 auto 24px !important;
       overflow: visible !important;
     }
-    /* Only show toolbar during editing */
-    .article-creator.article-creator--editing .article-creator__global-toolbar {
-      display: flex !important;
-    }
     /* Editing mode spacing: ensure content clears toolbar */
     .article-creator.article-creator--editing .article-creator__header {
       margin-top: 24px !important;
@@ -455,14 +451,11 @@
       padding: 8px 20px !important;
       margin-bottom: 8px !important;
     }
-    /* Add top padding while editing so content doesn't sit under toolbar */
+    /* Default mobile padding for mobile toolbar */
     .article-creator.article-creator--editing { padding-top: 64px !important; }
 
     /* Push Next button to the far right within the toolbar */
     #nextBtn { margin-left: auto !important; }
-    @media (min-width: 768px) {
-      .article-creator__global-toolbar { margin-bottom: 8px !important; }
-    }
     /* Ensure toolbar remains usable on narrow screens */
     .article-creator__global-toolbar {
       overflow-x: auto !important;
@@ -759,21 +752,66 @@
       background: #fff;
     }
 
+    /* Desktop Title Section - Wikipedia Visual Editor style */
+    .desktop-title-section {
+      display: none;
+      background: #fff;
+      border-bottom: 1px solid #c8ccd1;
+      padding: 12px 0;
+    }
+
+    .desktop-title-section__inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 16px;
+    }
+
+    .desktop-title-section__title {
+      font-family: 'Linux Libertine', Georgia, Times, serif;
+      font-size: 28px;
+      font-weight: normal;
+      color: #000;
+      margin: 0;
+      line-height: 1.3;
+    }
+
+    .desktop-title-section__subtitle {
+      font-size: 13px;
+      color: #72777d;
+      margin-top: 4px;
+    }
+
+    /* Separator between title and toolbar */
+    .desktop-separator {
+      display: none;
+      height: 1px;
+      background: #eaecf0;
+      border: none;
+    }
+
     /* Responsive Layout: Desktop vs Mobile */
     @media (max-width: 768px) {
-      /* Mobile: Keep current layout, hide Wikipedia toolbar */
+      /* Mobile: Show mobile toolbar when editing, hide Wikipedia toolbar */
       .wikipedia-toolbar {
         display: none !important;
       }
       
-      .article-creator__global-toolbar {
-        /* Keep existing mobile toolbar styles */
+      .article-creator--editing .article-creator__global-toolbar {
+        display: flex !important;
       }
     }
 
     @media (min-width: 769px) {
-      /* Desktop: Show Wikipedia toolbar, hide mobile toolbar */
-      .wikipedia-toolbar {
+      /* Desktop: Show all desktop editing components when editing */
+      .article-creator--editing .desktop-title-section {
+        display: block !important;
+      }
+
+      .article-creator--editing .desktop-separator {
+        display: block !important;
+      }
+      
+      .article-creator--editing .wikipedia-toolbar {
         display: block !important;
       }
       
@@ -789,7 +827,7 @@
       .article-creator__main {
         max-width: 1200px;
         margin: 0 auto;
-        padding: 20px 40px;
+        padding: 0 40px 20px;
       }
 
       /* Desktop article editor adjustments */
@@ -801,9 +839,27 @@
         display: none;
       }
 
-      /* Show Wikipedia toolbar in editing mode */
-      .article-creator--editing .wikipedia-toolbar {
-        display: block !important;
+      /* Proper spacing for editing section */
+      .article-creator--editing .article-creator__editing-section {
+        padding-top: 20px;
+        margin-top: 0;
+      }
+
+      /* Adjust article editor for desktop */
+      .article-creator--editing .article-editor {
+        max-width: 800px;
+        margin: 0 auto;
+      }
+
+      /* Position chips correctly below content */
+      .article-creator--editing .article-editor__chips {
+        margin-top: 24px;
+        padding-top: 16px;
+        border-top: 1px solid #eaecf0;
+        justify-content: center;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
       }
     }
   </style>
@@ -880,7 +936,7 @@
     })();
   </script>
   <!-- Dev-friendly sources for local; Vite will rewrite on build -->
-  <script type="module" crossorigin src="/article-creation/assets/prototype-DuKaOoC2.js"></script>
+  <script type="module" crossorigin src="/article-creation/assets/prototype-2LAvWCRC.js"></script>
   <link rel="modulepreload" crossorigin href="/article-creation/assets/modulepreload-polyfill-B5Qt9EMX.js">
   <link rel="stylesheet" crossorigin href="/article-creation/assets/codex-B5m2OaX5.css">
   <link rel="stylesheet" crossorigin href="/article-creation/assets/section-expansion-Qg1vSYNK.css">
@@ -917,6 +973,17 @@
                 <span class="cdx-button__icon"></span>
             </button>
         </div>
+
+        <!-- Desktop Title Section (shown only on desktop when editing) -->
+        <div class="desktop-title-section" id="desktopTitleSection" style="display: none;">
+            <div class="desktop-title-section__inner">
+                <h1 class="desktop-title-section__title" id="desktopTitle">Article Title</h1>
+                <div class="desktop-title-section__subtitle">From Wikipedia, the free encyclopedia</div>
+            </div>
+        </div>
+
+        <!-- Separator between title and toolbar -->
+        <hr class="desktop-separator" id="desktopSeparator" style="display: none;">
 
         <!-- Wikipedia-style Desktop Toolbar (shown only on desktop) -->
         <div class="wikipedia-toolbar" id="wikipediaToolbar" style="display: none;">
