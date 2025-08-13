@@ -697,6 +697,115 @@
       padding: 2px 0;
       min-width: 140px;
     }
+
+    /* Wikipedia-style Desktop Toolbar */
+    .wikipedia-toolbar {
+      display: none;
+      background: #f8f9fa;
+      border-bottom: 1px solid #a2a9b1;
+      padding: 8px 16px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .wikipedia-toolbar__inner {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .toolbar-group {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding-right: 8px;
+      border-right: 1px solid #c8ccd1;
+    }
+
+    .toolbar-group:last-child {
+      border-right: none;
+    }
+
+    .toolbar-group--save {
+      border-right: none;
+    }
+
+    .toolbar-tool {
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .toolbar-tool .cdx-button__text {
+      font-size: 13px;
+    }
+
+    .toolbar-spacer {
+      flex: 1;
+    }
+
+    /* Format and Insert dropdowns */
+    .toolbar-group .cdx-select {
+      min-width: 120px;
+    }
+
+    .toolbar-group .cdx-select__input {
+      font-size: 13px;
+      padding: 6px 8px;
+      border: 1px solid #a2a9b1;
+      border-radius: 2px;
+      background: #fff;
+    }
+
+    /* Responsive Layout: Desktop vs Mobile */
+    @media (max-width: 768px) {
+      /* Mobile: Keep current layout, hide Wikipedia toolbar */
+      .wikipedia-toolbar {
+        display: none !important;
+      }
+      
+      .article-creator__global-toolbar {
+        /* Keep existing mobile toolbar styles */
+      }
+    }
+
+    @media (min-width: 769px) {
+      /* Desktop: Show Wikipedia toolbar, hide mobile toolbar */
+      .wikipedia-toolbar {
+        display: block !important;
+      }
+      
+      .article-creator__global-toolbar {
+        display: none !important;
+      }
+
+      /* Full-width editing area for desktop */
+      .article-creator {
+        max-width: 100%;
+      }
+
+      .article-creator__main {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px 40px;
+      }
+
+      /* Desktop article editor adjustments */
+      .article-creator--editing {
+        padding-top: 0 !important;
+      }
+
+      .article-creator--editing .article-creator__header {
+        display: none;
+      }
+
+      /* Show Wikipedia toolbar in editing mode */
+      .article-creator--editing .wikipedia-toolbar {
+        display: block !important;
+      }
+    }
   </style>
   
   <script>
@@ -771,7 +880,7 @@
     })();
   </script>
   <!-- Dev-friendly sources for local; Vite will rewrite on build -->
-  <script type="module" crossorigin src="/article-creation/assets/prototype-D0PHS0vb.js"></script>
+  <script type="module" crossorigin src="/article-creation/assets/prototype-DuKaOoC2.js"></script>
   <link rel="modulepreload" crossorigin href="/article-creation/assets/modulepreload-polyfill-B5Qt9EMX.js">
   <link rel="stylesheet" crossorigin href="/article-creation/assets/codex-B5m2OaX5.css">
   <link rel="stylesheet" crossorigin href="/article-creation/assets/section-expansion-Qg1vSYNK.css">
@@ -807,6 +916,87 @@
             <button class="cdx-button cdx-button--action-progressive cdx-button--weight-primary cdx-button--size-medium article-editor__tool" id="nextBtn" title="Next">
                 <span class="cdx-button__icon"></span>
             </button>
+        </div>
+
+        <!-- Wikipedia-style Desktop Toolbar (shown only on desktop) -->
+        <div class="wikipedia-toolbar" id="wikipediaToolbar" style="display: none;">
+            <div class="wikipedia-toolbar__inner">
+                <!-- History Group -->
+                <div class="toolbar-group toolbar-group--history">
+                    <button class="cdx-button cdx-button--action-default cdx-button--weight-quiet cdx-button--size-medium toolbar-tool" id="undoBtn2" title="Undo ⌘Z">
+                        <span class="cdx-button__icon"></span>
+                        <span class="cdx-button__text">Undo</span>
+                    </button>
+                    <button class="cdx-button cdx-button--action-default cdx-button--weight-quiet cdx-button--size-medium toolbar-tool" id="redoBtn" title="Redo ⌘⇧Z">
+                        <span class="cdx-button__icon"></span>
+                        <span class="cdx-button__text">Redo</span>
+                    </button>
+                </div>
+
+                <!-- Format Group -->
+                <div class="toolbar-group toolbar-group--format">
+                    <div class="cdx-select">
+                        <select class="cdx-select__input" id="formatSelect">
+                            <option value="paragraph">Paragraph</option>
+                            <option value="heading">Heading</option>
+                            <option value="subheading1">Sub-heading 1</option>
+                            <option value="subheading2">Sub-heading 2</option>
+                            <option value="subheading3">Sub-heading 3</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Style Group -->
+                <div class="toolbar-group toolbar-group--style">
+                    <button class="cdx-button cdx-button--action-default cdx-button--weight-quiet cdx-button--size-medium toolbar-tool" id="boldBtn2" title="Bold ⌘B">
+                        <span class="cdx-button__icon"></span>
+                        <span class="cdx-button__text">Bold</span>
+                    </button>
+                    <button class="cdx-button cdx-button--action-default cdx-button--weight-quiet cdx-button--size-medium toolbar-tool" id="italicBtn2" title="Italic ⌘I">
+                        <span class="cdx-button__icon"></span>
+                        <span class="cdx-button__text">Italic</span>
+                    </button>
+                </div>
+
+                <!-- Link Group -->
+                <div class="toolbar-group toolbar-group--link">
+                    <button class="cdx-button cdx-button--action-default cdx-button--weight-quiet cdx-button--size-medium toolbar-tool" id="linkBtn2" title="Link ⌘K">
+                        <span class="cdx-button__icon"></span>
+                        <span class="cdx-button__text">Link</span>
+                    </button>
+                </div>
+
+                <!-- Citations Group -->
+                <div class="toolbar-group toolbar-group--citations">
+                    <button class="cdx-button cdx-button--action-default cdx-button--weight-quiet cdx-button--size-medium toolbar-tool" id="citeBtn" title="Cite ⌘⇧K">
+                        <span class="cdx-button__icon"></span>
+                        <span class="cdx-button__text">Cite</span>
+                    </button>
+                </div>
+
+                <!-- Insert Group -->
+                <div class="toolbar-group toolbar-group--insert">
+                    <div class="cdx-select">
+                        <select class="cdx-select__input" id="insertSelect">
+                            <option value="">Insert</option>
+                            <option value="image">Images and media</option>
+                            <option value="template">Template</option>
+                            <option value="table">Table</option>
+                            <option value="reference">References list</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Spacer -->
+                <div class="toolbar-spacer"></div>
+
+                <!-- Save Group -->
+                <div class="toolbar-group toolbar-group--save">
+                    <button class="cdx-button cdx-button--action-progressive cdx-button--weight-primary cdx-button--size-medium toolbar-tool" id="publishBtn" title="Publish page... ⌘S">
+                        <span class="cdx-button__text">Publish page...</span>
+                    </button>
+                </div>
+            </div>
         </div>
         
         <header class="article-creator__header">
