@@ -1,313 +1,376 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title id="pageTitle">Katie Bouman - Wikipedia</title>
-  <!-- Dev-friendly: load source TS and CSS; Vite bundles for prod -->
-  <script type="module" crossorigin src="/article-creation/assets/section-expansion-wizard-Bw0svYyT.js"></script>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title id="pageTitle">Katie Bouman — Wikipedia</title>
+
+  <!-- Codex tokens + CSS (design system) -->
+  <link rel="stylesheet" href="https://unpkg.com/@wikimedia/codex@2.3.0/dist/codex.style.css">
+  <link rel="stylesheet" href="https://unpkg.com/@wikimedia/codex-design-tokens@2.3.0/theme-wikimedia-ui.css">
+
+  <!-- VE styles -->
+  <script type="module" crossorigin src="/article-creation/assets/section-expansion-wizard-C02CO3cT.js"></script>
   <link rel="modulepreload" crossorigin href="/article-creation/assets/modulepreload-polyfill-B5Qt9EMX.js">
+  <link rel="modulepreload" crossorigin href="/article-creation/assets/ve-reading-script-C64JI2pR.js">
+  <link rel="stylesheet" crossorigin href="/article-creation/assets/ve-reading-script-BMSNudMv.css">
   <link rel="stylesheet" crossorigin href="/article-creation/assets/section-expansion-wizard-BvsshBIp.css">
-  <link rel="stylesheet" crossorigin href="/article-creation/assets/codex-B5m2OaX5.css">
-  <link rel="stylesheet" crossorigin href="/article-creation/assets/section-expansion-Qg1vSYNK.css">
 </head>
 <body>
-    <div class="article-expansion">
-        <!-- Wikipedia-style header -->
-        <header class="article-header">
-            <div class="article-header__nav">
-                <button class="cdx-button cdx-button--fake-button cdx-button--fake-button--enabled" onclick="window.location.href='./section-creation.html'">
-                    <span class="cdx-icon cdx-icon--medium">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20">
-                            <path d="M4 10l5-5v3h7v4h-7v3z"/>
-                        </svg>
-                    </span>
-                </button>
-            </div>
-            <div class="article-header__title-wrapper">
-                <h1 class="article-header__title" id="articleTitle">Katie Bouman</h1>
-                <div class="article-header__subtitle" id="articleSubtitle">American computer scientist and engineer</div>
-            </div>
-        </header>
 
-        <!-- Article content -->
-        <main class="article-content">
-            <article class="article-body" id="articleBody">
-                <!-- Dynamic content will be loaded here -->
-            </article>
-        </main>
+  <header class="container page-header" role="banner">
+    <h1 class="firstHeading" id="articleTitle">Katie Bouman</h1>
+    <div class="page-tabs-wrapper">
+      <nav class="ns-tabs" aria-label="Namespace tabs">
+        <button class="ns-tab active">Article</button>
+        <button class="ns-tab">Talk</button>
+      </nav>
+      <nav class="page-actions" aria-label="Page actions">
+        <button class="action-tab active">
+          <span class="action-tab-text">Read</span>
+          <span class="action-tab-icon cdx-icon" data-icon="cdxIconArticle"></span>
+        </button>
+        <button class="action-tab" id="editTab">
+          <span class="action-tab-text">Edit</span>
+          <span class="action-tab-icon cdx-icon" data-icon="cdxIconEdit"></span>
+        </button>
+        <button class="action-tab">
+          <span class="action-tab-text">View history</span>
+          <span class="action-tab-icon cdx-icon" data-icon="cdxIconHistory"></span>
+        </button>
+        <button class="action-tab star">
+          <span class="action-tab-text">⭐</span>
+          <span class="action-tab-icon cdx-icon" data-icon="cdxIconStar"></span>
+        </button>
+      </nav>
+    </div>
+  </header>
 
-        <!-- Smart Widget -->
-        <div class="smart-widget" id="smartWidget">
-            <button class="smart-widget__trigger" id="smartWidgetTrigger" onclick="openSectionWizard()">
-                <span class="smart-widget__icon">🧙‍♂️</span>
-                <span class="smart-widget__text">Add a section</span>
+  <!-- Reading Mode Content -->
+  <main class="content-wrap" id="readingContent">
+    <p class="tagline">From Wikipedia, the free encyclopedia</p>
+    <article class="article-content" id="articleBody">
+      <!-- Article content will be loaded here -->
+    </article>
+  </main>
+
+  <!-- Visual Editor (hidden by default) -->
+  <div class="ve-interface" id="veInterface" style="display: none;">
+    
+    <!-- Page header (duplicated for VE mode) -->
+    <header class="container page-header" role="banner">
+      <h1 class="firstHeading" id="articleTitleVE">Katie Bouman</h1>
+      <div class="page-tabs-wrapper">
+        <nav class="ns-tabs" aria-label="Namespace tabs">
+          <button class="ns-tab active">Article</button>
+          <button class="ns-tab">Talk</button>
+        </nav>
+        <nav class="page-actions" aria-label="Page actions">
+          <button class="action-tab">Read</button>
+          <button class="action-tab active" id="editTabVE">Edit</button>
+          <button class="action-tab">View history</button>
+          <button class="action-tab star">⭐</button>
+        </nav>
+      </div>
+    </header>
+
+    <!-- VE toolbar (positioned below tabs) -->
+    <div class="ve-strip" role="region" aria-label="Editing toolbar">
+      <div class="ve-bar">
+
+        <!-- Mobile toolbar -->
+        <div class="mobile-toolbar">
+          <!-- Close -->
+          <button class="btn" id="close" title="Close"><span class="cdx-icon" data-icon="cdxIconClose"></span></button>
+          
+          <!-- Undo -->
+          <button class="btn" id="undo" title="Undo"><span class="cdx-icon" data-icon="cdxIconUndo"></span></button>
+          
+          <!-- Text Style (A with dropdown) -->
+          <div class="dropdown" id="dd-style-mobile">
+            <span class="cdx-icon" data-icon="cdxIconTextStyle"></span>
+            <span class="caret" aria-hidden="true"></span>
+            <div class="menu" id="menu-style-mobile">
+              <button data-style="bold">Bold</button>
+              <button data-style="italic">Italic</button>
+              <button data-style="underline">Underline</button>
+              <button data-style="strike">Strikethrough</button>
+              <button data-style="script-sup">Superscript</button>
+              <button data-style="script-sub">Subscript</button>
+              <button data-style="clean">Clear styling</button>
+            </div>
+          </div>
+          
+          <!-- Quote -->
+          <button class="btn" id="quote" title="Quote"><span class="cdx-icon" data-icon="cdxIconQuotes"></span></button>
+          
+          <!-- Link -->
+          <button class="btn" id="btn-link-mobile" title="Add link"><span class="cdx-icon" data-icon="cdxIconLink"></span></button>
+          
+          <!-- Edit with dropdown -->
+          <div class="dropdown" id="dd-edit-mobile">
+            <span class="cdx-icon" data-icon="cdxIconEdit"></span>
+            <span class="caret" aria-hidden="true"></span>
+            <div class="menu" id="menu-edit-mobile">
+              <button data-insert="image">Media…</button>
+              <button data-insert="template">Template… (mock)</button>
+              <button data-insert="math">Math… (mock)</button>
+              <button data-insert="table">Table… (mock)</button>
+            </div>
+          </div>
+          
+          <!-- Submit (next icon) -->
+          <button class="btn submit-btn" id="submit" title="Submit" style="margin-left: auto;"><span class="cdx-icon" data-icon="cdxIconNext"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M7 1 5.6 2.5 13 10l-7.4 7.5L7 19l9-9z"></path></svg></span></button>
+        </div>
+
+        <!-- Desktop toolbar (hidden on mobile) -->
+        <div class="desktop-toolbar">
+          <!-- History -->
+          <div class="group tight">
+            <button class="btn" id="undo-desktop" title="Undo"><span class="cdx-icon" data-icon="cdxIconUndo"></span></button>
+            <button class="btn" id="redo" title="Redo"><span class="cdx-icon" data-icon="cdxIconRedo"></span></button>
+          </div>
+
+          <!-- Paragraph -->
+          <div class="group">
+            <div class="dropdown" id="dd-paragraph">
+              <span class="cdx-icon" data-icon="cdxIconTextHeading"></span>
+              <span class="cdx-button__label">Paragraph</span>
+              <span class="caret" aria-hidden="true"></span>
+              <div class="menu" id="menu-paragraph">
+                <button data-header="">Paragraph</button>
+                <button data-header="1">Heading 1</button>
+                <button data-header="2">Heading 2</button>
+                <button data-header="3">Heading 3</button>
+                <button data-header="4">Heading 4</button>
+                <button data-header="5">Heading 5</button>
+                <button data-header="6">Heading 6</button>
+                <button data-header="code">Preformatted</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Styles -->
+          <div class="group">
+            <div class="dropdown" id="dd-style">
+              <span class="cdx-icon" data-icon="cdxIconTextStyle"></span>
+              <span class="cdx-button__label">A</span>
+              <span class="caret" aria-hidden="true"></span>
+              <div class="menu" id="menu-style">
+                <button data-style="bold">Bold</button>
+                <button data-style="italic">Italic</button>
+                <button data-style="underline">Underline</button>
+                <button data-style="strike">Strikethrough</button>
+                <button data-style="script-sup">Superscript</button>
+                <button data-style="script-sub">Subscript</button>
+                <button data-style="clean">Clear styling</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Lists -->
+          <div class="group tight">
+            <button class="btn" data-cmd="ol" title="Numbered list"><span class="cdx-icon" data-icon="cdxIconListNumbered"></span></button>
+            <button class="btn" data-cmd="ul" title="Bullet list"><span class="cdx-icon" data-icon="cdxIconListBullet"></span></button>
+          </div>
+
+          <!-- Cite / Insert -->
+          <div class="group">
+            <button class="btn" id="btn-link" title="Add link">
+              <span class="cdx-icon" data-icon="cdxIconLink"></span>
+              <span class="cdx-button__label">Link</span>
             </button>
+
+            <div class="dropdown" id="dd-cite">
+              <span class="cdx-icon" data-icon="cdxIconReference"></span>
+              <span class="cdx-button__label">Cite</span>
+              <span class="caret"></span>
+              <div class="menu" id="menu-cite">
+                <button data-cite="web">Cite web… (mock)</button>
+                <button data-cite="book">Cite book… (mock)</button>
+                <button data-cite="news">Cite news… (mock)</button>
+              </div>
+            </div>
+
+            <div class="dropdown" id="dd-insert">
+              <span class="cdx-icon" data-icon="cdxIconAdd"></span>
+              <span class="cdx-button__label">Insert</span>
+              <span class="caret"></span>
+              <div class="menu" id="menu-insert">
+                <button data-insert="image">Media…</button>
+                <button data-insert="template">Template… (mock)</button>
+                <button data-insert="math">Math… (mock)</button>
+                <button data-insert="table">Table… (mock)</button>
+                <button data-insert="char">Special character…</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tools / Help -->
+          <div class="group tight">
+            <button class="btn" id="addSectionBtn" title="Add section"><span class="cdx-icon" data-icon="cdxIconAdd"></span><span class="cdx-button__label">Add section</span></button>
+            <button class="btn" disabled title="Page options"><span class="cdx-icon" data-icon="cdxIconSettings"></span></button>
+            <button class="btn" title="Help"><span class="cdx-icon" data-icon="cdxIconHelp"></span></button>
+          </div>
+
+          <!-- Publish -->
+          <div class="group" style="margin-left:auto;border-left:none;padding-right:0">
+            <button class="btn publish-btn" id="publish" disabled>Publish</button>
+          </div>
         </div>
 
-        <!-- Section Wizard Overlay -->
-        <div class="wizard-overlay" id="sectionWizard" style="display: none;">
-            <div class="wizard-backdrop"></div>
-            <div class="wizard-container">
-                <!-- Header with stepper -->
-                <div class="wizard-header">
-                    <div class="wizard-header-left">
-                        <h2 class="wizard-title">Add a section</h2>
-                        <div class="wizard-stepper">
-                            <div class="stepper-item active">
-                                <span class="stepper-number">1</span>
-                                <span class="stepper-label">Pick</span>
-                            </div>
-                            <div class="stepper-arrow">→</div>
-                            <div class="stepper-item">
-                                <span class="stepper-number">2</span>
-                                <span class="stepper-label">Sources</span>
-                            </div>
-                            <div class="stepper-arrow">→</div>
-                            <div class="stepper-item">
-                                <span class="stepper-number">3</span>
-                                <span class="stepper-label">Review</span>
-                            </div>
-                        </div>
-                    </div>
-                    <button class="wizard-close" id="wizardClose" title="Close wizard">×</button>
-                </div>
-
-                <!-- Context row -->
-                <div class="wizard-context">
-                    <span class="context-page-title" id="contextPageTitle">Article</span>
-                    <span class="context-article-type">Biography</span>
-                    <span class="context-blp-badge">BLP</span>
-                </div>
-
-                <!-- Main content area -->
-                <div class="wizard-content">
-                    <!-- Step 1: Pick a section -->
-                    <div class="wizard-step" id="step1">
-                        <h3 class="step-title">Step 1 · Pick a section</h3>
-                        
-                        <div class="section-suggestions">
-                            <div class="section-card" data-section="personal-life">
-                                <h4 class="section-card-title">Personal life</h4>
-                                <p class="section-card-why">Readers want to know about background and inspirations</p>
-                            </div>
-
-                            <div class="section-card" data-section="awards-honors">
-                                <h4 class="section-card-title">Awards and honors</h4>
-                                <p class="section-card-why">Recognition for groundbreaking contributions</p>
-                            </div>
-
-                            <div class="section-card" data-section="technical-innovations">
-                                <h4 class="section-card-title">Technical innovations</h4>
-                                <p class="section-card-why">Specific algorithmic contributions deserve explanation</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Step 2: Sources -->
-                    <div class="wizard-step" id="step2" style="display: none;">
-                        <h3 class="step-title">Step 2 · Sources</h3>
-                        
-                        <div class="chosen-section">
-                            <span class="chosen-section-label">Section: </span>
-                            <span class="chosen-section-name" id="chosenSectionName"></span>
-                        </div>
-
-                        <div class="source-input-area">
-                            <div class="source-input-group">
-                                <input type="url" placeholder="Paste a source URL..." class="source-url-input" id="sourceUrlInput">
-                                <button class="add-source-btn" id="addSourceBtn">Add</button>
-                            </div>
-                        </div>
-
-                        <div class="sources-list" id="sourcesList">
-                            <!-- Added sources will appear here -->
-                        </div>
-
-                        <div class="sources-nudge" id="sourcesNudge" style="display: none;">
-                            <p>💡 Consider adding at least one reliable source to support your content.</p>
-                        </div>
-                    </div>
-
-                    <!-- Step 3: Review -->
-                    <div class="wizard-step" id="step3" style="display: none;">
-                        <h3 class="step-title">Step 3 · Review</h3>
-                        
-                        <div class="chosen-section">
-                            <span class="chosen-section-label">Section: </span>
-                            <span class="chosen-section-name" id="chosenSectionName3"></span>
-                        </div>
-
-                        <div class="review-checks" id="reviewChecks">
-                            <!-- Review issues will appear here -->
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Footer -->
-                <div class="wizard-footer">
-                    <div class="wizard-footer-left">
-                        <a href="#" class="help-link">Help / policies</a>
-                    </div>
-                    <div class="wizard-footer-right">
-                        <button class="wizard-btn-back" id="wizardBack" style="display: none;">Back</button>
-                        <button class="wizard-btn-skip" id="wizardSkip" style="display: none;">Skip for now</button>
-                        <button class="wizard-btn-cancel" id="wizardCancel">Cancel</button>
-                        <button class="wizard-btn-continue" id="wizardContinue" disabled>Continue</button>
-                        <button class="wizard-btn-insert" id="wizardInsert" style="display: none;" disabled>Finish</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Floating Source Palette -->
-        <div class="source-palette" id="sourcePalette" style="display: none;">
-            <div class="source-palette-header">
-                <span class="source-palette-title">Sources</span>
-                <button class="source-palette-close" id="sourcePaletteClose" title="Close">×</button>
-            </div>
-            <div class="source-palette-content" id="sourcePaletteContent">
-                <!-- Source statements will appear here -->
-            </div>
-        </div>
+      </div>
     </div>
 
-    <script>
-        // Load selected article content from sessionStorage
-        document.addEventListener('DOMContentLoaded', function() {
-            const selectedArticleData = sessionStorage.getItem('selectedArticle');
-            
-            if (selectedArticleData) {
-                const article = JSON.parse(selectedArticleData);
-                loadArticleContent(article);
-            } else {
-                // Fallback to Katie Bouman if no selection found
-                loadDefaultContent();
-            }
-        });
+    <!-- VE Content -->
+    <main class="ve-content-wrap">
+      <p class="tagline">From Wikipedia, the free encyclopedia</p>
+      <div class="surface">
+        <div id="editor"></div>
+        <div class="status">
+          <span>Changes are preview‑only in this demo.</span>
+          <span class="badge">VE toolbar mock (Codex icons)</span>
+        </div>
+      </div>
+    </main>
 
-        function loadArticleContent(article) {
-            // Update page title and header
-            document.getElementById('pageTitle').textContent = article.title + ' - Wikipedia';
-            document.getElementById('articleTitle').textContent = article.title;
-            document.getElementById('articleSubtitle').textContent = article.description;
-            
-            // Convert MediaWiki markup to HTML
-            const htmlContent = convertMediaWikiToHTML(article.content);
-            document.getElementById('articleBody').innerHTML = htmlContent;
-            
-            // Update suggestion count in the smart widget
-            updateSuggestionCount(article.id || 'katie-bouman');
-        }
+  </div>
 
-        function convertMediaWikiToHTML(mediaWikiText) {
-            let html = mediaWikiText;
-            
-            // Convert section headers
-            html = html.replace(/^== (.+?) ==$/gm, '<section class="article-section"><h2 class="article-section__title">$1</h2><div class="article-section__content">');
-            html = html.replace(/^=== (.+?) ===$/gm, '<h3 class="article-subsection__title">$1</h3>');
-            
-            // Convert paragraphs - split by double newlines and wrap non-markup text in <p> tags
-            html = html.split('\n\n').map(paragraph => {
-                paragraph = paragraph.trim();
-                if (paragraph === '') return '';
-                if (paragraph.startsWith('<section') || paragraph.startsWith('<h3') || paragraph.startsWith('*') || paragraph.startsWith('{{')) {
-                    return paragraph;
-                }
-                return '<p>' + paragraph + '</p>';
-            }).join('\n');
-            
-            // Close section divs before new sections
-            html = html.replace(/<section class="article-section">/g, '</div></section><section class="article-section">');
-            html = html.replace(/^<\/div><\/section>/, ''); // Remove first closing tags
-            
-            // Convert lists
-            html = html.replace(/^\* (.+)$/gm, '<li>$1</li>');
-            html = html.replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>');
-            
-            // Convert wiki links to regular links (simplified)
-            html = html.replace(/\[\[([^\]|]+)(\|[^\]]+)?\]\]/g, '<a href="#" class="wiki-link">$1</a>');
-            
-            // Convert external links (simplified)
-            html = html.replace(/\[([^\s]+) ([^\]]+)\]/g, '<a href="$1" class="external-link">$2</a>');
-            
-            // Convert bold text
-            html = html.replace(/'''(.+?)'''/g, '<strong>$1</strong>');
-            
-            // Convert italic text
-            html = html.replace(/''(.+?)''/g, '<em>$1</em>');
-            
-            // Add closing div for last section
-            html += '</div></section>';
-            
-            // Add placeholder for new sections
-            html += '<div id="newSectionsContainer"></div>';
-            
-            return html;
-        }
+  <!-- Smart Widget (for section expansion) -->
+  <div class="smart-widget" id="smartWidget" style="display: none;">
+    <button class="smart-widget__trigger" id="smartWidgetTrigger">
+      <span class="smart-widget__icon">🧙‍♂️</span>
+      <span class="smart-widget__text">Add a section</span>
+    </button>
+  </div>
 
-        function loadDefaultContent() {
-            const defaultArticle = {
-                id: 'katie-bouman',
-                title: 'Katie Bouman',
-                description: 'American computer scientist and engineer',
-                content: `'''Katherine Louise Bouman''' (born 1989) is an American [[engineer]] and [[computer scientist]] working in the field of [[computational imaging]]. She led the development of an [[algorithm]] for imaging [[black hole]]s, known as [[CHIRP (algorithm)|Continuous High-resolution Image Reconstruction using Patch priors]] (CHIRP), and was a member of the [[Event Horizon Telescope]] team that captured the first image of a black hole.
+  <!-- Section Wizard Overlay -->
+  <div class="wizard-overlay" id="sectionWizard" style="display: none;">
+    <div class="wizard-backdrop"></div>
+    <div class="wizard-container">
+      <!-- Header with stepper -->
+      <div class="wizard-header">
+        <div class="wizard-header-left">
+          <h2 class="wizard-title">Add a section</h2>
+          <div class="wizard-stepper">
+            <div class="stepper-item active">
+              <span class="stepper-number">1</span>
+              <span class="stepper-label">Pick</span>
+            </div>
+            <div class="stepper-arrow">→</div>
+            <div class="stepper-item">
+              <span class="stepper-number">2</span>
+              <span class="stepper-label">Sources</span>
+            </div>
+            <div class="stepper-arrow">→</div>
+            <div class="stepper-item">
+              <span class="stepper-number">3</span>
+              <span class="stepper-label">Review</span>
+            </div>
+          </div>
+        </div>
+        <button class="wizard-close" id="wizardClose" title="Close wizard">×</button>
+      </div>
 
-== Early life and education ==
-Bouman grew up in [[West Lafayette, Indiana]]. Her father, [[Charles Bouman]], is a professor of [[electrical and computer engineering]] and [[biomedical engineering]] at [[Purdue University]].
+      <!-- Context row -->
+      <div class="wizard-context">
+        <span class="context-page-title" id="contextPageTitle">Article</span>
+        <span class="context-article-type">Biography</span>
+        <span class="context-blp-badge">BLP</span>
+      </div>
 
-== Research and career ==
-After earning her doctorate, Bouman joined [[Harvard University]] as a [[postdoctoral fellow]] on the Event Horizon Telescope Imaging team. She led the development of an algorithm for imaging black holes, known as [[CHIRP (algorithm)|Continuous High-resolution Image Reconstruction using Patch priors]] (CHIRP).
+      <!-- Main content area -->
+      <div class="wizard-content">
+        <!-- Step 1: Pick a section -->
+        <div class="wizard-step" id="step1">
+          <h3 class="step-title">Step 1 · Pick a section</h3>
+          
+          <div class="section-suggestions">
+            <div class="section-card" data-section="personal-life">
+              <h4 class="section-card-title">Personal life</h4>
+              <p class="section-card-why">Readers want to know about background and inspirations</p>
+            </div>
 
-== Recognition ==
-She was recognized as one of the [[BBC]]'s [[100 Women (BBC)#2019|100 women of 2019]]. In 2024, Bouman was awarded a [[Sloan Research Fellowship]].`
-            };
-            loadArticleContent(defaultArticle);
-        }
+            <div class="section-card" data-section="awards-honors">
+              <h4 class="section-card-title">Awards and honors</h4>
+              <p class="section-card-why">Recognition for groundbreaking contributions</p>
+            </div>
 
-        function updateSuggestionCount(articleId) {
-            // Same suggestion sets as in section-suggestions.html
-            const suggestionSets = {
-                'katie-bouman': {
-                    facts: 2, // Harvard, Caltech
-                    sections: 2 // Awards, Notable Works
-                },
-                'john-langford': {
-                    facts: 3, // Education, PhD, Microsoft
-                    sections: 3 // Education, Career, Research
-                },
-                'henri-gouraud': {
-                    facts: 3, // Birth, nephew, face-capture
-                    sections: 2 // Early life, Legacy
-                },
-                'eduardo-caianiello': {
-                    facts: 3, // Institutes, cybernetics, hafnian
-                    sections: 3 // Career, Research, Legacy
-                },
-                'patrick-mchale': {
-                    facts: 3, // Birth, CalArts, awards
-                    sections: 1 // Awards and recognition
-                }
-            };
+            <div class="section-card" data-section="technical-innovations">
+              <h4 class="section-card-title">Technical innovations</h4>
+              <p class="section-card-why">Specific algorithmic contributions deserve explanation</p>
+            </div>
+          </div>
+        </div>
 
-            const suggestions = suggestionSets[articleId] || suggestionSets['katie-bouman'];
-            const totalCount = suggestions.facts + suggestions.sections;
-            
-            const suggestionCountElement = document.getElementById('suggestionCount');
-            if (suggestionCountElement) {
-                suggestionCountElement.textContent = `${totalCount} ideas`;
-            }
-        }
-    </script>
-    
-    <style>
-        .loading-content {
-            text-align: center;
-            padding: 40px 20px;
-            color: #72777d;
-            font-style: italic;
-        }
-    </style>
+        <!-- Step 2: Sources -->
+        <div class="wizard-step" id="step2" style="display: none;">
+          <h3 class="step-title">Step 2 · Sources</h3>
+          
+          <div class="chosen-section">
+            <span class="chosen-section-label">Section: </span>
+            <span class="chosen-section-name" id="chosenSectionName"></span>
+          </div>
 
+          <div class="source-input-area">
+            <div class="source-input-group">
+              <input type="url" placeholder="Paste a source URL..." class="source-url-input" id="sourceUrlInput">
+              <button class="add-source-btn" id="addSourceBtn">Add</button>
+            </div>
+          </div>
+
+          <div class="sources-list" id="sourcesList">
+            <!-- Added sources will appear here -->
+          </div>
+
+          <div class="sources-nudge" id="sourcesNudge" style="display: none;">
+            <p>💡 Consider adding at least one reliable source to support your content.</p>
+          </div>
+        </div>
+
+        <!-- Step 3: Review -->
+        <div class="wizard-step" id="step3" style="display: none;">
+          <h3 class="step-title">Step 3 · Review</h3>
+          
+          <div class="chosen-section">
+            <span class="chosen-section-label">Section: </span>
+            <span class="chosen-section-name" id="chosenSectionName3"></span>
+          </div>
+
+          <div class="review-checks" id="reviewChecks">
+            <!-- Review issues will appear here -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="wizard-footer">
+        <div class="wizard-footer-left">
+          <a href="#" class="help-link">Help / policies</a>
+        </div>
+        <div class="wizard-footer-right">
+          <button class="wizard-btn-back" id="wizardBack" style="display: none;">Back</button>
+          <button class="wizard-btn-skip" id="wizardSkip" style="display: none;">Skip for now</button>
+          <button class="wizard-btn-cancel" id="wizardCancel">Cancel</button>
+          <button class="wizard-btn-continue" id="wizardContinue" disabled>Continue</button>
+          <button class="wizard-btn-insert" id="wizardInsert" style="display: none;" disabled>Finish</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Floating Source Palette -->
+  <div class="source-palette" id="sourcePalette" style="display: none;">
+    <div class="source-palette-header">
+      <span class="source-palette-title">Sources</span>
+      <button class="source-palette-close" id="sourcePaletteClose" title="Close">×</button>
+    </div>
+    <div class="source-palette-content" id="sourcePaletteContent">
+      <!-- Source statements will appear here -->
+    </div>
+  </div>
+
+  <!-- Load scripts -->
+  <script src="https://cdn.quilljs.com/1.3.7/quill.js"></script>
 </body>
 </html>
