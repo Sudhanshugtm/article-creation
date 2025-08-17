@@ -35,6 +35,84 @@
     padding: 40px 20px;
 }
 
+/* Concept Selection Styles */
+.concept-selection__title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #101418;
+    margin: 0 0 12px 0;
+}
+
+.concept-selection__subtitle {
+    font-size: 1rem;
+    color: #54595d;
+    margin: 0 0 32px 0;
+}
+
+.concept-card {
+    background: #fff;
+    border: 1px solid #c8ccd1;
+    border-radius: 8px;
+    padding: 24px;
+    margin-bottom: 24px;
+    transition: all 0.2s ease;
+}
+
+.concept-card:hover {
+    border-color: #0645ad;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.concept-card__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+}
+
+.concept-card__title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #101418;
+    margin: 0;
+}
+
+.concept-card__badge {
+    background: #eaf3ff;
+    color: #0645ad;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.concept-card__content {
+    margin-bottom: 20px;
+}
+
+.concept-card__description {
+    font-size: 1rem;
+    color: #54595d;
+    margin: 0 0 16px 0;
+    line-height: 1.5;
+}
+
+.concept-card__features {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.concept-card__feature {
+    font-size: 0.875rem;
+    color: #72777d;
+}
+
+.concept-card__button {
+    width: 100%;
+}
+
 .article-selection__title {
     font-size: 1.5rem;
     font-weight: 600;
