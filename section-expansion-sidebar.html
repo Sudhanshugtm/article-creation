@@ -10,9 +10,9 @@
   <link rel="stylesheet" href="https://unpkg.com/@wikimedia/codex-design-tokens@2.3.0/theme-wikimedia-ui.css">
 
   <!-- VE styles -->
-  <script type="module" crossorigin src="/article-creation/assets/section-expansion-sidebar-DYwC2KFF.js"></script>
+  <script type="module" crossorigin src="/article-creation/assets/section-expansion-sidebar-CxpEnwAn.js"></script>
   <link rel="modulepreload" crossorigin href="/article-creation/assets/modulepreload-polyfill-B5Qt9EMX.js">
-  <link rel="modulepreload" crossorigin href="/article-creation/assets/ve-reading-script-CiEBZPRH.js">
+  <link rel="modulepreload" crossorigin href="/article-creation/assets/ve-reading-script-CekbJ2YY.js">
   <link rel="stylesheet" crossorigin href="/article-creation/assets/ve-reading-script-BMSNudMv.css">
   <link rel="stylesheet" crossorigin href="/article-creation/assets/section-expansion-sidebar-tD8k3-xD.css">
 </head>
@@ -208,6 +208,10 @@
 
           <!-- Tools / Help -->
           <div class="group tight">
+            <button class="btn" id="expandArticleBtn" title="Expand this article">
+              <span class="cdx-icon" data-icon="cdxIconRobot">🤖</span>
+              <span class="cdx-button__label">Expand article</span>
+            </button>
             <button class="btn" disabled title="Page options"><span class="cdx-icon" data-icon="cdxIconSettings"></span></button>
             <button class="btn" title="Help"><span class="cdx-icon" data-icon="cdxIconHelp"></span></button>
           </div>
@@ -235,8 +239,8 @@
 
   </div>
 
-  <!-- Smart Widget (for section expansion) -->
-  <div class="smart-widget" id="smartWidget" style="display: none;">
+  <!-- Smart Widget (hidden - using toolbar button instead) -->
+  <div class="smart-widget" id="smartWidget" style="display: none !important;">
     <button class="smart-widget__trigger" id="smartWidgetTrigger">
       <span class="smart-widget__icon">🤖</span>
       <span class="smart-widget__text">Expand this article</span>
