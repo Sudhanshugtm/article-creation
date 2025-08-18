@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title id="pageTitle">Katie Bouman - Wikipedia</title>
   <!-- Dev-friendly: load source TS and CSS; Vite bundles for prod -->
-  <script type="module" crossorigin src="/article-creation/assets/section-expansion-5-pOypbg.js"></script>
+  <script type="module" crossorigin src="/article-creation/assets/section-expansion-sidebar-xY9Yj5u4.js"></script>
   <link rel="modulepreload" crossorigin href="/article-creation/assets/modulepreload-polyfill-B5Qt9EMX.js">
-  <link rel="modulepreload" crossorigin href="/article-creation/assets/WikidataEnhancementService-DbWP4Spv.js">
-  <link rel="stylesheet" crossorigin href="/article-creation/assets/codex-DBdVX30Q.css">
+  <link rel="stylesheet" crossorigin href="/article-creation/assets/section-expansion-sidebar-tD8k3-xD.css">
+  <link rel="stylesheet" crossorigin href="/article-creation/assets/codex-B5m2OaX5.css">
   <link rel="stylesheet" crossorigin href="/article-creation/assets/section-expansion-Qg1vSYNK.css">
 </head>
 <body>
@@ -39,10 +39,59 @@
 
         <!-- Smart Widget -->
         <div class="smart-widget" id="smartWidget">
-            <button class="smart-widget__trigger" id="smartWidgetTrigger" onclick="window.location.href='./section-suggestions.html'">
-                <span class="smart-widget__icon">💡</span>
-                <span class="smart-widget__text">What to improve?</span>
+            <button class="smart-widget__trigger" id="smartWidgetTrigger" onclick="showExpandSidebar()">
+                <span class="smart-widget__icon">🤖</span>
+                <span class="smart-widget__text">Expand this article</span>
             </button>
+        </div>
+
+        <!-- Expand Sidebar -->
+        <div class="expand-sidebar" id="expandSidebar" style="display: none;">
+            <div class="expand-sidebar__header">
+                <h2 class="expand-sidebar__title">Expand this article</h2>
+                <button class="expand-sidebar__close" id="sidebarClose">×</button>
+            </div>
+            <div class="expand-sidebar__content">
+                <div class="expand-section">
+                    <h3 class="expand-section__title">Missing Facts</h3>
+                    <ul class="expand-suggestions" id="factSuggestions">
+                        <li class="expand-suggestion">
+                            <div class="expand-suggestion__content">
+                                <div class="expand-suggestion__text">Harvard postdoc position (2018)</div>
+                                <div class="expand-suggestion__hint">Add to Research section</div>
+                            </div>
+                            <button class="expand-suggestion__action" data-type="fact" data-id="harvard">Add</button>
+                        </li>
+                        <li class="expand-suggestion">
+                            <div class="expand-suggestion__content">
+                                <div class="expand-suggestion__text">Caltech professorship details</div>
+                                <div class="expand-suggestion__hint">Expand career section</div>
+                            </div>
+                            <button class="expand-suggestion__action" data-type="fact" data-id="caltech">Add</button>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="expand-section">
+                    <h3 class="expand-section__title">Suggested Sections</h3>
+                    <ul class="expand-suggestions" id="sectionSuggestions">
+                        <li class="expand-suggestion">
+                            <div class="expand-suggestion__content">
+                                <div class="expand-suggestion__text">Awards and honors</div>
+                                <div class="expand-suggestion__hint">Recognition and achievements</div>
+                            </div>
+                            <button class="expand-suggestion__action" data-type="section" data-id="awards">Add</button>
+                        </li>
+                        <li class="expand-suggestion">
+                            <div class="expand-suggestion__content">
+                                <div class="expand-suggestion__text">Notable works</div>
+                                <div class="expand-suggestion__hint">Publications and projects</div>
+                            </div>
+                            <button class="expand-suggestion__action" data-type="section" data-id="works">Add</button>
+                        </li>
+                    </ul>
+                </div>
+            </div>
         </div>
     </div>
 

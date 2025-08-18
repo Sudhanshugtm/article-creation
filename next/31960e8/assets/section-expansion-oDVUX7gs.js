@@ -1,0 +1,37 @@
+var u=Object.defineProperty;var h=(r,e,n)=>e in r?u(r,e,{enumerable:!0,configurable:!0,writable:!0,value:n}):r[e]=n;var d=(r,e,n)=>h(r,typeof e!="symbol"?e+"":e,n);import"./modulepreload-polyfill-B5Qt9EMX.js";import{W as p}from"./WikidataEnhancementService-DbWP4Spv.js";/* empty css              *//* empty css                          */class f{constructor(){d(this,"addedContent",new Set);d(this,"wikidataService");d(this,"wikidataSuggestions",new Map);this.wikidataService=new p,this.initialize()}async initialize(){this.checkForAppliedSuggestions(),this.updateSuggestionCount(),this.loadWikidataSuggestionsWithTimeout(3e3).catch(()=>{})}async loadWikidataSuggestionsWithTimeout(e){const n=new Promise(i=>setTimeout(i,e));try{await Promise.race([this.loadWikidataSuggestions(),n])}catch{}}async loadWikidataSuggestions(){try{const e=this.getExistingArticleContent();(await this.wikidataService.getEnhancementSuggestions(e)).forEach(i=>{this.wikidataSuggestions.set(i.id,i)})}catch(e){console.error("Error loading Wikidata suggestions:",e)}}getExistingArticleContent(){const e=document.querySelectorAll(".article-section .article-section__content");let n="";return e.forEach(i=>{n+=i.textContent+" "}),n.trim()}checkForAppliedSuggestions(){const e=sessionStorage.getItem("selectedSuggestions"),n=sessionStorage.getItem("wikidataSuggestions");if(console.log("Checking for applied suggestions..."),console.log("Selected suggestions from storage:",e),console.log("Wikidata suggestions from storage:",n),e){if(n){const t=JSON.parse(n);console.log("Loading Wikidata suggestions:",t),t.forEach(a=>{this.wikidataSuggestions.set(a.id,a)})}const i=JSON.parse(e);console.log("Applying suggestions:",i),this.applySuggestions(i),sessionStorage.removeItem("selectedSuggestions"),sessionStorage.removeItem("wikidataSuggestions")}else console.log("No suggestions to apply")}applySuggestions(e){const n=[],i=[];e.forEach(t=>{const a=t.indexOf("-");if(a===-1)return;const s=t.slice(0,a),o=t.slice(a+1);s==="fact"?n.push(o):s==="section"&&i.push(o)}),n.forEach(t=>{this.addFact(t)}),i.forEach(t=>{this.addSection(t)}),e.forEach(t=>{this.addedContent.add(t)}),this.updateSuggestionCount(),this.showSuccessFeedback()}addFact(e){console.log(`Adding fact: ${e}`);const n=document.getElementById("articleBody"),i=document.getElementById("researchCareerContent")||n;if(!i){console.warn("No suitable container found to insert fact");return}let t=i.querySelector("p");t||(t=document.createElement("p"),i.appendChild(t));const a=this.wikidataSuggestions.get(e);if(a){const s=document.createElement("span");s.className="fact-highlight",s.textContent=" "+a.content,t.appendChild(s),console.log(`Added Wikidata fact: ${a.content}`);return}if(e==="harvard"){const s=t.innerHTML,o=s.replace("on the Event Horizon Telescope Imaging team",'on the Event Horizon Telescope Imaging team <span class="fact-highlight">(2018)</span>');if(o!==s)t.innerHTML=o;else{const c=document.createElement("span");c.className="fact-highlight",c.textContent=" (2018)",t.appendChild(c)}console.log("Added Harvard fact")}else if(e==="caltech"){const s=" She then joined the California Institute of Technology (Caltech) as an assistant professor in June 2019, later promoted to associate professor.",o=document.createElement("span");o.className="fact-highlight",o.textContent=s,t.appendChild(o),console.log("Added Caltech fact")}}addSection(e){const n=document.getElementById("newSectionsContainer");console.log(`Adding section: ${e}`),console.log("Available Wikidata suggestions:",Array.from(this.wikidataSuggestions.keys()));let i=this.wikidataSuggestions.get(e);if(!i&&e.endsWith("-section")){const o=e.replace(/-section$/,"");i=this.wikidataSuggestions.get(o)||this.wikidataSuggestions.get(`${o}-section`)}if(!i){const c=(e.endsWith("-section")?e.replace(/-section$/,""):e).replace(/-/g," ").toLowerCase();for(const l of this.wikidataSuggestions.values())if((l==null?void 0:l.type)==="section"){const g=(l.title||"").toLowerCase();if(g===c||g.includes(c)||c.includes(g)){i=l;break}}}if(i){console.log(`Found Wikidata suggestion for ${e}:`,i);const o=document.createElement("section");o.className="article-section article-section--new",o.innerHTML=`
+                <h2 class="article-section__title">${i.title}</h2>
+                <div class="article-section__content">
+                    ${i.content}
+                </div>
+            `,n.appendChild(o),console.log(`Added Wikidata section: ${i.title}`);return}const t=this.getSelectedArticleTitle(),a={awards:{title:"Awards",content:`<p>${t} has received recognition for contributions in their field:</p>
+                <ul>
+                    <li>Year – Award or honor</li>
+                    <li>Year – Award or honor</li>
+                    <li>Year – Award or honor</li>
+                </ul>`},works:{title:"Notable works",content:`<p>Selected works and publications by ${t}:</p>
+                <ul>
+                    <li>Year – Work title</li>
+                    <li>Year – Work title</li>
+                    <li>Year – Work title</li>
+                </ul>`},education:{title:"Education",content:`<p>Educational background for ${t}:</p>
+                <ul>
+                    <li>Degree or program – Institution (Year)</li>
+                    <li>Degree or program – Institution (Year)</li>
+                </ul>`},personal:{title:"Personal life",content:`<p>Personal background and notable life details for ${t}.</p>`},career:{title:"Career",content:`<p>Notable roles, appointments, and positions held by ${t} across academia and industry.</p>`},research:{title:"Research contributions",content:`<p>Key areas of research focus and significant contributions by ${t}.</p>`},legacy:{title:"Legacy",content:`<p>Long-term impact, influence, and recognition of ${t} within their field.</p>`},"early-life":{title:"Early life",content:`<p>Background, upbringing, and formative experiences of ${t} leading to later career and research interests.</p>`}},s=e.endsWith("-section")?e.replace(/-section$/,""):e;if(a[s]){console.log(`Found hardcoded content for ${s}: ${a[s].title}`);const o=document.createElement("section");o.className="article-section article-section--new",o.innerHTML=`
+                <h2 class="article-section__title">${a[s].title}</h2>
+                <div class="article-section__content">
+                    ${a[s].content}
+                </div>
+            `,n.appendChild(o),console.log(`Added hardcoded section: ${a[s].title}`)}else console.warn(`No content found for section ID: ${e}`),console.log("Available hardcoded sections:",Object.keys(a))}getSelectedArticleTitle(){try{const e=sessionStorage.getItem("selectedArticle");if(!e)return"This topic";const n=JSON.parse(e);return(n==null?void 0:n.title)||"This topic"}catch{return"This topic"}}updateSuggestionCount(){const e=document.getElementById("suggestionCount");e&&e.parentElement&&e.parentElement.removeChild(e)}showSuccessFeedback(){const e=document.createElement("div");e.className="success-feedback",e.textContent="✓ Changes applied successfully!",e.style.cssText=`
+            position: fixed;
+            bottom: 32px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #00af89;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 4px;
+            font-weight: 500;
+            z-index: 1000;
+            animation: fadeInOut 3s ease;
+        `,document.body.appendChild(e),setTimeout(()=>{e.remove()},3e3)}}document.addEventListener("DOMContentLoaded",()=>{new f});

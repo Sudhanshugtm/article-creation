@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Section Creation - Wikipedia</title>
   <!-- Dev-friendly styles -->
-  <link rel="stylesheet" crossorigin href="/article-creation/assets/section-creation-Bd-fXVO4.css">
-  <link rel="stylesheet" crossorigin href="/article-creation/assets/codex-DBdVX30Q.css">
+  <link rel="stylesheet" crossorigin href="/article-creation/assets/section-creation-mav-lUbp.css">
+  <link rel="stylesheet" crossorigin href="/article-creation/assets/codex-B5m2OaX5.css">
 </head>
 <body>
     <div class="section-creator">
@@ -21,7 +21,24 @@
         </header>
 
         <main class="section-creator__main">
-            <div class="article-selection">
+            <div class="concept-selection">
+                <h2 class="concept-selection__title">Choose a concept to test</h2>
+                
+                <div class="simple-concept-list">
+                    <div class="simple-concept-item" onclick="selectConcept('sidebar')">
+                        <h3>Sidebar Enhancement</h3>
+                        <p>Smart sidebar with contextual suggestions</p>
+                    </div>
+                    
+                    <div class="simple-concept-item" onclick="selectConcept('wizard')">
+                        <h3>Guided Section Wizard</h3>
+                        <p>Step-by-step section creation wizard</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Hidden: Article Selection (shown after concept choice) -->
+            <div class="article-selection" id="articleSelection" style="display: none;">
                 <h2 class="article-selection__title">Select an article to expand</h2>
                 
                 <!-- Katie Bouman - Computer Science -->
@@ -363,10 +380,33 @@ The short became the basis for a ten-part [[miniseries]] ''Over the Garden Wall'
             }
         };
 
+        let selectedConcept = null;
+
+        function selectConcept(concept) {
+            selectedConcept = concept;
+            sessionStorage.setItem('selectedConcept', concept);
+            
+            // Hide concept selection and show article selection
+            document.querySelector('.concept-selection').style.display = 'none';
+            document.getElementById('articleSelection').style.display = 'block';
+            
+            // Update header to reflect the concept choice
+            const title = document.querySelector('.section-creator__title');
+            const subtitle = document.querySelector('.section-creator__subtitle');
+            
+            if (concept === 'sidebar') {
+                title.textContent = 'Concept 1: Sidebar Enhancement';
+                subtitle.textContent = 'Select an article to test the smart sidebar concept';
+            } else if (concept === 'wizard') {
+                title.textContent = 'Concept 2: Guided Section Wizard';
+                subtitle.textContent = 'Select an article to test the guided wizard concept';
+            }
+        }
+
         function selectArticle(articleId) {
             // Store selected article metadata
             const article = articleData[articleId];
-            if (article) {
+            if (article && selectedConcept) {
                 sessionStorage.setItem('selectedArticleId', articleId);
                 sessionStorage.setItem('selectedArticle', JSON.stringify({
                     id: articleId,
@@ -376,8 +416,12 @@ The short became the basis for a ten-part [[miniseries]] ''Over the Garden Wall'
                     content: article.content
                 }));
                 
-                // Navigate to expansion interface - it will fetch real content via MediaWiki
-                window.location.href = './section-expansion.html';
+                // Navigate based on selected concept
+                if (selectedConcept === 'sidebar') {
+                    window.location.href = './section-expansion-sidebar.html';
+                } else if (selectedConcept === 'wizard') {
+                    window.location.href = './section-expansion-wizard.html';
+                }
             }
         }
 

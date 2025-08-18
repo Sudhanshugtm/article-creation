@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title id="pageTitle">Katie Bouman - Wikipedia</title>
   <!-- Dev-friendly: load source TS and CSS; Vite bundles for prod -->
-  <script type="module" crossorigin src="/article-creation/assets/section-expansion-5-pOypbg.js"></script>
+  <script type="module" crossorigin src="/article-creation/assets/section-expansion-wizard-Bw0svYyT.js"></script>
   <link rel="modulepreload" crossorigin href="/article-creation/assets/modulepreload-polyfill-B5Qt9EMX.js">
-  <link rel="modulepreload" crossorigin href="/article-creation/assets/WikidataEnhancementService-DbWP4Spv.js">
-  <link rel="stylesheet" crossorigin href="/article-creation/assets/codex-DBdVX30Q.css">
+  <link rel="stylesheet" crossorigin href="/article-creation/assets/section-expansion-wizard-BvsshBIp.css">
+  <link rel="stylesheet" crossorigin href="/article-creation/assets/codex-B5m2OaX5.css">
   <link rel="stylesheet" crossorigin href="/article-creation/assets/section-expansion-Qg1vSYNK.css">
 </head>
 <body>
@@ -39,10 +39,136 @@
 
         <!-- Smart Widget -->
         <div class="smart-widget" id="smartWidget">
-            <button class="smart-widget__trigger" id="smartWidgetTrigger" onclick="window.location.href='./section-suggestions.html'">
-                <span class="smart-widget__icon">💡</span>
-                <span class="smart-widget__text">What to improve?</span>
+            <button class="smart-widget__trigger" id="smartWidgetTrigger" onclick="openSectionWizard()">
+                <span class="smart-widget__icon">🧙‍♂️</span>
+                <span class="smart-widget__text">Add a section</span>
             </button>
+        </div>
+
+        <!-- Section Wizard Overlay -->
+        <div class="wizard-overlay" id="sectionWizard" style="display: none;">
+            <div class="wizard-backdrop"></div>
+            <div class="wizard-container">
+                <!-- Header with stepper -->
+                <div class="wizard-header">
+                    <div class="wizard-header-left">
+                        <h2 class="wizard-title">Add a section</h2>
+                        <div class="wizard-stepper">
+                            <div class="stepper-item active">
+                                <span class="stepper-number">1</span>
+                                <span class="stepper-label">Pick</span>
+                            </div>
+                            <div class="stepper-arrow">→</div>
+                            <div class="stepper-item">
+                                <span class="stepper-number">2</span>
+                                <span class="stepper-label">Sources</span>
+                            </div>
+                            <div class="stepper-arrow">→</div>
+                            <div class="stepper-item">
+                                <span class="stepper-number">3</span>
+                                <span class="stepper-label">Review</span>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="wizard-close" id="wizardClose" title="Close wizard">×</button>
+                </div>
+
+                <!-- Context row -->
+                <div class="wizard-context">
+                    <span class="context-page-title" id="contextPageTitle">Article</span>
+                    <span class="context-article-type">Biography</span>
+                    <span class="context-blp-badge">BLP</span>
+                </div>
+
+                <!-- Main content area -->
+                <div class="wizard-content">
+                    <!-- Step 1: Pick a section -->
+                    <div class="wizard-step" id="step1">
+                        <h3 class="step-title">Step 1 · Pick a section</h3>
+                        
+                        <div class="section-suggestions">
+                            <div class="section-card" data-section="personal-life">
+                                <h4 class="section-card-title">Personal life</h4>
+                                <p class="section-card-why">Readers want to know about background and inspirations</p>
+                            </div>
+
+                            <div class="section-card" data-section="awards-honors">
+                                <h4 class="section-card-title">Awards and honors</h4>
+                                <p class="section-card-why">Recognition for groundbreaking contributions</p>
+                            </div>
+
+                            <div class="section-card" data-section="technical-innovations">
+                                <h4 class="section-card-title">Technical innovations</h4>
+                                <p class="section-card-why">Specific algorithmic contributions deserve explanation</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Sources -->
+                    <div class="wizard-step" id="step2" style="display: none;">
+                        <h3 class="step-title">Step 2 · Sources</h3>
+                        
+                        <div class="chosen-section">
+                            <span class="chosen-section-label">Section: </span>
+                            <span class="chosen-section-name" id="chosenSectionName"></span>
+                        </div>
+
+                        <div class="source-input-area">
+                            <div class="source-input-group">
+                                <input type="url" placeholder="Paste a source URL..." class="source-url-input" id="sourceUrlInput">
+                                <button class="add-source-btn" id="addSourceBtn">Add</button>
+                            </div>
+                        </div>
+
+                        <div class="sources-list" id="sourcesList">
+                            <!-- Added sources will appear here -->
+                        </div>
+
+                        <div class="sources-nudge" id="sourcesNudge" style="display: none;">
+                            <p>💡 Consider adding at least one reliable source to support your content.</p>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Review -->
+                    <div class="wizard-step" id="step3" style="display: none;">
+                        <h3 class="step-title">Step 3 · Review</h3>
+                        
+                        <div class="chosen-section">
+                            <span class="chosen-section-label">Section: </span>
+                            <span class="chosen-section-name" id="chosenSectionName3"></span>
+                        </div>
+
+                        <div class="review-checks" id="reviewChecks">
+                            <!-- Review issues will appear here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <div class="wizard-footer">
+                    <div class="wizard-footer-left">
+                        <a href="#" class="help-link">Help / policies</a>
+                    </div>
+                    <div class="wizard-footer-right">
+                        <button class="wizard-btn-back" id="wizardBack" style="display: none;">Back</button>
+                        <button class="wizard-btn-skip" id="wizardSkip" style="display: none;">Skip for now</button>
+                        <button class="wizard-btn-cancel" id="wizardCancel">Cancel</button>
+                        <button class="wizard-btn-continue" id="wizardContinue" disabled>Continue</button>
+                        <button class="wizard-btn-insert" id="wizardInsert" style="display: none;" disabled>Finish</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Floating Source Palette -->
+        <div class="source-palette" id="sourcePalette" style="display: none;">
+            <div class="source-palette-header">
+                <span class="source-palette-title">Sources</span>
+                <button class="source-palette-close" id="sourcePaletteClose" title="Close">×</button>
+            </div>
+            <div class="source-palette-content" id="sourcePaletteContent">
+                <!-- Source statements will appear here -->
+            </div>
         </div>
     </div>
 
