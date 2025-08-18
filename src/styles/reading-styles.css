@@ -1,0 +1,245 @@
+/* ABOUTME: Core reading mode styles for Wikipedia-like article display */
+/* ABOUTME: Provides typography, layout, and visual hierarchy for article content */
+
+/* Base article layout */
+.content-wrap {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 20px;
+  line-height: 1.6;
+}
+
+.tagline {
+  font-size: 0.875rem;
+  color: #54595d;
+  margin: 8px 0 16px 0;
+  font-style: italic;
+}
+
+/* Article content */
+.article-content {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: #202122;
+}
+
+.article-section {
+  margin-bottom: 24px;
+}
+
+.article-section__title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #202122;
+  margin: 24px 0 12px 0;
+  border-bottom: 1px solid #a2a9b1;
+  padding-bottom: 4px;
+}
+
+.article-section__content p {
+  margin-bottom: 12px;
+}
+
+.article-section__content p:last-child {
+  margin-bottom: 0;
+}
+
+/* Typography */
+.article-content strong {
+  font-weight: 600;
+}
+
+.article-content ul,
+.article-content ol {
+  margin: 12px 0;
+  padding-left: 24px;
+}
+
+.article-content li {
+  margin-bottom: 4px;
+}
+
+/* Page header */
+.page-header {
+  background: #ffffff;
+  border-bottom: 1px solid #a2a9b1;
+  margin-bottom: 16px;
+  padding: 16px 20px 0;
+}
+
+.firstHeading {
+  font-size: 2rem;
+  font-weight: 400;
+  color: #202122;
+  margin: 0 0 12px 0;
+  font-family: Georgia, serif;
+}
+
+.page-tabs-wrapper {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: -1px;
+}
+
+/* Namespace tabs */
+.ns-tabs {
+  display: flex;
+  gap: 0;
+}
+
+.ns-tab {
+  background: none;
+  border: none;
+  padding: 6px 12px;
+  font-size: 0.875rem;
+  color: #0645ad;
+  cursor: pointer;
+  border-radius: 4px 4px 0 0;
+  margin-right: 1px;
+}
+
+.ns-tab.active {
+  background: #ffffff;
+  color: #202122;
+  border: 1px solid #a2a9b1;
+  border-bottom: 1px solid #ffffff;
+}
+
+/* Page actions */
+.page-actions {
+  display: flex;
+  gap: 0;
+}
+
+.action-tab {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  padding: 8px 12px;
+  font-size: 0.875rem;
+  color: #0645ad;
+  cursor: pointer;
+  border-radius: 4px 4px 0 0;
+  margin-left: 1px;
+  transition: all 0.2s ease;
+}
+
+.action-tab.active {
+  background: #ffffff;
+  color: #202122;
+  border: 1px solid #a2a9b1;
+  border-bottom: 1px solid #ffffff;
+}
+
+.action-tab:hover:not(.active) {
+  background: #eaecf0;
+}
+
+.action-tab.star {
+  color: #fc3;
+}
+
+.action-tab-icon {
+  font-size: 0.875rem;
+}
+
+/* VE interface styles */
+.ve-interface {
+  width: 100%;
+}
+
+.ve-content-wrap {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.surface {
+  margin-top: 16px;
+}
+
+#editor {
+  min-height: 400px;
+  border: 1px solid #a2a9b1;
+  border-radius: 2px;
+  padding: 16px;
+  background: #ffffff;
+  font-family: Georgia, serif;
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+
+#editor:focus-within {
+  border-color: #3366cc;
+  box-shadow: 0 0 0 1px #3366cc;
+}
+
+.status {
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.75rem;
+  color: #54595d;
+}
+
+.badge {
+  background: #eaecf0;
+  padding: 2px 6px;
+  border-radius: 10px;
+  font-weight: 500;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .content-wrap,
+  .ve-content-wrap {
+    padding: 0 12px;
+  }
+  
+  .page-header {
+    padding: 12px 12px 0;
+  }
+  
+  .firstHeading {
+    font-size: 1.5rem;
+  }
+  
+  .page-tabs-wrapper {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+  
+  .ns-tabs,
+  .page-actions {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .action-tab-text {
+    display: none;
+  }
+  
+  .action-tab {
+    min-width: 40px;
+    justify-content: center;
+  }
+}
+
+/* Print styles */
+@media print {
+  .page-header,
+  .ve-strip {
+    display: none;
+  }
+  
+  .article-content {
+    font-size: 12pt;
+    line-height: 1.5;
+  }
+}

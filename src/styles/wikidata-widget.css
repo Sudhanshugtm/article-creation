@@ -1,0 +1,157 @@
+/* ABOUTME: Styles for Wikidata integration widgets and smart suggestions */
+/* ABOUTME: Provides visual styling for data-driven article enhancement features */
+
+.smart-widget {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 1000;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.3s ease;
+}
+
+.smart-widget.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.smart-widget__trigger {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #3366cc;
+  color: white;
+  border: none;
+  padding: 12px 16px;
+  border-radius: 24px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 500;
+  box-shadow: 0 4px 16px rgba(51, 102, 204, 0.3);
+  transition: all 0.2s ease;
+}
+
+.smart-widget__trigger:hover {
+  background: #2a4b8d;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(51, 102, 204, 0.4);
+}
+
+.smart-widget__icon {
+  font-size: 1rem;
+}
+
+.smart-widget__text {
+  white-space: nowrap;
+}
+
+/* Wikidata info boxes */
+.wikidata-infobox {
+  float: right;
+  width: 300px;
+  margin: 0 0 16px 16px;
+  background: #f8f9fa;
+  border: 1px solid #a2a9b1;
+  border-radius: 6px;
+  padding: 16px;
+  font-size: 0.875rem;
+}
+
+.wikidata-infobox h3 {
+  margin: 0 0 12px 0;
+  font-size: 1rem;
+  color: #202122;
+  text-align: center;
+}
+
+.wikidata-property {
+  display: flex;
+  margin-bottom: 8px;
+  align-items: flex-start;
+}
+
+.wikidata-property-label {
+  font-weight: 600;
+  color: #54595d;
+  width: 40%;
+  margin-right: 8px;
+}
+
+.wikidata-property-value {
+  flex: 1;
+  color: #202122;
+}
+
+.wikidata-property-value a {
+  color: #0645ad;
+  text-decoration: none;
+}
+
+.wikidata-property-value a:hover {
+  text-decoration: underline;
+}
+
+/* Entity suggestions */
+.entity-suggestion {
+  background: #f0f4ff;
+  border: 1px solid #3366cc;
+  border-radius: 4px;
+  padding: 8px 12px;
+  margin: 8px 0;
+  position: relative;
+}
+
+.entity-suggestion::before {
+  content: "💡";
+  position: absolute;
+  left: -8px;
+  top: -8px;
+  background: #3366cc;
+  color: white;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+}
+
+.entity-suggestion-text {
+  font-size: 0.875rem;
+  color: #202122;
+  margin-bottom: 4px;
+}
+
+.entity-suggestion-source {
+  font-size: 0.75rem;
+  color: #54595d;
+  font-style: italic;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .smart-widget {
+    bottom: 16px;
+    right: 16px;
+  }
+  
+  .smart-widget__text {
+    display: none;
+  }
+  
+  .smart-widget__trigger {
+    padding: 12px;
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    justify-content: center;
+  }
+  
+  .wikidata-infobox {
+    float: none;
+    width: auto;
+    margin: 16px 0;
+  }
+}

@@ -727,6 +727,16 @@
       min-width: 140px;
     }
 
+    /* Fix for toolbar button SVG icons - ensure they inherit text color */
+    .cdx-button__icon svg {
+      fill: currentColor !important;
+    }
+    
+    /* Remove background color from button icons when they contain SVG */
+    .cdx-button__icon:has(svg) {
+      background-color: transparent !important;
+    }
+
     /* Wikipedia-style Desktop Toolbar */
     .wikipedia-toolbar {
       display: none;
