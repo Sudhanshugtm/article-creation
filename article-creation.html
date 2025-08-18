@@ -495,18 +495,8 @@
     
     @media (max-width: 768px) {
       .article-creator__global-toolbar {
-        padding: 8px 12px !important;
-        width: 100% !important;
-        max-width: 100% !important;
-        margin: 0 0 12px !important;
-        box-sizing: border-box !important;
-        flex-wrap: wrap !important; /* allow wrapping instead of horizontal scroll */
-        gap: 8px 8px !important; /* row and column gap */
-        overflow-x: hidden !important; /* prevent page-level horizontal scroll */
+        padding: 8px 16px !important;
       }
-      .article-editor__tool { flex: 0 0 auto !important; }
-      /* Keep Next visible without forcing horizontal overflow */
-      #nextBtn { order: 99; margin-left: 0 !important; }
     }
     
     /* Direct targeting approaches for toolbar spacing */
@@ -584,29 +574,6 @@
     }
     .article-lead { margin-bottom: 8px; color: var(--color-base, #202122); }
     .article-editor__chips { margin-top: 4px; display: flex; gap: 8px; }
-    /* Hint chip inside editor chips container */
-    .editor-chip-hint {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 12px;
-      background: var(--background-color-interactive-subtle, #f8f9fa);
-      border: none;
-      border-radius: 16px;
-      color: var(--color-base30, #72777d);
-      font-size: 13px;
-      line-height: 1.3;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.04);
-      width: fit-content;
-      max-width: 90%;
-      margin-top: 10px;
-      flex-shrink: 0;
-      word-wrap: break-word;
-      white-space: normal;
-    }
-    .editor-chip-break { flex-basis: 100%; height: 0; }
-    .editor-chip-hint__icon { font-size: 14px; }
-    .editor-chip-hint__text { display: inline-block; }
     /* Toolbar layout improvements */
     .article-creator__global-toolbar { flex-wrap: nowrap !important; }
     .article-editor__tool { flex: 0 0 auto !important; min-width: 0 !important; }
@@ -770,24 +737,12 @@
       background-color: transparent !important;
     }
 
-    /* Sparkle button coloring (desktop and mobile) */
-    #suggestionsBtn .cdx-button__icon,
-    #suggestionsBtnMobile .cdx-button__icon { color: #b8860b !important; }
-    #suggestionsBtn .cdx-button__icon svg,
-    #suggestionsBtnMobile .cdx-button__icon svg { fill: currentColor !important; }
-    #suggestionsBtn:hover .cdx-button__icon,
-    #suggestionsBtnMobile:hover .cdx-button__icon { color: #996c09 !important; }
-    #suggestionsBtn:active .cdx-button__icon,
-    #suggestionsBtnMobile:active .cdx-button__icon,
-    #suggestionsBtn:focus-visible .cdx-button__icon,
-    #suggestionsBtnMobile:focus-visible .cdx-button__icon { color: #8a6b08 !important; }
-
     /* Wikipedia-style Desktop Toolbar */
     .wikipedia-toolbar {
       display: none;
       background: transparent;
       border-bottom: none;
-      padding: 8px 0; /* align left edge with title/editor */
+      padding: 8px 24px;
       position: sticky;
       top: 0;
       z-index: 100;
@@ -799,55 +754,22 @@
     .wikipedia-toolbar__inner {
       display: flex;
       align-items: center;
-      justify-content: space-between; /* Spread groups across available width */
       gap: 8px;
       width: 100%;
-      max-width: 800px; /* match editor/title width */
-      margin: 0 auto;   /* center to align with title/editor */
-      padding: 0;       /* no extra inset */
+      max-width: none;
+      margin: 0;
     }
 
     .toolbar-group {
       display: flex;
       align-items: center;
-      justify-content: center; /* Center items within each group */
       gap: 4px;
       padding-right: 8px;
       border-right: 1px solid #c8ccd1;
-      flex: 1 1 0; /* Distribute groups evenly across width */
-      min-width: 0; /* Allow shrinking without overflow */
-    }
-
-    /* Ensure toolbar buttons align consistently (icon-only and icon+text) */
-    .toolbar-tool.cdx-button {
-      display: inline-flex !important;
-      align-items: center !important;
-      gap: 6px !important;
-      height: 32px !important; /* normalize medium size height */
-      line-height: 1 !important;
-      white-space: nowrap !important;
-    }
-    .toolbar-tool .cdx-button__icon {
-      display: inline-flex !important;
-      align-items: center !important;
-      justify-content: center !important;
-      width: 16px !important;
-      height: 16px !important;
-      min-width: 16px !important;
-    }
-    .toolbar-tool .cdx-button__text {
-      line-height: 1 !important;
-      display: inline-block !important;
     }
 
     .toolbar-group:last-child {
       border-right: none;
-    }
-
-    /* Remove trailing separator for the Suggestions group specifically */
-    .toolbar-group--suggestions {
-      border-right: none !important;
-      padding-right: 0 !important;
     }
 
     .toolbar-group--save {
@@ -866,8 +788,6 @@
     .toolbar-spacer {
       flex: 1;
     }
-    /* When using space-between, spacer is unnecessary in Wikipedia toolbar */
-    .wikipedia-toolbar__inner .toolbar-spacer { display: none; }
 
     /* Format and Insert dropdowns */
     .toolbar-group .cdx-select {
@@ -977,13 +897,7 @@
       .article-creator__main {
         max-width: 1200px;
         margin: 0 auto;
-        padding: 0 40px 20px 0; /* remove left padding for better alignment */
-      }
-
-      /* Align desktop title with editor content left edge */
-      .desktop-title-section__inner {
-        max-width: 800px; /* match .article-editor width */
-        padding: 0;       /* remove side padding so text aligns exactly */
+        padding: 0 40px 20px;
       }
 
       /* Desktop article editor adjustments */
@@ -1009,21 +923,14 @@
 
       /* Position chips correctly below content */
       .article-creator--editing .article-editor__chips {
-        margin-top: 20px;
-        padding-top: 0;
-        justify-content: flex-start;
-        width: 100%;
-        margin-left: 0;
-        margin-right: 0;
+        margin-top: 24px;
+        padding-top: 16px;
+        border-top: 1px solid #eaecf0;
+        justify-content: center;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
       }
-      
-      /* Sparkle icon: improve contrast (gold → darker goldenrod) */
-      #suggestionsBtn .cdx-button__icon { color: #b8860b !important; }
-      #suggestionsBtn .cdx-button__icon svg { fill: currentColor !important; }
-      #suggestionsBtn:hover .cdx-button__icon { color: #996c09 !important; }
-      #suggestionsBtn:active .cdx-button__icon,
-      #suggestionsBtn:focus-visible .cdx-button__icon { color: #8a6b08 !important; }
-      
     }
   </style>
   
@@ -1115,9 +1022,9 @@
     })();
   </script>
   <!-- Dev-friendly sources for local; Vite will rewrite on build -->
-  <script type="module" crossorigin src="/article-creation/assets/prototype-BfkQnvNr.js"></script>
+  <script type="module" crossorigin src="/article-creation/assets/prototype-BK2m0qQS.js"></script>
   <link rel="modulepreload" crossorigin href="/article-creation/assets/modulepreload-polyfill-B5Qt9EMX.js">
-  <link rel="stylesheet" crossorigin href="/article-creation/assets/codex-DBdVX30Q.css">
+  <link rel="stylesheet" crossorigin href="/article-creation/assets/codex-B5m2OaX5.css">
   <link rel="stylesheet" crossorigin href="/article-creation/assets/section-expansion-Qg1vSYNK.css">
 </head>
 <body>
@@ -1142,10 +1049,6 @@
                 <span class="cdx-button__icon"></span>
             </button>
             <button class="cdx-button cdx-button--action-default cdx-button--weight-quiet cdx-button--size-medium article-editor__tool" id="undoBtn" title="Undo">
-                <span class="cdx-button__icon"></span>
-            </button>
-            <!-- Mobile Suggestions (sparkle) button -->
-            <button class="cdx-button cdx-button--action-default cdx-button--weight-quiet cdx-button--size-medium article-editor__tool" id="suggestionsBtnMobile" title="Toggle Writing Suggestions" aria-label="Show or hide writing suggestion chips">
                 <span class="cdx-button__icon"></span>
             </button>
             <button class="cdx-button cdx-button--action-default cdx-button--weight-quiet cdx-button--size-medium article-editor__tool" id="moreBtn" title="More">
@@ -1178,6 +1081,18 @@
                     </button>
                 </div>
 
+                <!-- Format Group -->
+                <div class="toolbar-group toolbar-group--format">
+                    <div class="cdx-select">
+                        <select class="cdx-select__input" id="formatSelect">
+                            <option value="paragraph">Paragraph</option>
+                            <option value="heading">Heading</option>
+                            <option value="subheading1">Sub-heading 1</option>
+                            <option value="subheading2">Sub-heading 2</option>
+                            <option value="subheading3">Sub-heading 3</option>
+                        </select>
+                    </div>
+                </div>
 
                 <!-- Style Group -->
                 <div class="toolbar-group toolbar-group--style">
@@ -1203,17 +1118,28 @@
                     </button>
                 </div>
 
-                <!-- Suggestions Group -->
-                <div class="toolbar-group toolbar-group--suggestions">
-                    <button class="cdx-button cdx-button--action-default cdx-button--weight-quiet cdx-button--size-medium toolbar-tool" id="suggestionsBtn" title="Toggle Writing Suggestions" aria-label="Show or hide writing suggestion chips">
-                        <span class="cdx-button__icon"></span>
-                        <span class="cdx-button__text">Suggestions</span>
-                    </button>
+                <!-- Insert Group -->
+                <div class="toolbar-group toolbar-group--insert">
+                    <div class="cdx-select">
+                        <select class="cdx-select__input" id="insertSelect">
+                            <option value="">Insert</option>
+                            <option value="image">Images and media</option>
+                            <option value="template">Template</option>
+                            <option value="table">Table</option>
+                            <option value="reference">References list</option>
+                        </select>
+                    </div>
                 </div>
 
                 <!-- Spacer -->
                 <div class="toolbar-spacer"></div>
 
+                <!-- Save Group -->
+                <div class="toolbar-group toolbar-group--save">
+                    <button class="cdx-button cdx-button--action-progressive cdx-button--weight-primary cdx-button--size-medium toolbar-tool" id="publishBtn" title="Publish page... ⌘S">
+                        <span class="cdx-button__text">Publish page...</span>
+                    </button>
+                </div>
             </div>
         </div>
         
